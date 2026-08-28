@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.19</title>
+<title>Kollaudierung – V6.21</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.19 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.21 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.19 alter Testhinweis entfernt ===== */
+/* ===== V6.21 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.19 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.21 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1163,7 +1163,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.19 HINWEISE / TEXTE ===== */
+/* ===== V6.21 HINWEISE / TEXTE ===== */
 #autoPlanLinkSummary{line-height:1.25}
 #autoPlanLinkMeta{line-height:1.35}
 #draftEntrySummary .fsCell .smallHint{
@@ -1174,9 +1174,145 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.19 EINHEITLICHE BEGRIFFE ===== */
+/* ===== V6.21 EINHEITLICHE BEGRIFFE ===== */
 .terminologyHint{
   line-height:1.4;
+}
+
+
+/* ===== V6.21 LETZTE ERFASSUNGEN ===== */
+.v620RecentTable{
+ table-layout:fixed!important;
+ width:100%!important;
+ min-width:0!important;
+}
+.v620RecentTable th,
+.v620RecentTable td{
+ vertical-align:top!important;
+}
+.v620RecentTable th:nth-child(1){width:7%!important}
+.v620RecentTable th:nth-child(2){width:18%!important}
+.v620RecentTable th:nth-child(3){width:31%!important}
+.v620RecentTable th:nth-child(4){width:17%!important}
+.v620RecentTable th:nth-child(5){width:10%!important}
+.v620RecentTable th:nth-child(6){width:9%!important}
+.v620RecentTable th:nth-child(7){width:8%!important}
+
+.v620RecentTable .entryBlock{
+ border-top:2px solid #c8d6de;
+}
+.v620RecentTable .entryBlock td{
+ padding-top:10px!important;
+ padding-bottom:10px!important;
+}
+.v620RecentTable .entryIdCell{
+ text-align:center;
+}
+.v620RecentTable .entryIdBadge{
+ min-width:34px;
+ min-height:34px;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ font-size:14px;
+}
+.v620Desc{
+ font-weight:700;
+ line-height:1.25;
+ overflow-wrap:anywhere;
+}
+.v620LvWrap{
+ display:flex;
+ flex-direction:column;
+ gap:0;
+}
+.v620LvRow{
+ display:grid;
+ grid-template-columns:92px 1fr;
+ gap:10px;
+ padding:5px 0;
+ border-bottom:1px solid #e5ecef;
+ align-items:start;
+}
+.v620LvRow:last-child{border-bottom:0}
+.v620LvCode{
+ font-weight:800;
+ white-space:nowrap;
+}
+.v620LvText{
+ overflow-wrap:anywhere;
+ line-height:1.25;
+}
+.v620QtyWrap{
+ display:flex;
+ flex-direction:column;
+ gap:0;
+}
+.v620QtyRow{
+ min-height:34px;
+ padding:5px 0;
+ border-bottom:1px solid #e5ecef;
+}
+.v620QtyRow:last-child{border-bottom:0}
+.v620QtyMain{
+ font-weight:800;
+ line-height:1.2;
+}
+.v620QtyCalc{
+ font-size:10px;
+ color:var(--muted);
+ margin-top:2px;
+}
+.v620ActionStack{
+ display:flex;
+ flex-direction:column;
+ gap:7px;
+ align-items:stretch;
+ min-width:132px;
+}
+.v620ActionStack button{
+ width:100%;
+ white-space:nowrap;
+}
+.v620DeleteBtn{
+ background:#fff0f0!important;
+ border-color:#d9a3a3!important;
+ color:#9c2222!important;
+}
+.v620DeleteBtn:hover{
+ background:#ffe3e3!important;
+}
+@media(max-width:800px){
+ .v620RecentTable{min-width:900px!important}
+ .v620ActionStack{min-width:120px}
+}
+
+
+/* ===== V6.21 ID-AUSWAHL IM AUFMASSBLATT ===== */
+.v621SheetIdToolbar{
+ display:flex;
+ align-items:flex-end;
+ gap:10px;
+ margin-top:10px;
+ padding:10px;
+ border:1px solid var(--line);
+ border-radius:9px;
+ background:#f8fafb;
+}
+.v621SelectWrap{flex:1;min-width:220px}
+.v621SelectWrap label{
+ display:block;
+ font-size:11px;
+ font-weight:700;
+ color:var(--muted);
+ margin-bottom:4px;
+}
+.v621SheetIdActions{display:flex;gap:8px}
+.v621SheetIdActions button{min-width:120px}
+@media(max-width:700px){
+ .v621SheetIdToolbar{flex-direction:column;align-items:stretch}
+ .v621SheetIdActions{width:100%}
+ .v621SheetIdActions button{flex:1;min-width:0}
 }
 
 </style>
@@ -1193,7 +1329,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.19version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.21version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1209,7 +1345,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.19</h1>
+   <h1>Kollaudierung – V6.21</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -1564,6 +1700,19 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
      <label style="margin-top:8px">Aufmaßblatt anzeigen</label>
      <select id="sheetViewSelect" onchange="changeSheetFromView()"></select>
      <div id="sheetTitle" class="small" style="margin-top:4px"></div>
+
+     <div class="v621SheetIdToolbar noPrint">
+      <div class="v621SelectWrap">
+       <label for="sheetEntryIdSelect">Erfassungs-ID auswählen</label>
+       <select id="sheetEntryIdSelect" onchange="v621SheetIdSelectionChanged()">
+        <option value="">– ID auswählen –</option>
+       </select>
+      </div>
+      <div class="v621SheetIdActions">
+       <button type="button" class="secondary" id="sheetEditIdBtn" onclick="v621EditSelectedSheetId()" disabled>Bearbeiten</button>
+       <button type="button" class="danger" id="sheetDeleteIdBtn" onclick="v621DeleteSelectedSheetId()" disabled>ID löschen</button>
+      </div>
+     </div>
     </div>
     <div class="toolbar">
      <label class="exportOption"><input id="exportBillingSummary" type="checkbox" checked> Abrechnungsaufstellung</label>
@@ -9887,7 +10036,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.19 MULTI-LV ================= */
+/* ================= V6.21 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10086,7 +10235,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.19 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.21 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10666,13 +10815,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.19 Gruppenmigration",e)}
+}catch(e){console.warn("V6.21 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.19 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.21 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -10778,7 +10927,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.19 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.21 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -10825,13 +10974,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.19 Migration",e)}
+}catch(e){console.warn("V6.21 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.19 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.21 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -11067,13 +11216,13 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.19 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.21 Gruppendarstellung",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.19 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   V6.21 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
    ============================================================ */
 
 function v615OrderedEntryGroups(){
@@ -11195,7 +11344,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.19 ID-Kompaktierung",e)}
+  }catch(e){console.warn("V6.21 ID-Kompaktierung",e)}
   return r;
 };
 
@@ -11249,13 +11398,13 @@ try{
   renderDraftEntrySummary?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.19 Startmigration",e)}
+}catch(e){console.warn("V6.21 Startmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.19 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
+   V6.21 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
    ============================================================ */
 
 function v616DraftLvItems(){
@@ -11421,7 +11570,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.19 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
+   V6.21 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
    ============================================================ */
 
 function v618GroupForId(id){
@@ -11581,7 +11730,7 @@ finalizeCurrentEntry=function(){
     }
     return result;
   }catch(err){
-    console.error("V6.19 Erfassung speichern",err);
+    console.error("V6.21 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -11606,7 +11755,7 @@ editEntry=function(id){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.19 Erfassung bearbeiten",err);
+    console.error("V6.21 Erfassung bearbeiten",err);
     alert("Erfassung konnte nicht zum Bearbeiten geöffnet werden: "+(err?.message||err));
   }
 };
@@ -11698,13 +11847,13 @@ try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.19 Datenkonsistenz",e)}
+}catch(e){console.warn("V6.21 Datenkonsistenz",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.19 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
+   V6.21 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
    ============================================================ */
 
 let v619IdMaintenanceRunning=false;
@@ -12015,7 +12164,7 @@ finalizeCurrentEntry=function(){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.19 Erfassung speichern",err);
+    console.error("V6.21 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -12025,12 +12174,243 @@ finalizeCurrentEntry=function(){
   }
 };
 
-/* Repair current project once after loading V6.19. */
+/* Repair current project once after loading V6.21. */
 try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.19 ID-Reparatur",e)}
+}catch(e){console.warn("V6.21 ID-Reparatur",e)}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.21 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
+   ============================================================ */
+
+function v620RecentLvHtml(group){
+  return `<div class="v620LvWrap">${group.map(e=>{
+    const pos=getPos(e.pos);
+    return `<div class="v620LvRow">
+      <div class="v620LvCode">${esc(e.pos)}</div>
+      <div class="v620LvText">${esc(pos?.text||"")}</div>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+function v620RecentQtyHtml(group){
+  return `<div class="v620QtyWrap">${group.map(e=>`
+    <div class="v620QtyRow">
+      <div class="v620QtyMain">${num(e.qty)} ${esc(e.unit||"")}</div>
+      <div class="v620QtyCalc">${esc(e.calc||"")}</div>
+    </div>`).join("")}</div>`;
+}
+
+renderRecent=function(){
+  const all=sortedSheetEntries();
+  const groups=[];
+  const seen=new Set();
+
+  for(const e of all.slice().reverse()){
+    const key=v612GroupKey(e);
+    if(seen.has(key))continue;
+    seen.add(key);
+    const g=v612GroupEntries(e);
+    if(g.length)groups.push(g);
+    if(groups.length>=12)break;
+  }
+
+  const body=document.getElementById("recentBody");
+  const table=body?.closest("table");
+  if(!body||!table)return;
+
+  table.classList.add("v620RecentTable");
+
+  const head=table.querySelector("thead");
+  if(head){
+    head.innerHTML=`
+      <tr>
+       <th>ID</th>
+       <th>Beschreibung</th>
+       <th>LV-Unterposition(en)</th>
+       <th>Menge / Rechenansatz</th>
+       <th>Status</th>
+       <th>Anmerkung</th>
+       <th>Aktionen</th>
+      </tr>`;
+  }
+
+  if(!groups.length){
+    body.innerHTML='<tr><td colspan="7" class="empty">Noch keine Erfassungen im aktiven Aufmaßblatt.</td></tr>';
+    return;
+  }
+
+  body.innerHTML=groups.map(group=>{
+    const anchor=v618GroupAnchor?.(group)||group[0];
+    const id=entryDisplayId(anchor);
+    const desc=anchor.lineDesc||"";
+    const detail=anchor.detail||"";
+    const status=anchor.reason||"";
+    const note=anchor.note||"";
+
+    return `<tr class="entryBlock">
+      <td class="entryIdCell">
+        <span class="entryIdBadge">${id}</span>
+      </td>
+      <td>
+        <div class="v620Desc">${esc(desc)}</div>
+        ${detail?`<div class="small" style="margin-top:5px">${esc(detail)}</div>`:""}
+      </td>
+      <td>${v620RecentLvHtml(group)}</td>
+      <td>${v620RecentQtyHtml(group)}</td>
+      <td>${esc(status)}</td>
+      <td class="wrap">${esc(note)}</td>
+      <td>
+        <div class="v620ActionStack">
+          <button class="secondary" onclick="editEntry('${anchor.id}')">Bearbeiten</button>
+          <button class="okBtn" onclick="markEntryOnPlan('${anchor.id}')">Planmarkierung bearbeiten</button>
+          <button class="danger v620DeleteBtn" onclick="deleteEntry('${anchor.id}')">ID löschen</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+};
+
+/* Ensure refreshed display immediately */
+try{renderRecent?.()}catch(e){}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.21 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
+   ============================================================ */
+
+function v621CurrentSheetViewIds(){
+  const p=project(); if(!p)return[];
+  const sel=document.getElementById("sheetViewSelect");
+  const val=sel?.value||"";
+
+  if(val==="all" || val==="__all__" || val==="ALL"){
+    return (p.sheets||[]).map(sh=>sh.id);
+  }
+
+  /* Some versions use a synthetic "all" option label instead of a fixed value. */
+  if(sel){
+    const opt=sel.options[sel.selectedIndex];
+    const txt=(opt?.textContent||"").trim().toLowerCase();
+    if(txt==="alle" || txt.includes("alle aufmaßblätter") || txt.includes("alle blätter")){
+      return (p.sheets||[]).map(sh=>sh.id);
+    }
+  }
+
+  const sh=activeSheet();
+  return sh?[sh.id]:[];
+}
+
+function v621VisibleIdGroups(){
+  const p=project(); if(!p)return[];
+  const sheetIds=v621CurrentSheetViewIds();
+  const groups=[],seen=new Set();
+
+  for(const e of (p.entries||[])){
+    if(sheetIds.length && !sheetIds.includes(e.sheetId))continue;
+    const key=v612GroupKey(e);
+    if(seen.has(key))continue;
+    seen.add(key);
+    const g=v612GroupEntries(e);
+    if(g.length)groups.push(g);
+  }
+
+  groups.sort((a,b)=>{
+    const ai=entryDisplayId(a[0]),bi=entryDisplayId(b[0]);
+    if(ai!==bi)return ai-bi;
+    return String(a[0]?.lineDesc||"").localeCompare(String(b[0]?.lineDesc||""));
+  });
+  return groups;
+}
+
+function v621PopulateSheetIdSelect(){
+  const sel=document.getElementById("sheetEntryIdSelect");
+  if(!sel)return;
+
+  const old=sel.value;
+  const groups=v621VisibleIdGroups();
+
+  sel.innerHTML='<option value="">– ID auswählen –</option>'+
+    groups.map(g=>{
+      const a=v618GroupAnchor?.(g)||g[0];
+      const id=entryDisplayId(a);
+      const sh=project().sheets.find(x=>x.id===a.sheetId);
+      const desc=a.lineDesc||"";
+      const text=`ID ${id} · ${desc}${sh?.code?` · ${sh.code}`:""}`;
+      return `<option value="${esc(a.id)}">${esc(text)}</option>`;
+    }).join("");
+
+  if(old && [...sel.options].some(o=>o.value===old))sel.value=old;
+  else sel.value="";
+
+  v621SheetIdSelectionChanged();
+}
+
+function v621SelectedEntry(){
+  const id=document.getElementById("sheetEntryIdSelect")?.value;
+  return id?project()?.entries?.find(x=>x.id===id):null;
+}
+
+function v621SheetIdSelectionChanged(){
+  const has=!!v621SelectedEntry();
+  const edit=document.getElementById("sheetEditIdBtn");
+  const del=document.getElementById("sheetDeleteIdBtn");
+  if(edit)edit.disabled=!has;
+  if(del)del.disabled=!has;
+}
+
+function v621EditSelectedSheetId(){
+  const e=v621SelectedEntry(); if(!e)return;
+  project().activeSheetId=e.sheetId;
+  persist();
+  try{renderSheetSelect?.()}catch(err){}
+  try{
+    editEntry(e.id);
+    showView("entry");
+  }catch(err){
+    console.error(err);
+    alert("Erfassungs-ID konnte nicht geöffnet werden.");
+  }
+}
+
+function v621DeleteSelectedSheetId(){
+  const e=v621SelectedEntry(); if(!e)return;
+  const sel=document.getElementById("sheetEntryIdSelect");
+  deleteEntry(e.id);
+  if(sel)sel.value="";
+  try{v621PopulateSheetIdSelect()}catch(err){}
+  try{renderSheet?.()}catch(err){}
+  try{renderRecent?.()}catch(err){}
+}
+
+/* Keep the dropdown current whenever sheet view is rendered. */
+const _v621RenderSheetBase=renderSheet;
+renderSheet=function(){
+  const r=_v621RenderSheetBase();
+  try{v621PopulateSheetIdSelect()}catch(e){}
+  return r;
+};
+
+/* changeSheetFromView is the actual selector handler in this app. */
+if(typeof changeSheetFromView==="function"){
+  const _v621ChangeSheetFromView=changeSheetFromView;
+  changeSheetFromView=function(){
+    const r=_v621ChangeSheetFromView.apply(this,arguments);
+    setTimeout(()=>{try{v621PopulateSheetIdSelect()}catch(e){}},0);
+    return r;
+  };
+}
+
+window.addEventListener("load",()=>{
+  try{v621PopulateSheetIdSelect()}catch(e){}
+});
 </script>
 
 </body>
