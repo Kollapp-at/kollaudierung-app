@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.10</title>
+<title>Kollaudierung – V6.12</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.10 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.12 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1095,6 +1095,12 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
  .multiLvBox .toolbar button{width:100%}
 }
 
+
+/* ===== V6.12 alter Testhinweis entfernt ===== */
+.notice.noPrint{
+  display:none !important;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1109,7 +1115,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.10version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.12version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1125,7 +1131,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.10</h1>
+   <h1>Kollaudierung – V6.12</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -1236,10 +1242,10 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
     <div class="multiLvBox" id="multiLvBox">
      <div class="toolbar" style="justify-content:space-between;align-items:center">
       <div>
-       <b>Mehrere LV-Positionen zur selben Beschreibung</b>
-       <div class="small">Aktuelle LV-Position und Rechenansatz übernehmen, danach die nächste Position auswählen.</div>
+       <b>LV-Positionen dieser Erfassung</b>
+       <div class="small">Eine Erfassung kann mehrere LV-Positionen enthalten. Alle gehören zur selben ID.</div>
       </div>
-      <button type="button" class="secondary" onclick="addCurrentLvToBatch()">+ LV-Position übernehmen</button>
+      <button type="button" class="secondary" onclick="addCurrentLvToBatch()">+ LV-Position hinzufügen</button>
      </div>
      <div id="multiLvList" class="multiLvList">
       <div class="small">Noch keine zusätzlichen LV-Positionen vorgemerkt.</div>
@@ -9798,7 +9804,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.10 MULTI-LV ================= */
+/* ================= V6.12 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -9992,6 +9998,592 @@ cancelEdit=function(){
 };
 
 window.addEventListener("load",()=>renderMultiLvDraft());
+</script>
+
+
+<script>
+/* ============================================================
+   V6.12 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   ============================================================ */
+let v612EditingGroupId=null;
+let v612EditingAnchorId=null;
+
+function v612GroupKey(e){
+  if(!e)return "";
+  return e.multiLvGroup || ("single:"+e.id);
+}
+function v612GroupEntries(entryOrId){
+  const e=typeof entryOrId==="string"
+    ? project()?.entries?.find(x=>x.id===entryOrId)
+    : entryOrId;
+  if(!e)return[];
+  const key=v612GroupKey(e);
+  return (project().entries||[]).filter(x=>v612GroupKey(x)===key)
+    .slice().sort((a,b)=>(a.pos||"").localeCompare(b.pos||""));
+}
+function v612AnchorEntry(entryOrId){
+  const arr=v612GroupEntries(entryOrId);
+  return arr[0]||null;
+}
+function v612NormalizeGroupIds(){
+  const p=project(); if(!p)return;
+  ensureEntryDisplayIds?.();
+
+  const groups=new Map();
+  (p.entries||[]).forEach(e=>{
+    if(!e.multiLvGroup)return;
+    if(!groups.has(e.multiLvGroup))groups.set(e.multiLvGroup,[]);
+    groups.get(e.multiLvGroup).push(e);
+  });
+
+  groups.forEach(arr=>{
+    const valid=arr.map(e=>Number(e.displayId)).filter(n=>Number.isInteger(n)&&n>0);
+    const shared=valid.length?Math.min(...valid):peekNextEntryDisplayId();
+    arr.forEach(e=>assignEntryDisplayId(e,shared));
+  });
+}
+function v612SharedDisplayIdForGroup(entryOrId){
+  const a=v612AnchorEntry(entryOrId);
+  return a?entryDisplayId(a):"";
+}
+function v612GroupLvItems(entryOrId){
+  return v612GroupEntries(entryOrId).map(e=>({
+    entryId:e.id,
+    syncUuid:e.syncUuid,
+    pos:e.pos,
+    text:getPos(e.pos)?.text||"",
+    unit:e.unit||getPos(e.pos)?.unit||"",
+    calc:e.calc||String(e.qty??""),
+    qty:Number(e.qty||0)
+  }));
+}
+function v612SetFormPosition(item){
+  const ps=document.getElementById("posSearch");
+  const sel=document.getElementById("posSelect");
+  const calc=document.getElementById("calc");
+  if(ps)ps.value=item?.pos||"";
+  filterPositions?.();
+  if(sel)sel.value=item?.pos||"";
+  showPosInfo?.();
+  if(calc)calc.value=item?.calc||"";
+  previewCalc?.();
+}
+function v612RenderEditHeadline(){
+  const btn=document.getElementById("saveEntryBtn");
+  if(btn && v612EditingGroupId)btn.textContent=`ID ${v612SharedDisplayIdForGroup(v612EditingAnchorId)} speichern`;
+}
+
+/* Multi-LV list now represents the whole ID while editing. */
+renderMultiLvDraft=function(){
+ const box=document.getElementById("multiLvList");
+ if(!box)return;
+
+ const editMode=!!v612EditingGroupId;
+ if(!multiLvDraft.length){
+   box.innerHTML=`<div class="small">${editMode?"Diese ID enthält derzeit noch keine LV-Position.":"Noch keine zusätzlichen LV-Positionen vorgemerkt."}</div>`;
+   return;
+ }
+
+ box.innerHTML=multiLvDraft.map((x,i)=>`
+   <div class="multiLvItem">
+    <div class="mliPos">${esc(x.pos)}</div>
+    <div class="mliText">${esc(x.text||getPos(x.pos)?.text||"")}</div>
+    <div class="mliCalc"><b>Ansatz:</b> ${esc(x.calc)}</div>
+    <div class="mliQty"><b>${num(x.qty)} ${esc(x.unit)}</b></div>
+    <div class="toolbar">
+      <button type="button" class="secondary" onclick="v612LoadLvItem(${i})">Ändern</button>
+      <button type="button" class="danger" onclick="removeLvFromBatch(${i})">Entfernen</button>
+    </div>
+   </div>`).join("")+
+   `<div class="toolbar"><span class="small"><b>${multiLvDraft.length}</b> LV-Position(en) gehören zu ${editMode?`ID ${v612SharedDisplayIdForGroup(v612EditingAnchorId)}`:"dieser Erfassung"}.</span></div>`;
+};
+
+function v612LoadLvItem(index){
+ const item=multiLvDraft[index]; if(!item)return;
+ multiLvDraft.splice(index,1);
+ renderMultiLvDraft();
+ v612SetFormPosition(item);
+ msg(`LV-Position ${item.pos} zum Ändern geladen.`);
+}
+
+/* In edit mode adding/replacing LV is explicitly allowed. */
+addCurrentLvToBatch=function(){
+ const c=v610CurrentLvCandidate();
+ if(!c.valid){msg(c.message,true);return}
+
+ const same=multiLvDraft.findIndex(x=>x.pos===c.pos);
+ if(same>=0){
+   if(!confirm(`LV-Position ${c.pos} ist bereits enthalten. Rechenansatz und Menge ersetzen?`))return;
+   const prev=multiLvDraft[same];
+   multiLvDraft[same]={...prev,...c};
+ }else{
+   multiLvDraft.push(c);
+ }
+ renderMultiLvDraft();
+ msg(`LV-Position ${c.pos} übernommen.`);
+ document.getElementById("calc").value="";
+ document.getElementById("posSearch").value="";
+ document.getElementById("posSelect").value="";
+ filterPositions?.(); previewCalc?.();
+};
+
+/* One grouped entry gets one common visible ID. */
+v610CreateBatchEntry=function(item,shared){
+ const sh=activeSheet();
+ const pos=getPos(item.pos);
+ const e={
+   id:uid("e"),
+   sheetId:sh.id,
+   lineDesc:shared.lineDesc,
+   lineNo:lineNoFor(shared.lineDesc,sh.id,null),
+   pos:item.pos,
+   calc:item.calc,
+   qty:Number(item.qty),
+   unit:item.unit||pos?.unit||"",
+   detail:shared.detail,
+   reason:shared.reason,
+   note:shared.note,
+   planId:shared.planId||"",
+   updated:new Date().toISOString(),
+   multiLvGroup:shared.groupId
+ };
+ project().entries.push(e);
+ assignEntryDisplayId(e,shared.displayId||null);
+ if(typeof markEntrySyncDirty==="function" && currentAccess?.().mode==="worker"){
+   markEntrySyncDirty(e,true);
+ }else{
+   if(!e.syncUuid)e.syncUuid="entry_"+cryptoSafeId();
+   e.syncRevision=1;
+   e.syncUpdatedAt=new Date().toISOString();
+   e.syncDirty=false;
+ }
+ return e;
+};
+
+function v612ReassignAnnotations(oldIds,newAnchorId){
+  if(!newAnchorId)return;
+  const set=new Set(oldIds);
+  plans().forEach(pl=>{
+    (pl.annotations||[]).forEach(a=>{
+      if(set.has(a.entryId)){
+        a.entryId=newAnchorId;
+        const anchor=project().entries.find(e=>e.id===newAnchorId);
+        if(anchor)a.label=String(entryDisplayId(anchor));
+      }
+    });
+  });
+}
+
+function v612MarkExistingDirty(e,baseRevision){
+  e.updated=new Date().toISOString();
+  if(currentAccess?.().mode==="worker"){
+    if(typeof e.syncBaseRevision!=="number")e.syncBaseRevision=Number(baseRevision||e.syncRevision||1);
+    e.syncRevision=Number(baseRevision||e.syncRevision||1)+1;
+    e.syncDirty=true;
+    e.syncUpdatedAt=new Date().toISOString();
+    e.syncUpdatedBy=currentAccess().user?.id||"";
+    e.syncUpdatedByName=syncUserName?.()||"";
+  }else{
+    e.syncRevision=Number(baseRevision||e.syncRevision||1)+1;
+    e.syncUpdatedAt=new Date().toISOString();
+    e.syncUpdatedBy="MASTER";
+    e.syncUpdatedByName="Master";
+    e.syncMasterChangedSinceSource=true;
+    e.syncDirty=false;
+  }
+}
+
+/* Edit entire ID, not one sub-position. */
+editEntry=function(id){
+ const e=project().entries.find(x=>x.id===id); if(!e)return;
+ const group=v612GroupEntries(e);
+ const groupId=e.multiLvGroup || ("mlv_"+cryptoSafeId());
+ const sharedId=entryDisplayId(e);
+
+ /* Convert old single entry into a proper group as soon as it is edited. */
+ group.forEach(x=>{
+   x.multiLvGroup=groupId;
+   assignEntryDisplayId(x,sharedId);
+ });
+
+ v612EditingGroupId=groupId;
+ v612EditingAnchorId=group[0]?.id||id;
+ editingEntryId=v612EditingAnchorId;
+
+ project().activeSheetId=e.sheetId;
+ renderSheetSelect?.();
+
+ document.getElementById("lineDesc").value=e.lineDesc||"";
+ document.getElementById("detail").value=e.detail||"";
+ document.getElementById("reason").value=e.reason||"";
+ document.getElementById("note").value=e.note||"";
+
+ multiLvDraft=v612GroupLvItems(e);
+ /* The list contains all LV positions. Current position fields start empty so
+    the user can add another one immediately. */
+ document.getElementById("posSearch").value="";
+ document.getElementById("posSelect").value="";
+ document.getElementById("calc").value="";
+ filterPositions?.(); previewCalc?.();
+
+ document.getElementById("entryCard").classList.add("editing");
+ document.getElementById("cancelEditBtn").style.display="inline-block";
+ v612RenderEditHeadline();
+ renderMultiLvDraft();
+ showView("entry");
+ renderDraftEntrySummary?.();
+ window.scrollTo({top:document.getElementById("entryCard").offsetTop-80,behavior:"smooth"});
+};
+
+cancelEdit=function(){
+ editingEntryId=null;
+ v612EditingGroupId=null;
+ v612EditingAnchorId=null;
+ multiLvDraft=[];
+ document.getElementById("entryCard").classList.remove("editing");
+ document.getElementById("saveEntryBtn").textContent="Erfassung speichern";
+ document.getElementById("cancelEditBtn").style.display="none";
+ clearEntryForm(false);
+ renderMultiLvDraft();
+ msg("");
+};
+
+/* Save a whole grouped ID. */
+const _v612PrevFinalize=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+ const fm=document.getElementById("finalizeMessage");
+
+ /* ----- Editing an existing grouped ID ----- */
+ if(v612EditingGroupId){
+   const sh=activeSheet();
+   const lineDesc=document.getElementById("lineDesc")?.value.trim()||"";
+   if(!sh){fm.style.color="#aa3030";fm.textContent="Bitte ein Aufmaßblatt auswählen.";return}
+   if(!lineDesc){fm.style.color="#aa3030";fm.textContent="Bitte eine Positionsbeschreibung eingeben.";return}
+
+   let items=multiLvDraft.slice();
+   const current=v610CurrentLvCandidate();
+   if(current.valid){
+     const ix=items.findIndex(x=>x.pos===current.pos);
+     if(ix>=0)items[ix]={...items[ix],...current};
+     else items.push(current);
+   }
+   if(!items.length){
+     fm.style.color="#aa3030";
+     fm.textContent="Eine Erfassung muss mindestens eine LV-Position enthalten.";
+     return;
+   }
+
+   const oldGroup=project().entries.filter(e=>e.multiLvGroup===v612EditingGroupId);
+   const oldIds=oldGroup.map(e=>e.id);
+   const sharedDisplayId=oldGroup.length?entryDisplayId(oldGroup[0]):currentPlannedEntryDisplayId();
+   const oldByPos=new Map(oldGroup.map(e=>[e.pos,e]));
+   const newEntries=[];
+
+   const shared={
+     lineDesc,
+     detail:document.getElementById("detail")?.value.trim()||"",
+     reason:document.getElementById("reason")?.value||"",
+     note:document.getElementById("note")?.value.trim()||"",
+     planId:document.getElementById("entryPlanSelect")?.value||oldGroup[0]?.planId||"",
+     groupId:v612EditingGroupId,
+     displayId:sharedDisplayId
+   };
+
+   for(const item of items){
+     const existing=oldByPos.get(item.pos);
+     if(existing){
+       const baseRev=Number(existing.syncRevision||1);
+       Object.assign(existing,{
+         sheetId:sh.id,
+         lineDesc:shared.lineDesc,
+         lineNo:oldGroup[0]?.lineNo||existing.lineNo,
+         pos:item.pos,
+         calc:item.calc,
+         qty:Number(item.qty),
+         unit:item.unit||getPos(item.pos)?.unit||"",
+         detail:shared.detail,
+         reason:shared.reason,
+         note:shared.note,
+         planId:shared.planId,
+         multiLvGroup:v612EditingGroupId,
+         displayId:sharedDisplayId
+       });
+       v612MarkExistingDirty(existing,baseRev);
+       newEntries.push(existing);
+       oldByPos.delete(item.pos);
+     }else{
+       newEntries.push(v610CreateBatchEntry(item,shared));
+     }
+   }
+
+   /* Removed LV positions are actually removed from this ID. */
+   const removed=[...oldByPos.values()];
+   const removedIds=removed.map(e=>e.id);
+   if(currentAccess?.().mode==="worker"){
+     removed.forEach(e=>{
+       if(e.syncUuid && Number(e.syncRevision||0)>0){
+         ensureProjectSync().deletedEntries.push({
+           syncUuid:e.syncUuid,
+           baseRevision:Number(e.syncRevision||1),
+           displayId:sharedDisplayId,
+           deletedAt:new Date().toISOString(),
+           deletedBy:currentAccess().user?.id||"",
+           deletedByName:syncUserName?.()||""
+         });
+       }
+     });
+   }
+   project().entries=project().entries.filter(e=>!removedIds.includes(e.id));
+
+   /* Keep all plan markers on the surviving anchor of this ID. */
+   const newAnchor=newEntries[0]?.id;
+   v612ReassignAnnotations([...oldIds,...removedIds],newAnchor);
+   newEntries.forEach(e=>assignEntryDisplayId(e,sharedDisplayId));
+   syncAnnotationLabelsToEntryIds?.();
+
+   editingEntryId=null;
+   v612EditingGroupId=null;
+   v612EditingAnchorId=null;
+   multiLvDraft=[];
+   document.getElementById("entryCard").classList.remove("editing");
+   document.getElementById("saveEntryBtn").textContent="Erfassung speichern";
+   document.getElementById("cancelEditBtn").style.display="none";
+   clearEntryForm(false);
+   renderMultiLvDraft();
+   persist();
+   renderAll?.(); renderSheet?.(); renderRecent?.(); renderLV?.();
+   fm.style.color="#1f7a4d";
+   fm.innerHTML=`ID <b>${sharedDisplayId}</b> aktualisiert · ${newEntries.length} LV-Position(en).`;
+   return;
+ }
+
+ /* ----- Creating a new multi-LV ID ----- */
+ if(multiLvDraft.length){
+   const sh=activeSheet();
+   const lineDesc=document.getElementById("lineDesc")?.value.trim()||"";
+   if(!sh){fm.style.color="#aa3030";fm.textContent="Bitte zuerst ein Aufmaßblatt auswählen.";return}
+   if(!lineDesc){fm.style.color="#aa3030";fm.textContent="Bitte eine Positionsbeschreibung eingeben.";return}
+
+   let items=multiLvDraft.slice();
+   const current=v610CurrentLvCandidate();
+   if(current.valid){
+     const ix=items.findIndex(x=>x.pos===current.pos);
+     if(ix>=0)items[ix]={...items[ix],...current}; else items.push(current);
+   }
+   if(!items.length){fm.style.color="#aa3030";fm.textContent="Bitte mindestens eine LV-Position eingeben.";return}
+
+   const sharedDisplayId=peekNextEntryDisplayId();
+   const shared={
+     lineDesc,
+     detail:document.getElementById("detail")?.value.trim()||"",
+     reason:document.getElementById("reason")?.value||"",
+     note:document.getElementById("note")?.value.trim()||"",
+     planId:document.getElementById("entryPlanSelect")?.value||"",
+     groupId:"mlv_"+cryptoSafeId(),
+     displayId:sharedDisplayId
+   };
+   const saved=items.map(item=>v610CreateBatchEntry(item,shared));
+   saved.forEach(e=>assignEntryDisplayId(e,sharedDisplayId));
+   syncAnnotationLabelsToEntryIds?.();
+
+   /* Consume the ID exactly once for the whole group. */
+   project().nextEntryDisplayId=Math.max(Number(project().nextEntryDisplayId)||1,sharedDisplayId+1);
+
+   if(typeof removeDraftAnnotations==="function")removeDraftAnnotations();
+   multiLvDraft=[]; newDraftToken?.();
+   clearEntryForm(false);
+   const eps=document.getElementById("entryPlanSelect");if(eps)eps.value="";
+   selectedAnnotationId=null;
+   renderMultiLvDraft();
+   persist();
+   renderAll?.(); renderRecent?.(); renderSheet?.(); renderLV?.();
+   fm.style.color="#1f7a4d";
+   fm.innerHTML=`ID <b>${sharedDisplayId}</b> gespeichert · ${saved.length} LV-Position(en).`;
+   return;
+ }
+
+ return _v612PrevFinalize();
+};
+
+/* Delete entire ID/group, not only one LV sub-position. */
+deleteEntry=function(id){
+ const e=project()?.entries.find(x=>x.id===id); if(!e)return;
+ const group=v612GroupEntries(e);
+ const displayId=entryDisplayId(e);
+ const text=group.length>1
+   ? `ID ${displayId} mit allen ${group.length} LV-Positionen wirklich löschen?`
+   : `ID ${displayId} wirklich löschen?`;
+ if(!confirm(text))return;
+
+ const ids=new Set(group.map(x=>x.id));
+
+ if(currentAccess?.().mode==="worker"){
+   group.forEach(x=>{
+     if(x.syncUuid && Number(x.syncRevision||0)>0){
+       ensureProjectSync().deletedEntries.push({
+         syncUuid:x.syncUuid,
+         baseRevision:Number(x.syncRevision||1),
+         displayId,
+         deletedAt:new Date().toISOString(),
+         deletedBy:currentAccess().user?.id||"",
+         deletedByName:syncUserName?.()||""
+       });
+     }
+   });
+ }
+
+ project().entries=project().entries.filter(x=>!ids.has(x.id));
+ plans().forEach(pl=>{
+   pl.annotations=(pl.annotations||[]).filter(a=>!ids.has(a.entryId));
+ });
+ persist();
+ renderAll?.(); showPosInfo?.();
+};
+
+/* Plan editing always edits the whole ID through its anchor. */
+markEntryOnPlan=function(entryId){
+ ensurePlanData();
+ const e=project().entries.find(x=>x.id===entryId); if(!e)return;
+ const anchor=v612AnchorEntry(e)||e;
+ const group=v612GroupEntries(e);
+ const target=anchor.planId || group.find(x=>x.planId)?.planId || activePlanId || plans()[0]?.id;
+
+ if(!plans().length){
+   alert("Für dieses Projekt ist noch kein Plan hinterlegt. Bitte zuerst einen Plan hinzufügen.");
+   return;
+ }
+ group.forEach(x=>x.planId=target);
+ persist();
+ showView("plans");
+ openPlan(target).then(()=>{
+   const sel=document.getElementById("planEntrySelect");
+   if(sel)sel.value=anchor.id;
+   planEntryChanged?.();
+   setPlanTool("select");
+ });
+};
+
+/* Newly drawn plan annotations are assigned to the group's anchor. */
+function v612CanonicalizeAnnotationEntry(a){
+  if(!a?.entryId || typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId))return;
+  const e=project().entries.find(x=>x.id===a.entryId); if(!e)return;
+  const anchor=v612AnchorEntry(e);
+  if(anchor){
+    a.entryId=anchor.id;
+    a.label=String(entryDisplayId(anchor));
+  }
+}
+const _v612CreateAnn=createPlanAnnotation;
+createPlanAnnotation=function(type,pt){
+  const before=activePlan()?.annotations?.length||0;
+  const r=_v612CreateAnn(type,pt);
+  const arr=activePlan()?.annotations||[];
+  if(arr.length>before)v612CanonicalizeAnnotationEntry(arr[arr.length-1]);
+  persist();
+  return r;
+};
+const _v612FinishLine=finishPlanLine;
+finishPlanLine=function(){
+  const before=activePlan()?.annotations?.length||0;
+  const r=_v612FinishLine();
+  const arr=activePlan()?.annotations||[];
+  if(arr.length>before)v612CanonicalizeAnnotationEntry(arr[arr.length-1]);
+  persist();
+  return r;
+};
+const _v612FinishFree=finishFreehand;
+finishFreehand=function(){
+  const before=activePlan()?.annotations?.length||0;
+  const r=_v612FinishFree();
+  const arr=activePlan()?.annotations||[];
+  if(arr.length>before)v612CanonicalizeAnnotationEntry(arr[arr.length-1]);
+  persist();
+  return r;
+};
+
+/* Grouped display in recent list: one row per ID. */
+renderRecent=function(){
+  const all=sortedSheetEntries();
+  const groups=[];
+  const seen=new Set();
+  for(const e of all.slice().reverse()){
+    const key=v612GroupKey(e);
+    if(seen.has(key))continue;
+    seen.add(key);
+    groups.push(v612GroupEntries(e));
+    if(groups.length>=12)break;
+  }
+  const b=document.getElementById("recentBody");
+  const head=b.closest("table")?.querySelector("thead");
+  if(head)head.innerHTML='<tr><th>ID</th><th>Beschreibung</th><th>LV-Position(en)</th><th>Mengen</th><th>Status</th><th>Anmerkung</th><th></th></tr>';
+  if(!groups.length){
+    b.innerHTML='<tr><td colspan="7" class="empty">Noch keine Erfassungen im aktiven Aufmaßblatt.</td></tr>';return;
+  }
+  b.innerHTML=groups.map(g=>{
+    const a=g[0], id=entryDisplayId(a);
+    return `<tr>
+      <td><span class="entryIdBadge">${id}</span></td>
+      <td class="wrap">${esc(a.lineDesc)}</td>
+      <td class="wrap">${g.map(x=>`<b>${esc(x.pos)}</b> · ${esc(getPos(x.pos)?.text||"")}`).join("<br>")}</td>
+      <td class="wrap">${g.map(x=>`${num(x.qty)} ${esc(x.unit)} · ${esc(x.calc)}`).join("<br>")}</td>
+      <td>${esc(a.reason||"")}</td>
+      <td class="wrap">${esc(a.note||"")}</td>
+      <td><div class="toolbar"><button class="secondary" onclick="editEntry('${a.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${a.id}')">Plan bearbeiten</button></div></td>
+    </tr>`;
+  }).join("");
+};
+
+/* Aufmaßblatt: same ID/description shown once, LV subpositions below it. */
+const _v612RenderSheetBase=renderSheet;
+renderSheet=function(){
+ const sh=activeSheet(),body=document.getElementById("sheetBody"),totals=document.getElementById("sheetTotalsBody");
+ if(!sh)return _v612RenderSheetBase();
+
+ const title=[sh.code,sh.topArea,sh.area].filter(Boolean).join(" · ");
+ document.getElementById("sheetTitle").textContent=title;
+ document.getElementById("sheetPrintHead").innerHTML=`<div class="projectMeta">
+  <div class="metaCell"><b>Projekt</b>${esc(project().meta.name)}</div>
+  <div class="metaCell"><b>Projektnr.</b>${esc(project().meta.number||"–")}</div>
+  <div class="metaCell"><b>Kollaudierungsblatt</b>${esc(sh.code)}</div>
+  <div class="metaCell"><b>Datum / Gewerk</b>${esc(sh.date||"–")} · ${esc(sh.trade||"–")}</div>
+  <div class="metaCell"><b>Bereich</b>${esc([sh.topArea,sh.area].filter(Boolean).join(" – "))}</div>
+  <div class="metaCell"><b>Auftragnehmer</b>${esc(project().meta.contractor||"–")}</div>
+ </div>`;
+
+ const rows=sortedSheetEntries();
+ if(!rows.length){
+   body.innerHTML='<tr><td colspan="11" class="empty">Noch keine Erfassungen.</td></tr>';
+ }else{
+   const seen=new Set();
+   body.innerHTML=rows.map(e=>{
+     const key=v612GroupKey(e), first=!seen.has(key);seen.add(key);
+     const pos=getPos(e.pos), tag=pos?.manual?`<span class="badge manual">${esc(pos.manualType||"manuell")}</span> `:"";
+     return `<tr class="${first?"lineStart":"lineGroup"}">
+       <td>${first?`<span class="entryIdBadge">${entryDisplayId(e)}</span>`:""}</td>
+       <td class="wide">${first?esc(e.lineDesc):""}</td>
+       <td>${tag}<b>${esc(e.pos)}</b></td>
+       <td class="wrap">${esc(pos?.text||"")}</td>
+       <td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td>
+       <td>${first?esc(e.detail):""}</td><td>${first?esc(e.reason):""}</td><td class="wrap">${first?esc(e.note):""}</td>
+       <td class="noPrint">${first?`<div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan bearbeiten</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div>`:""}</td>
+     </tr>`;
+   }).join("");
+ }
+
+ const used=[...new Set(rows.map(e=>e.pos))];
+ totals.innerHTML=used.length?used.map(code=>{
+   const pos=getPos(code),st=sheetTotal(code,sh.id),pt=projectTotal(code),target=typeof hasTargetQty==="function"?hasTargetQty(pos):true,rest=target?Number(pos.lv_qty)-pt:null;
+   return `<tr><td><b>${esc(code)}</b></td><td class="wrap">${esc(pos?.text||"")}</td><td>${num(st)}</td><td>${esc(pos?.unit||"")}</td><td>${num(pt)}</td><td>${target?num(pos.lv_qty):"–"}</td><td>${target?num(rest):"–"}</td></tr>`;
+ }).join(""):'<tr><td colspan="7" class="empty">Keine Summen vorhanden.</td></tr>';
+};
+
+/* Migration for V6.10/V6.11 grouped records: collapse their visible IDs. */
+try{
+  v612NormalizeGroupIds();
+  syncAnnotationLabelsToEntryIds?.();
+  persist();
+  renderAll?.();
+}catch(e){console.warn("V6.12 Gruppenmigration",e)}
 </script>
 
 </body>
