@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.6 Test</title>
+<title>Kollaudierung – V6.7 Test</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1092,7 +1092,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.6 Testversion:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.7 Testversion:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1108,7 +1108,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.6 Test</h1>
+   <h1>Kollaudierung – V6.7 Test</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -1672,6 +1672,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
      <div id="workerPermissionInfo" class="info" style="margin-top:9px"></div>
      <button class="primary" style="margin-top:12px" onclick="exportWorkerReturn()">Rückgabedatei für Projektleiter erstellen</button>
      <div class="small" style="margin-top:7px">Die Rückgabe enthält nur Änderungen aus dieser Arbeitsdatei. Sie überschreibt beim Projektleiter nicht das gesamte Projekt.</div>
+     <div class="notice" style="margin-top:9px"><b>Projekt abgeschlossen?</b> Der Monteur kann seine lokale Arbeitskopie im Reiter „Projekt“ löschen. Das Masterprojekt beim Projektleiter bleibt davon unberührt.</div>
     </div>
    </div>
 
@@ -8661,7 +8662,9 @@ function applyRoleRestrictions(){
  const projectButtons=document.querySelector("#view-project .toolbar.noPrint");
  if(projectButtons && currentAccess().mode==="worker"){
    [...projectButtons.querySelectorAll("button")].forEach(b=>{
-     if(!b.textContent.includes("Plan"))b.style.display="none";
+     const t=(b.textContent||"").trim();
+     const allow=t.includes("Plan") || t.includes("Projekt löschen") || t==="Löschen";
+     b.style.display=allow?"":"none";
    });
  }
 
@@ -8708,7 +8711,32 @@ openImportForCurrent=function(){
 };
 const _v6DeleteCurrentProject=deleteCurrentProject;
 deleteCurrentProject=function(){
- if(currentAccess().mode==="worker"||!can("projectEdit")){alert("Projekt löschen ist für dieses Profil nicht erlaubt.");return}
+ const p=project(); if(!p)return;
+
+ if(currentAccess().mode==="worker"){
+   const name=p.meta?.name||"Arbeitsprojekt";
+   const user=currentAccess().user?.name||"Monteur";
+   const msg=`Lokale Arbeitskopie "${name}" für ${user} wirklich von diesem Gerät löschen?\n\n`+
+             `Wichtig: Dadurch wird NICHT das Masterprojekt beim Projektleiter gelöscht.\n`+
+             `Noch nicht exportierte Änderungen und Planmarkierungen auf diesem Gerät gehen dabei verloren.`;
+   if(!confirm(msg))return;
+
+   const pid=p.id;
+   delete state.projects[pid];
+   const remaining=Object.keys(state.projects||{});
+   state.currentProjectId=remaining[0]||null;
+   persist();
+   renderProjectSelect();
+   renderProject();
+   try{showView("entry")}catch(e){}
+   alert("Die lokale Arbeitskopie wurde von diesem Gerät gelöscht.");
+   return;
+ }
+
+ if(!can("projectEdit")){
+   alert("Projekt löschen ist für dieses Profil nicht erlaubt.");
+   return;
+ }
  return _v6DeleteCurrentProject();
 };
 
