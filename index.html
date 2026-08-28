@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.12</title>
+<title>Kollaudierung – V6.13</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.12 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.13 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,7 +1096,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.12 alter Testhinweis entfernt ===== */
+/* ===== V6.13 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
@@ -1115,7 +1115,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.12version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.13version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1131,7 +1131,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.12</h1>
+   <h1>Kollaudierung – V6.13</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -9804,7 +9804,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.12 MULTI-LV ================= */
+/* ================= V6.13 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10003,7 +10003,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.12 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.13 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10583,7 +10583,166 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.12 Gruppenmigration",e)}
+}catch(e){console.warn("V6.13 Gruppenmigration",e)}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.13 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   ============================================================ */
+
+function v613NormDesc(v){
+  return String(v||"").trim().replace(/\s+/g," ").toLowerCase();
+}
+
+function v613SameDescriptionEntries(entry){
+  if(!entry)return[];
+  const key=v613NormDesc(entry.lineDesc);
+  if(!key)return[entry];
+  return (project()?.entries||[]).filter(e =>
+    e.sheetId===entry.sheetId &&
+    v613NormDesc(e.lineDesc)===key
+  );
+}
+
+/* Merge all records with identical description within the same sheet. */
+function v613MergeSameDescriptions(){
+  const p=project();
+  if(!p?.entries?.length)return false;
+
+  let changed=false;
+  const buckets=new Map();
+
+  for(const e of p.entries){
+    const desc=v613NormDesc(e.lineDesc);
+    if(!desc)continue;
+    const key=`${e.sheetId}::${desc}`;
+    if(!buckets.has(key))buckets.set(key,[]);
+    buckets.get(key).push(e);
+  }
+
+  for(const arr of buckets.values()){
+    if(arr.length<2)continue;
+
+    const ids=arr.map(e=>Number(e.displayId)).filter(n=>Number.isInteger(n)&&n>0);
+    const sharedId=ids.length?Math.min(...ids):peekNextEntryDisplayId();
+
+    let groupId=arr.find(e=>e.multiLvGroup)?.multiLvGroup;
+    if(!groupId)groupId="mlv_"+cryptoSafeId();
+
+    for(const e of arr){
+      if(e.multiLvGroup!==groupId){e.multiLvGroup=groupId;changed=true}
+      if(Number(e.displayId)!==Number(sharedId)){
+        assignEntryDisplayId(e,sharedId);
+        changed=true;
+      }
+    }
+
+    /* All plan annotations of the group point to one anchor entry. */
+    const anchor=arr.slice().sort((a,b)=>(a.id||"").localeCompare(b.id||""))[0];
+    const memberIds=new Set(arr.map(e=>e.id));
+    plans().forEach(pl=>{
+      (pl.annotations||[]).forEach(a=>{
+        if(memberIds.has(a.entryId)){
+          if(a.entryId!==anchor.id){a.entryId=anchor.id;changed=true}
+          const lbl=String(sharedId);
+          if(a.label!==lbl){a.label=lbl;changed=true}
+        }
+      });
+    });
+  }
+
+  if(changed){
+    syncAnnotationLabelsToEntryIds?.();
+    persist();
+  }
+  return changed;
+}
+
+/* Group key now also falls back to description, so UI is immediately correct
+   even before persistence/migration has completed. */
+v612GroupKey=function(e){
+  if(!e)return "";
+  if(e.multiLvGroup)return e.multiLvGroup;
+  const d=v613NormDesc(e.lineDesc);
+  return d ? `desc:${e.sheetId}:${d}` : ("single:"+e.id);
+};
+
+v612GroupEntries=function(entryOrId){
+  const e=typeof entryOrId==="string"
+    ? project()?.entries?.find(x=>x.id===entryOrId)
+    : entryOrId;
+  if(!e)return[];
+  const desc=v613NormDesc(e.lineDesc);
+  if(desc){
+    return (project().entries||[]).filter(x=>
+      x.sheetId===e.sheetId &&
+      v613NormDesc(x.lineDesc)===desc
+    ).slice().sort((a,b)=>(a.pos||"").localeCompare(b.pos||""));
+  }
+  const key=v612GroupKey(e);
+  return (project().entries||[]).filter(x=>v612GroupKey(x)===key)
+    .slice().sort((a,b)=>(a.pos||"").localeCompare(b.pos||""));
+};
+
+/* After every save/update, automatically merge same descriptions. */
+const _v613Finalize=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const result=_v613Finalize();
+  try{
+    v613MergeSameDescriptions();
+    renderRecent?.();
+    renderSheet?.();
+    renderLV?.();
+  }catch(e){console.warn("V6.13 Beschreibung zusammenführen",e)}
+  return result;
+};
+
+/* When editing and changing a description to an existing one,
+   the edited record is merged into that existing ID automatically. */
+const _v613CancelEdit=cancelEdit;
+cancelEdit=function(){
+  const r=_v613CancelEdit();
+  return r;
+};
+
+/* New project/restore/workfile/render paths also normalize old data. */
+const _v613RenderProject=renderProject;
+renderProject=function(){
+  const r=_v613RenderProject();
+  try{
+    v613MergeSameDescriptions();
+    renderRecent?.();
+    renderSheet?.();
+  }catch(e){}
+  return r;
+};
+
+const _v613SwitchProject=switchProject;
+switchProject=function(){
+  const r=_v613SwitchProject();
+  try{
+    v613MergeSameDescriptions();
+    renderRecent?.();
+    renderSheet?.();
+  }catch(e){}
+  return r;
+};
+
+/* One-time migration for already existing projects. */
+try{
+  Object.values(state.projects||{}).forEach(pr=>{
+    const old=state.currentProjectId;
+    state.currentProjectId=pr.id;
+    try{v613MergeSameDescriptions()}catch(e){}
+    state.currentProjectId=old;
+  });
+  persist();
+  v613MergeSameDescriptions();
+  renderRecent?.();
+  renderSheet?.();
+}catch(e){console.warn("V6.13 Migration",e)}
 </script>
 
 </body>
