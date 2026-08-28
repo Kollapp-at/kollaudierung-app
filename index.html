@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.15</title>
+<title>Kollaudierung – V6.17</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.15 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.17 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.15 alter Testhinweis entfernt ===== */
+/* ===== V6.17 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.15 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.17 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1162,6 +1162,23 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
  font-weight:600;
 }
 
+
+/* ===== V6.17 HINWEISE / TEXTE ===== */
+#autoPlanLinkSummary{line-height:1.25}
+#autoPlanLinkMeta{line-height:1.35}
+#draftEntrySummary .fsCell .smallHint{
+  display:block;
+  margin-top:4px;
+  font-size:11px;
+  color:var(--muted);
+}
+
+
+/* ===== V6.17 EINHEITLICHE BEGRIFFE ===== */
+.terminologyHint{
+  line-height:1.4;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1176,7 +1193,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.15version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.17version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1192,7 +1209,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.15</h1>
+   <h1>Kollaudierung – V6.17</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -1212,7 +1229,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
  </div>
 
  <div class="stats">
-  <div class="stat"><div class="k">LV-Positionen</div><div class="v" id="stPos">0</div></div>
+  <div class="stat"><div class="k">LV-Unterpositionen</div><div class="v" id="stPos">0</div></div>
   <div class="stat"><div class="k">Aufmaßblätter</div><div class="v" id="stSheets">0</div></div>
   <div class="stat"><div class="k">Erfassungen</div><div class="v" id="stEntries">0</div></div>
   <div class="stat"><div class="k">Kollaudierungswert</div><div class="v" id="stValue">€ 0,00</div></div>
@@ -1275,9 +1292,9 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
     <input id="lineDesc" placeholder="Beschreibung der Leistung">
     <div class="small" style="margin-top:6px">Jede gespeicherte Eintragung erhält automatisch eine eindeutige fortlaufende ID. Diese ID verbindet Aufmaß, Planmarkierung und Abrechnung.</div>
 
-    <label>LV-Position suchen</label>
+    <label>LV-Unterposition suchen</label>
     <input id="posSearch" placeholder="Positionsnummer oder Text" oninput="filterPositions()">
-    <label class="desktopPosLabel">LV-Position</label>
+    <label class="desktopPosLabel">LV-Unterposition</label>
     <select id="posSelect" size="7" onchange="showPosInfo()"></select>
 
     <div id="mobilePosPicker" class="mobilePosPicker">
@@ -1288,7 +1305,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
       <div id="mobilePosResults" class="mobilePosResults"></div>
     </div>
 
-    <div id="posInfo" class="info"><span class="small">LV-Position auswählen.</span></div>
+    <div id="posInfo" class="info"><span class="small">LV-Unterposition auswählen.</span></div>
    </div>
 
    <div class="card" id="entryCard">
@@ -1303,13 +1320,13 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
     <div class="multiLvBox" id="multiLvBox">
      <div class="toolbar" style="justify-content:space-between;align-items:center">
       <div>
-       <b>LV-Positionen dieser Erfassung</b>
-       <div class="small">Eine Erfassung kann mehrere LV-Positionen enthalten. Alle gehören zur selben ID.</div>
+       <b>LV-Unterpositionen dieser Erfassung</b>
+       <div class="small">Eine Erfassung kann mehrere LV-Unterpositionen enthalten. Alle gehören zur selben Erfassungs-ID.</div>
       </div>
-      <button type="button" class="secondary" onclick="addCurrentLvToBatch()">+ LV-Position hinzufügen</button>
+      <button type="button" class="secondary" onclick="addCurrentLvToBatch()">+ LV-Unterposition hinzufügen</button>
      </div>
      <div id="multiLvList" class="multiLvList">
-      <div class="small">Noch keine zusätzlichen LV-Positionen vorgemerkt.</div>
+      <div class="small">Noch keine zusätzlichen LV-Unterpositionen vorgemerkt.</div>
      </div>
     </div>
 
@@ -1354,7 +1371,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
      <button class="danger" id="cancelEditBtn" style="display:none" onclick="cancelEdit()">Bearbeitung abbrechen</button>
     </div>
     <div id="message" class="small" style="margin-top:9px"></div>
-    <div class="small" style="margin-top:5px"><b>Planmarkierung:</b> Sie kann sofort gesetzt oder nach dem Speichern jederzeit über „Plan bearbeiten“ ergänzt bzw. geändert werden.</div>
+    <div class="small" style="margin-top:5px"><b>Planmarkierung:</b> Sie kann sofort gesetzt oder nach dem Speichern jederzeit über „Planmarkierung bearbeiten“ ergänzt bzw. geändert werden.</div>
    </div>
   </div>
 
@@ -1442,7 +1459,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
       <div class="autoPlanLinkBox">
        <div class="small" style="font-weight:700;margin-bottom:5px">Automatisch verknüpft mit</div>
-       <div id="autoPlanLinkSummary" class="strong">Aktuelle Erfassung</div>
+       <div id="autoPlanLinkSummary" class="strong">Aktuelle Erfassungs-ID</div>
        <div id="autoPlanLinkMeta" class="small" style="margin-top:5px"></div>
       </div>
 
@@ -1485,7 +1502,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
       </div>
 
       <div class="planLinkBox">
-       <div class="small"><b>Keine weitere Zuordnung nötig:</b> Die Markierung wird automatisch mit der aktuellen Aufmaßzeile und LV-Position verbunden. Nur Werkzeug wählen, im Plan markieren und danach unten speichern.</div>
+       <div class="small"><b>Keine weitere Zuordnung nötig:</b> Die Markierung wird automatisch mit der aktuellen Aufmaßzeile und LV-Unterposition verbunden. Nur Werkzeug wählen, im Plan markieren und danach unten speichern.</div>
       </div>
 
       <div id="selectedAnnBox" class="planSelectedBox" style="display:none">
@@ -1508,7 +1525,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   <div id="entryFinalizeCard" class="card finalizeEntryCard">
    <div class="toolbar" style="justify-content:space-between;align-items:flex-start">
     <div>
-     <h2 style="margin:0">4. Erfassung abschließen</h2>
+     <h2 style="margin:0">4. Erfassung speichern</h2>
      <div class="small" style="margin-top:4px">Erst hier werden Aufmaß, Menge, Planverknüpfung und Markierung gemeinsam gespeichert.</div>
     </div>
     <span id="draftPlanStatus" class="badge warn">noch nicht gespeichert</span>
@@ -1518,7 +1535,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    </div>
    <div id="unsavedPlanWarning" class="unsavedPlanWarning" style="display:none"></div>
    <div class="toolbar" style="margin-top:12px">
-    <button class="primary" id="finalSaveEntryBtn" onclick="finalizeCurrentEntry()">Erfassung vollständig speichern</button>
+    <button class="primary" id="finalSaveEntryBtn" onclick="finalizeCurrentEntry()">Erfassung speichern</button>
     <button class="secondary" onclick="scrollToEntryTop()">Eingaben prüfen</button>
    </div>
    <div id="finalizeMessage" class="small" style="margin-top:9px"></div>
@@ -1527,8 +1544,8 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   <div class="spacer"></div>
   <div class="card">
    <div class="toolbar" style="justify-content:space-between">
-    <h2 style="margin:0">Letzte Erfassungen im aktiven Blatt</h2>
-    <button class="secondary" onclick="showView('sheet')">Ganzes Aufmaßblatt anzeigen</button>
+    <h2 style="margin:0">Letzte Erfassungen im aktiven Aufmaßblatt</h2>
+    <button class="secondary" onclick="showView('sheet')">Gesamtes Aufmaßblatt anzeigen</button>
    </div>
    <div class="tablewrap" style="margin-top:12px">
     <table>
@@ -1580,12 +1597,12 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div id="sheetPrintHead" style="margin:8px 0 14px"></div>
    <div class="tablewrap">
     <table>
-     <thead><tr><th>ID</th><th>Positionsbeschreibung / Anmerkung</th><th>LV Pos.</th><th>LV-Leistung</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th><th class="noPrint"></th></tr></thead>
+     <thead><tr><th>ID</th><th>Positionsbeschreibung / Anmerkung</th><th>LV-Unterposition</th><th>Leistungsbeschreibung</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th><th class="noPrint"></th></tr></thead>
      <tbody id="sheetBody"></tbody>
     </table>
    </div>
    <div class="spacer"></div>
-   <h3>Summen je LV-Position auf diesem Blatt</h3>
+   <h3>Summen je LV-Unterposition auf diesem Blatt</h3>
    <div class="tablewrap">
     <table>
      <thead><tr><th>Pos.</th><th>Leistung</th><th>Summe</th><th>EH</th><th>Projekt gesamt</th><th>LV-Menge</th><th>Rest</th></tr></thead>
@@ -1698,10 +1715,15 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
  
  <section id="view-sync" class="view">
+
+<div class="small terminologyHint noPrint" style="margin:8px 0 12px;color:var(--muted)">
+ <b>Begriffe:</b> Erfassung = eine Erfassungs-ID · LV-Unterposition = einzelne abrechenbare LV-Zeile innerhalb einer Erfassung · Planmarkierung = grafische Kennzeichnung im Plan.
+</div>
+
   <div class="card">
    <div class="toolbar" style="justify-content:space-between;align-items:flex-start">
     <div>
-     <h2 style="margin:0">Benutzer & Offline-Übergabe</h2>
+     <h2 style="margin:0">Benutzer & Projektübergabe</h2>
      <div class="small" id="syncModeInfo" style="margin-top:4px"></div>
     </div>
     <span id="syncProjectBadge" class="badge ok">MASTERPROJEKT</span>
@@ -1733,7 +1755,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
        <option value="500" selected>500 IDs</option>
        <option value="1000">1000 IDs</option>
       </select>
-      <button class="primary" style="margin-top:10px;width:100%" onclick="exportWorkerPackage()">Arbeitsdatei für Monteur erstellen</button>
+      <button class="primary" style="margin-top:10px;width:100%" onclick="exportWorkerPackage()">Monteur-Arbeitsdatei erstellen</button>
       <div class="small" style="margin-top:7px">Die Arbeitsdatei erhält einen eigenen ID-Bereich. Dadurch kollidieren neue Erfassungen verschiedener Monteure nicht.</div>
      </div>
     </div>
@@ -1742,11 +1764,11 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
     <div class="syncPanel">
      <div class="toolbar" style="justify-content:space-between">
       <div>
-       <h3 style="margin:0">Rückgaben in Master einspielen</h3>
-       <div class="small" style="margin-top:3px">Der Master wird nicht ersetzt. Änderungen werden datensatzweise geprüft und zusammengeführt.</div>
+       <h3 style="margin:0">Rückgabedateien ins Masterprojekt einspielen</h3>
+       <div class="small" style="margin-top:3px">Das Masterprojekt wird nicht ersetzt. Änderungen werden datensatzweise geprüft und zusammengeführt.</div>
       </div>
       <div class="toolbar">
-       <label for="returnImportFile" class="primary filePickLabel" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer">Rückgabe auswählen</label>
+       <label for="returnImportFile" class="primary filePickLabel" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer">Rückgabedatei auswählen</label>
        <input id="returnImportFile" type="file" accept=".json,application/json,text/plain,.koll" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="importWorkerReturn(event)">
       </div>
      </div>
@@ -1760,7 +1782,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
      <h3>Monteur-Arbeitsdatei</h3>
      <div id="workerIdentity" class="projectMeta"></div>
      <div id="workerPermissionInfo" class="info" style="margin-top:9px"></div>
-     <button class="primary" style="margin-top:12px" onclick="exportWorkerReturn()">Rückgabedatei für Projektleiter erstellen</button>
+     <button class="primary" style="margin-top:12px" onclick="exportWorkerReturn()">Rückgabedatei erstellen</button>
      <div class="small" style="margin-top:7px">Die Rückgabe enthält nur Änderungen aus dieser Arbeitsdatei. Sie überschreibt beim Projektleiter nicht das gesamte Projekt.</div>
      <div class="notice" style="margin-top:9px"><b>Projekt abgeschlossen?</b> Der Monteur kann seine lokale Arbeitskopie im Reiter „Projekt“ löschen. Das Masterprojekt beim Projektleiter bleibt davon unberührt.</div>
     </div>
@@ -1768,10 +1790,10 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
    <div class="spacer"></div>
    <div class="syncPanel">
-    <h3>Arbeitsdatei laden</h3>
+    <h3>Monteur-Arbeitsdatei laden</h3>
     <div class="small">Auf dem Monteurgerät wird hier ausschließlich die vom Projektleiter erzeugte <b>ARBEITSDATEI</b> geladen.</div>
-    <div class="notice" style="margin-top:8px"><b>Wichtig:</b> Keine Datensicherung auswählen. Der Dateiname der richtigen Datei enthält ab V6.2 deutlich <b>ARBEITSDATEI</b> und endet auf <b>.json</b>.</div>
-    <label for="workImportFile" class="secondary filePickLabel" style="margin-top:9px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">Arbeitsdatei auswählen</label>
+    <div class="notice" style="margin-top:8px"><b>Wichtig:</b> Keine Datensicherung auswählen. Der Dateiname der richtigen Datei enthält deutlich <b>ARBEITSDATEI</b> und endet auf <b>.json</b>.</div>
+    <label for="workImportFile" class="secondary filePickLabel" style="margin-top:9px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">Monteur-Arbeitsdatei auswählen</label>
     <input id="workImportFile" type="file" accept=".json,application/json,text/plain,.koll" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="importWorkerPackage(event)">
    </div>
   </div>
@@ -1788,7 +1810,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
      <button class="secondary" onclick="editCurrentProject()">Projektdaten bearbeiten</button>
      <button class="okBtn" onclick="openManualPosition()">+ Manuelle Position / Regie</button>
      <button class="primary" onclick="openImportForCurrent()">Excel / PDF importieren</button>
-     <button class="danger" id="deleteProjectBtn" onclick="deleteCurrentProject()">Projekt löschen</button>
+     <button class="danger" id="deleteProjectBtn" onclick="deleteCurrentProject()">Projekt lokal löschen</button>
     </div>
    </div>
    <div id="projectDetails" class="projectMeta"></div>
@@ -1806,7 +1828,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div id="projectPlanLibrary" class="projectPlanGrid" style="margin-top:9px"></div>
 
    <div class="spacer"></div>
-   <h3>Importierte LV-Positionen</h3>
+   <h3>Importierte LV-Unterpositionen</h3>
    <div class="tablewrap">
     <table>
      <thead><tr><th>LG</th><th>Pos.</th><th>Leistung</th><th>Menge</th><th>EH</th><th>Lohn/EH</th><th>Sonst./EH</th><th>EH-Preis</th></tr></thead>
@@ -2215,7 +2237,7 @@ function filterPositions(){
 }
 function showPosInfo(){
  const p=getPos(document.getElementById("posSelect").value),box=document.getElementById("posInfo");
- if(!p){box.innerHTML=positions().length?'<span class="small">LV-Position auswählen.</span>':'<span class="small">Dieses Projekt hat noch kein importiertes LV. Öffne „Excel / PDF importieren“.</span>';return}
+ if(!p){box.innerHTML=positions().length?'<span class="small">LV-Unterposition auswählen.</span>':'<span class="small">Dieses Projekt hat noch kein importiertes LV. Öffne „Excel / PDF importieren“.</span>';return}
  const done=projectTotal(p.pos),rest=Number(p.lv_qty)-done;
  box.innerHTML=`<div class="strong">${esc(p.pos)} · ${esc(p.text)}</div><div class="small" style="margin-top:5px">LV-Menge: <b>${num(p.lv_qty)} ${esc(p.unit)}</b> · Projekt kollaudiert: <b>${num(done)} ${esc(p.unit)}</b> · Rest: <b>${num(rest)} ${esc(p.unit)}</b><br>EH-Preis: <b>${euro(p.ep)}</b> · Lohn/EH: ${euro(p.labor)} · Sonstiges/EH: ${euro(p.material)}</div>`;
  previewCalc();
@@ -2242,7 +2264,7 @@ function lineNoFor(desc,sheetId,excludeId=null){
 }
 function saveEntry(){
  const s=activeSheet();if(!s){msg("Bitte zuerst ein Aufmaßblatt auswählen oder anlegen.",true);return}
- const p=getPos(document.getElementById("posSelect").value);if(!p){msg("Bitte eine LV-Position auswählen.",true);return}
+ const p=getPos(document.getElementById("posSelect").value);if(!p){msg("Bitte eine LV-Unterposition auswählen.",true);return}
  const desc=document.getElementById("lineDesc").value.trim();if(!desc){msg("Bitte eine Beschreibung der Aufmaßzeile eingeben.",true);return}
  const qty=previewCalc();if(qty===null||qty===0){msg("Bitte einen gültigen Rechenansatz mit Ergebnis ungleich 0 eingeben.",true);return}
  const entry={id:editingEntryId||uid("e"),sheetId:s.id,lineDesc:desc,lineNo:lineNoFor(desc,s.id,editingEntryId),pos:p.pos,calc:document.getElementById("calc").value.trim(),qty,unit:p.unit,detail:document.getElementById("detail").value.trim(),reason:document.getElementById("reason").value,note:document.getElementById("note").value.trim(),updated:new Date().toISOString()};
@@ -2493,7 +2515,7 @@ function parsePositionsFromMapping(limit=null){
 }
 function refreshImportPreview(){
  const ps=parsePositionsFromMapping(25),all=parsePositionsFromMapping(null);
- document.getElementById("previewCount").textContent=all.length?`${all.length} LV-Positionen werden importiert.`:"Noch keine gültigen LV-Positionen erkannt.";
+ document.getElementById("previewCount").textContent=all.length?`${all.length} LV-Unterpositionen werden importiert.`:"Noch keine gültigen LV-Unterpositionen erkannt.";
  const box=document.getElementById("importPreview");
  if(!ps.length){box.innerHTML='<div class="empty">Bitte mindestens Position und Positionstext richtig zuordnen.</div>';return}
  box.innerHTML=`<table><thead><tr><th>LG</th><th>Pos.</th><th>Leistung</th><th>LV-Menge</th><th>EH</th><th>Lohn/EH</th><th>Sonst./EH</th><th>EP</th></tr></thead><tbody>${ps.map(p=>`<tr><td>${esc(p.lg)}</td><td><b>${esc(p.pos)}</b></td><td class="wide">${esc(p.text)}</td><td>${num(p.lv_qty)}</td><td>${esc(p.unit)}</td><td>${euro(p.labor)}</td><td>${euro(p.material)}</td><td>${euro(p.ep)}</td></tr>`).join("")}</tbody></table>`;
@@ -2540,7 +2562,7 @@ function extractImportedSheets(){
  return out;
 }
 function finishProjectImport(){
- const imported=parsePositionsFromMapping(null);if(!imported.length){alert("Es wurden keine LV-Positionen erkannt. Bitte die Spaltenzuordnung prüfen.");return}
+ const imported=parsePositionsFromMapping(null);if(!imported.length){alert("Es wurden keine LV-Unterpositionen erkannt. Bitte die Spaltenzuordnung prüfen.");return}
  const sheetName=document.getElementById("mapSheet").value,importSheets=(sheetName==='PDF-Erkennung'?[]:extractImportedSheets()),now=new Date().toISOString();
  if(wizard.mode==="new"){
   const name=document.getElementById("wName").value.trim();if(!name){alert("Bitte Projektname eingeben.");return}
@@ -2598,7 +2620,7 @@ async function handleUniversalFile(ev){
    wizard.workbook={SheetNames:["PDF-Erkennung"]};
    wizard.detection={sheetName:"PDF-Erkennung",headerRow:0,map:{lg:0,pos:1,text:2,qty:3,unit:4,labor:5,material:6,ep:7},score:100};
    const checkText=pdfGrandTotal!=null?'<br>Prüfsumme: <b>'+euro(detectedTotal)+'</b> / PDF-Gesamtsumme: <b>'+euro(pdfGrandTotal)+'</b> '+(totalOk?'✓ stimmt überein':'⚠ bitte Vorschau prüfen'):'';
-   document.getElementById('fileInfo').innerHTML='<div class="'+(parsed.positions.length&&(!pdfGrandTotal||totalOk)?'success':'notice')+'"><span class="importFileName">'+esc(file.name)+'</span><br>'+pdf.numPages+' Seiten · '+totalItems+' Textelemente · <b>'+parsed.positions.length+'</b> LV-Positionen erkannt.'+(parsed.headerPages.length?' KWP-Tabelle auf Seite(n) <b>'+parsed.headerPages.join(', ')+'</b>.':'')+checkText+'</div>';
+   document.getElementById('fileInfo').innerHTML='<div class="'+(parsed.positions.length&&(!pdfGrandTotal||totalOk)?'success':'notice')+'"><span class="importFileName">'+esc(file.name)+'</span><br>'+pdf.numPages+' Seiten · '+totalItems+' Textelemente · <b>'+parsed.positions.length+'</b> LV-Unterpositionen erkannt.'+(parsed.headerPages.length?' KWP-Tabelle auf Seite(n) <b>'+parsed.headerPages.join(', ')+'</b>.':'')+checkText+'</div>';
    if(ps){ps.style.display='block';ps.innerHTML='<div class="small">Text-PDF erkannt. '+(parsed.headerPages.length?'Tabellenkopf auf Seite(n) '+parsed.headerPages.join(', ')+' erkannt.':'Kein eindeutiger Tabellenkopf erkannt – Vorschau bitte besonders sorgfältig prüfen.')+'</div>';}
  }catch(err){console.error(err);wizard.workbook=null;document.getElementById('fileInfo').innerHTML='<div class="error">Die PDF konnte nicht gelesen oder ausgewertet werden.</div>';}
 }
@@ -2875,7 +2897,7 @@ function renderProjectAdmin(){
 /* Position info: no fake negative rest for Regie without target quantity. */
 function showPosInfo(){
  const p=getPos(document.getElementById("posSelect").value),box=document.getElementById("posInfo");
- if(!p){box.innerHTML=positions().length?'<span class="small">LV-Position auswählen.</span>':'<span class="small">Dieses Projekt hat noch kein importiertes LV. Öffne „Excel / PDF importieren“ oder füge eine manuelle Position hinzu.</span>';return}
+ if(!p){box.innerHTML=positions().length?'<span class="small">LV-Unterposition auswählen.</span>':'<span class="small">Dieses Projekt hat noch kein importiertes LV. Öffne „Excel / PDF importieren“ oder füge eine manuelle Position hinzu.</span>';return}
  const done=projectTotal(p.pos);
  const typeText=p.manual?`<span class="badge manual">${esc(p.manualType||"manuell")}</span> `:"";
  if(!hasTargetQty(p)){
@@ -3023,7 +3045,7 @@ async function loadPlanImageBlob(plan){
 function openPlanUpload(){
  const p=project();
  if(!p||!p.id){
-   alert("Bitte zuerst ein Projekt anlegen oder eine Projekt-/Arbeitsdatei laden. Danach kann ein Plan hinzugefügt werden.");
+   alert("Bitte zuerst ein Projekt anlegen oder eine Projekt-/Monteur-Arbeitsdatei laden. Danach kann ein Plan hinzugefügt werden.");
    return;
  }
  planTempFile=null;planTempPdf=null;
@@ -3083,7 +3105,7 @@ async function saveUploadedPlan(){
  const name=document.getElementById("puName").value.trim(),file=planTempFile,msg=document.getElementById("puMessage");
  if(!p||!p.id){
    msg.style.color="#aa3030";
-   msg.textContent="Kein aktives Projekt vorhanden. Bitte zuerst ein Projekt anlegen oder eine Projekt-/Arbeitsdatei laden.";
+   msg.textContent="Kein aktives Projekt vorhanden. Bitte zuerst ein Projekt anlegen oder eine Projekt-/Monteur-Arbeitsdatei laden.";
    return;
  }
  if(!name||!file){msg.style.color="#aa3030";msg.textContent="Bitte Planname und Datei auswählen.";return}
@@ -3165,7 +3187,7 @@ function populatePlanLinks(){
    const sa=project().sheets.find(s=>s.id===a.sheetId)?.code||"",sb=project().sheets.find(s=>s.id===b.sheetId)?.code||"";
    return sa.localeCompare(sb)||(a.lineNo-b.lineNo);
  });
- es.innerHTML='<option value="">– keine / nur LV-Position –</option>'+entries.map(e=>{
+ es.innerHTML='<option value="">– keine / nur LV-Unterposition –</option>'+entries.map(e=>{
    const sh=project().sheets.find(s=>s.id===e.sheetId);
    return `<option value="${esc(e.id)}">${esc(sh?.code||"AMBL")} · Z${e.lineNo} · ${esc(e.pos)} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}</option>`;
  }).join("");
@@ -3215,14 +3237,14 @@ function planCanvasClick(ev){
 function planCanvasDoubleClick(ev){if(planTool==="line"){ev.preventDefault();finishPlanLine()}}
 function createPlanAnnotation(type,pt){
  const pl=activePlan(),link=currentPlanLink();
- if(!link.pos){alert("Bitte zuerst eine LV-Position auswählen.");return}
+ if(!link.pos){alert("Bitte zuerst eine LV-Unterposition auswählen.");return}
  if(type==="text"&&!link.text){alert("Bitte einen Text für die Planmarkierung eingeben.");return}
  const ann={id:uid("ann"),type,label:nextAnnLabel(type),entryId:link.entryId,pos:link.pos,note:link.note,text:type==="text"?link.text:"",x:pt.x,y:pt.y,createdAt:new Date().toISOString()};
  pl.annotations.push(ann);selectedAnnotationId=ann.id;persist();populatePlanFilter();renderPlanList();renderPlanAnnotations();renderSelectedAnnotation();
 }
 function finishPlanLine(){
  if(planLineDraft.length<2){if(planLineDraft.length)alert("Für eine Linie mindestens zwei Punkte setzen.");return}
- const pl=activePlan(),link=currentPlanLink();if(!link.pos){alert("Bitte zuerst eine LV-Position auswählen.");return}
+ const pl=activePlan(),link=currentPlanLink();if(!link.pos){alert("Bitte zuerst eine LV-Unterposition auswählen.");return}
  const ann={id:uid("ann"),type:"line",label:nextAnnLabel("line"),entryId:link.entryId,pos:link.pos,note:link.note,text:"",points:planLineDraft.slice(),createdAt:new Date().toISOString()};
  pl.annotations.push(ann);planLineDraft=[];selectedAnnotationId=ann.id;persist();populatePlanFilter();renderPlanList();renderPlanAnnotations();renderSelectedAnnotation();toggleLineButtons();
 }
@@ -3295,12 +3317,12 @@ function renderSelectedAnnotation(){
  if(!a){box.style.display="none";return}
  box.style.display="block";const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId);
  document.getElementById("selectedAnnTitle").textContent=`${a.label} · ${a.type==="point"?"Punkt":a.type==="line"?"Linie":"Text"}`;
- document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${e?`Aufmaß: Zeile ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
+ document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${e?`Erfassung: ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
  document.getElementById("goEntryBtn").style.display=e?"inline-block":"none";
 }
 function saveSelectedAnnotation(){
  const a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);if(!a)return;
- const link=currentPlanLink();if(!link.pos){alert("Bitte LV-Position auswählen.");return}
+ const link=currentPlanLink();if(!link.pos){alert("Bitte LV-Unterposition auswählen.");return}
  a.entryId=link.entryId;a.pos=link.pos;a.note=link.note;if(a.type==="text"&&link.text)a.text=link.text;
  persist();populatePlanFilter();renderPlanList();renderPlanAnnotations();renderSelectedAnnotation();
 }
@@ -3354,7 +3376,7 @@ function renderRecent(){
  const head=b.closest("table")?.querySelector("thead");
  if(head)head.innerHTML='<tr><th>ID</th><th>Beschreibung</th><th>Pos.</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Status</th><th>Anmerkung</th><th></th></tr>';
  if(!rows.length){b.innerHTML='<tr><td colspan="9" class="empty">Noch keine Erfassungen im aktiven Aufmaßblatt.</td></tr>';return}
- b.innerHTML=rows.map(e=>`<tr><td>${e.lineNo}</td><td class="wrap">${esc(e.lineDesc)}</td><td><b>${esc(e.pos)}</b></td><td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td><td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td><td><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan bearbeiten</button></div></td></tr>`).join("");
+ b.innerHTML=rows.map(e=>`<tr><td>${e.lineNo}</td><td class="wrap">${esc(e.lineDesc)}</td><td><b>${esc(e.pos)}</b></td><td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td><td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td><td><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Planmarkierung bearbeiten</button></div></td></tr>`).join("");
 }
 
 /* Planbeilage: Plan + sichtbare Markierungen + Legende; PDF über Browser-Druck */
@@ -3397,7 +3419,7 @@ async function printPlanAppendix(){
     <div class="printMeta"><div><b>Projekt</b><br>${esc(project().meta.name)}</div><div><b>Projektnr.</b><br>${esc(project().meta.number||"–")}</div><div><b>Plan</b><br>${esc(pl.name)}${pl.number?" · "+esc(pl.number):""}</div><div><b>Bereich / Stand</b><br>${esc(pl.area||"–")} · ${esc(pl.date||"–")}</div></div>
     <img src="${dataUrl}">
     <h3>Legende / Zuordnung</h3>
-    <table><thead><tr><th>Nr.</th><th>LV-Pos.</th><th>Beschreibung</th><th>Menge</th><th>Aufmaß</th><th>Bemerkung</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Keine sichtbaren Markierungen.</td></tr>'}</tbody></table>`;
+    <table><thead><tr><th>Nr.</th><th>LV-Unterposition</th><th>Beschreibung</th><th>Menge</th><th>Aufmaß</th><th>Bemerkung</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Keine sichtbaren Markierungen.</td></tr>'}</tbody></table>`;
    document.body.classList.add("planPrintMode");
    const cleanup=()=>{document.body.classList.remove("planPrintMode");window.removeEventListener("afterprint",cleanup)};
    window.addEventListener("afterprint",cleanup);setTimeout(()=>window.print(),100);
@@ -3418,7 +3440,7 @@ function renderSheet(){
    body.innerHTML=rows.map(e=>{
      const first=e.lineNo!==last;last=e.lineNo;const pos=getPos(e.pos);
      const tag=pos?.manual?`<span class="badge manual">${esc(pos.manualType||"manuell")}</span> `:"";
-     return `<tr class="${first?'lineStart':'lineGroup'}"><td>${first?e.lineNo:""}</td><td class="wide">${first?esc(e.lineDesc):""}</td><td>${tag}<b>${esc(e.pos)}</b></td><td class="wrap">${esc(pos?.text||"")}</td><td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td><td>${esc(e.detail)}</td><td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td><td class="noPrint"><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan bearbeiten</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div></td></tr>`;
+     return `<tr class="${first?'lineStart':'lineGroup'}"><td>${first?e.lineNo:""}</td><td class="wide">${first?esc(e.lineDesc):""}</td><td>${tag}<b>${esc(e.pos)}</b></td><td class="wrap">${esc(pos?.text||"")}</td><td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td><td>${esc(e.detail)}</td><td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td><td class="noPrint"><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Planmarkierung bearbeiten</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div></td></tr>`;
    }).join("");
  }
  const used=[...new Set(rows.map(e=>e.pos))];
@@ -3502,8 +3524,8 @@ function makeSheetPrintBlock(sh){
     <div><b>Bereich</b><br>${esc([sh.topArea,sh.area].filter(Boolean).join(" – ")||"–")}</div>
     <div><b>Datum / Gewerk</b><br>${esc(sh.date||"–")} · ${esc(sh.trade||"–")}</div>
    </div>
-   <table><thead><tr><th>ID</th><th>Beschreibung</th><th>LV Pos.</th><th>LV-Leistung</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th></tr></thead><tbody>${body}</tbody></table>
-   <h2>Summen je LV-Position</h2>
+   <table><thead><tr><th>ID</th><th>Beschreibung</th><th>LV-Unterposition</th><th>Leistungsbeschreibung</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th></tr></thead><tbody>${body}</tbody></table>
+   <h2>Summen je LV-Unterposition</h2>
    <table><thead><tr><th>Pos.</th><th>Leistung</th><th>Blatt-Summe</th><th>EH</th><th>Projekt gesamt</th><th>LV-Menge</th><th>Rest</th></tr></thead><tbody>${totals}</tbody></table>
   </div>`;
 }
@@ -3873,7 +3895,7 @@ async function makeSheetPrintBlockV52(sh,includeBilling){
     <div><b>Bereich</b><br>${esc([sh.topArea,sh.area].filter(Boolean).join(" – ")||"–")}</div>
     <div><b>Datum / Gewerk</b><br>${esc(sh.date||"–")} · ${esc(sh.trade||"–")}</div>
    </div>
-   <table><thead><tr><th>ID</th><th>Beschreibung</th><th>LV Pos.</th><th>LV-Leistung</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th></tr></thead><tbody>${body}</tbody></table>
+   <table><thead><tr><th>ID</th><th>Beschreibung</th><th>LV-Unterposition</th><th>Leistungsbeschreibung</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th></tr></thead><tbody>${body}</tbody></table>
    ${plansHtml}
    ${billing}
   </div>`;
@@ -4074,9 +4096,9 @@ function renderDraftEntrySummary(){
  }
  box.innerHTML=`
   <div class="fsCell"><b>Aufmaßblatt</b>${esc(x.sheet?.code||"–")}<br>${esc([x.sheet?.topArea,x.sheet?.area].filter(Boolean).join(" – "))}</div>
-  <div class="fsCell"><b>LV-Position</b>${esc(x.pos?.pos||"–")}<br>${esc(x.pos?.text||"")}</div>
+  <div class="fsCell"><b>LV-Unterposition</b>${esc(x.pos?.pos||"–")}<br>${esc(x.pos?.text||"")}</div>
   <div class="fsCell"><b>Menge</b>${num(x.qty)} ${esc(x.pos?.unit||"")}<br>${esc(x.calc)}</div>
-  <div class="fsCell"><b>Plan / Markierung</b>${esc(x.plan?.name||"kein Plan gewählt")}<br>${anns.length} Markierung(en)</div>`;
+  <div class="fsCell"><b>Plan / Markierung</b>${esc(x.plan?.name||"kein Plan ausgewählt")}<br>${anns.length} Markierung(en)</div>`;
  if(status){
    status.className=anns.length?"badge ok":"badge warn";
    status.textContent=anns.length?`${anns.length} Planmarkierung(en)`:"keine Planmarkierung";
@@ -4090,7 +4112,7 @@ function scrollToEntryTop(){
 async function continueCurrentEntryToPlan(){
  const x=currentEntryPreview();
  if(!activeSheet()){msg("Bitte zuerst ein Aufmaßblatt auswählen oder anlegen.",true);return}
- if(!x.pos){msg("Bitte eine LV-Position auswählen.",true);return}
+ if(!x.pos){msg("Bitte eine LV-Unterposition auswählen.",true);return}
  if(!x.lineDesc){msg("Bitte eine Beschreibung der Aufmaßzeile eingeben.",true);return}
  if(x.qty===null||x.qty===0){msg("Bitte einen gültigen Rechenansatz mit Ergebnis ungleich 0 eingeben.",true);return}
  if(!x.planId){
@@ -4119,7 +4141,7 @@ populatePlanLinks=function(){
    const sa=project().sheets.find(s=>s.id===a.sheetId)?.code||"",sb=project().sheets.find(s=>s.id===b.sheetId)?.code||"";
    return sa.localeCompare(sb)||(a.lineNo-b.lineNo);
  });
- const draftText=x.pos?`Aktuelle Erfassung · ${x.pos.pos} · ${x.lineDesc||"noch ohne Beschreibung"}${x.qty!==null?` · ${num(x.qty)} ${x.pos.unit}`:""}`:"Aktuelle Erfassung (noch nicht gespeichert)";
+ const draftText=x.pos?`Aktuelle Erfassungs-ID · ${x.pos.pos} · ${x.lineDesc||"noch ohne Beschreibung"}${x.qty!==null?` · ${num(x.qty)} ${x.pos.unit}`:""}`:"Aktuelle Erfassungs-ID (noch nicht gespeichert)";
  es.innerHTML=`<option value="__CURRENT_DRAFT__">${esc(draftText)}</option>`+
    entries.map(e=>{
      const sh=project().sheets.find(s=>s.id===e.sheetId);
@@ -4161,7 +4183,7 @@ renderSelectedAnnotation=function(){
  box.style.display="block";const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId);
  const draft=isDraftEntryId(a.entryId);
  document.getElementById("selectedAnnTitle").textContent=`${a.label} · ${a.type==="point"?"Punkt":a.type==="line"?"Linie":"Text"}`;
- document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassung · noch nicht gespeichert":e?`Aufmaß: Zeile ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
+ document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassungs-ID · noch nicht gespeichert":e?`Erfassung: ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
  document.getElementById("goEntryBtn").style.display=e?"inline-block":"none";
 };
 
@@ -4177,7 +4199,7 @@ deleteSelectedAnnotation=function(){_v54DeleteSelectedAnnotation();renderDraftEn
 function finalizeCurrentEntry(){
  const x=currentEntryPreview(),fm=document.getElementById("finalizeMessage");
  if(!x.valid){
-   fm.style.color="#aa3030";fm.textContent="Bitte Aufmaßzeile, LV-Position und Rechenansatz vollständig ausfüllen.";
+   fm.style.color="#aa3030";fm.textContent="Bitte Aufmaßzeile, LV-Unterposition und Rechenansatz vollständig ausfüllen.";
    scrollToEntryTop();return;
  }
  const token=v54DraftToken;
@@ -4318,7 +4340,7 @@ async function exportSelectedPlanAppendixPDF(){
    Im Planeditor ist KEINE erneute Zuordnung mehr nötig.
    Die aktuelle Erfassung bestimmt automatisch:
    - Aufmaß / Draft-ID
-   - LV-Position
+   - LV-Unterposition
    - gewählten Plan
 ================================================= */
 
@@ -4345,8 +4367,8 @@ function renderAutoPlanLinkSummary(){
    title.textContent=`${p.pos} · ${p.text}`;
    meta.innerHTML=`${esc(sh.code)} · ${esc(lineDesc)}<br>${num(qty)} ${esc(p.unit)}${pl?` · Plan: ${esc(pl.name)}`:""}`;
  }else{
-   title.textContent="Aktuelle Erfassung";
-   meta.textContent="Aufmaßzeile, LV-Position und Menge werden aus Punkt 1/2 übernommen.";
+   title.textContent="Aktuelle Erfassungs-ID";
+   meta.textContent="Aufmaßzeile, LV-Unterposition und Menge werden aus Punkt 1/2 übernommen.";
  }
 }
 
@@ -4610,7 +4632,7 @@ function renderFreehandDraft(){
 function finishFreehand(){
  if(freehandDraftPoints.length<2){freehandDraftPoints=[];freehandPointerId=null;renderPlanAnnotations();return}
  const link=currentPlanLink();
- if(!link.pos){freehandDraftPoints=[];freehandPointerId=null;alert("Bitte zuerst eine LV-Position erfassen.");renderPlanAnnotations();return}
+ if(!link.pos){freehandDraftPoints=[];freehandPointerId=null;alert("Bitte zuerst eine LV-Unterposition erfassen.");renderPlanAnnotations();return}
  const pl=activePlan();
  const points=simplifyFreehand(freehandDraftPoints);
  const ann={
@@ -4735,7 +4757,7 @@ renderSelectedAnnotation=function(){
  box.style.display="block";const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
  const typeName=a.type==="point"?"Punkt":a.type==="line"?"Linie":a.type==="freehand"?"Freihand":"Text";
  document.getElementById("selectedAnnTitle").textContent=`${a.label} · ${typeName}`;
- document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassung · noch nicht gespeichert":e?`Aufmaß: Zeile ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
+ document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassungs-ID · noch nicht gespeichert":e?`Erfassung: ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
  document.getElementById("goEntryBtn").style.display=e?"inline-block":"none";
 };
 
@@ -5305,7 +5327,7 @@ nextAnnLabel=function(type){
 /* Create point/text with style */
 createPlanAnnotation=function(type,pt){
  const pl=activePlan(),link=currentPlanLink(),style=currentPlanStyle();
- if(!link.pos){alert("Bitte zuerst eine LV-Position erfassen.");return}
+ if(!link.pos){alert("Bitte zuerst eine LV-Unterposition erfassen.");return}
  if(type==="text" && !link.text){alert("Bitte einen Text für die Planmarkierung eingeben.");return}
  const ann={id:uid("ann"),type,label:nextAnnLabel(type),entryId:link.entryId,pos:link.pos,note:link.note,text:type==="text"?link.text:"",x:pt.x,y:pt.y,color:style.color,width:style.width,createdAt:new Date().toISOString()};
  pl.annotations.push(ann); selectedAnnotationId=ann.id; persist(); populatePlanFilter(); renderPlanList(); renderPlanAnnotations(); renderSelectedAnnotation();
@@ -5316,7 +5338,7 @@ createPlanAnnotation=function(type,pt){
 finishPlanLine=function(){
  if(planLineDraft.length<2){ if(planLineDraft.length)alert("Für eine Linie mindestens zwei Punkte setzen."); return; }
  const pl=activePlan(),link=currentPlanLink(),style=currentPlanStyle();
- if(!link.pos){alert("Bitte zuerst eine LV-Position erfassen.");return}
+ if(!link.pos){alert("Bitte zuerst eine LV-Unterposition erfassen.");return}
  const ann={id:uid("ann"),type:"line",label:nextAnnLabel("line"),entryId:link.entryId,pos:link.pos,note:link.note,text:"",points:planLineDraft.slice(),color:style.color,width:style.width,createdAt:new Date().toISOString()};
  pl.annotations.push(ann); planLineDraft=[]; planLineHoverNorm=null; selectedAnnotationId=ann.id; persist(); populatePlanFilter(); renderPlanList(); renderPlanAnnotations(); renderSelectedAnnotation(); toggleLineButtons();
  try{renderDraftEntrySummary(); renderAutoPlanLinkSummary();}catch(e){}
@@ -5325,7 +5347,7 @@ finishPlanLine=function(){
 /* Finish freehand with style */
 finishFreehand=function(){
  if(freehandDraftPoints.length<2){freehandDraftPoints=[];freehandPointerId=null;renderPlanAnnotations();return}
- const link=currentPlanLink(); if(!link.pos){freehandDraftPoints=[];freehandPointerId=null;alert("Bitte zuerst eine LV-Position erfassen.");renderPlanAnnotations();return}
+ const link=currentPlanLink(); if(!link.pos){freehandDraftPoints=[];freehandPointerId=null;alert("Bitte zuerst eine LV-Unterposition erfassen.");renderPlanAnnotations();return}
  const pl=activePlan(),style=currentPlanStyle();
  const points=simplifyFreehand(freehandDraftPoints);
  const ann={id:uid("ann"),type:"freehand",label:nextAnnLabel("freehand"),entryId:link.entryId,pos:link.pos,note:link.note,text:"",points,width:style.width,color:style.color,createdAt:new Date().toISOString()};
@@ -5338,7 +5360,7 @@ function finishShapeDraft(){
  if(!planShapeDraft)return;
  const draft=planShapeDraft; planShapeDraft=null;
  const link=currentPlanLink(),style=currentPlanStyle(),pl=activePlan();
- if(!link.pos){renderPlanAnnotations(); alert("Bitte zuerst eine LV-Position erfassen."); return}
+ if(!link.pos){renderPlanAnnotations(); alert("Bitte zuerst eine LV-Unterposition erfassen."); return}
  const b = draft.type==="circle" ? normalizeCircleBounds(draft.start,draft.current) : normalizeRectBounds(draft.start,draft.current);
  if(Math.abs(b.x2-b.x1)<5 || Math.abs(b.y2-b.y1)<5){renderPlanAnnotations(); return}
  const ann={id:uid("ann"),type:draft.type,label:nextAnnLabel(draft.type),entryId:link.entryId,pos:link.pos,note:link.note,text:"",color:style.color,width:style.width,createdAt:new Date().toISOString(),...b};
@@ -5499,7 +5521,7 @@ renderSelectedAnnotation=function(){
  box.style.display="block";
  const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
  document.getElementById("selectedAnnTitle").textContent=`${a.label} · ${annotationTypeName(a.type)}`;
- document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassung · noch nicht gespeichert":e?`Aufmaß: Zeile ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}<br>Farbe: <span style="display:inline-block;width:10px;height:10px;border:1px solid #999;vertical-align:middle;background:${esc(a.color||"#b83232")}"></span> · Linienstärke: ${Number(a.width||7)}`;
+ document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassungs-ID · noch nicht gespeichert":e?`Erfassung: ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}<br>Farbe: <span style="display:inline-block;width:10px;height:10px;border:1px solid #999;vertical-align:middle;background:${esc(a.color||"#b83232")}"></span> · Linienstärke: ${Number(a.width||7)}`;
  document.getElementById("goEntryBtn").style.display=e?"inline-block":"none";
 };
 
@@ -5968,7 +5990,7 @@ renderRecent=function(){
    <td>${esc(e.calc)}</td>
    <td>${num(e.qty)}</td><td>${esc(e.unit)}</td>
    <td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td>
-   <td><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan bearbeiten</button></div></td>
+   <td><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Planmarkierung bearbeiten</button></div></td>
   </tr>`).join("");
 };
 
@@ -6004,7 +6026,7 @@ renderSheet=function(){
     <td class="wrap">${esc(pos?.text||"")}</td>
     <td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td>
     <td>${esc(e.detail)}</td><td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td>
-    <td class="noPrint"><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan bearbeiten</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div></td>
+    <td class="noPrint"><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Planmarkierung bearbeiten</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div></td>
    </tr>`;
  }).join("");
 
@@ -6052,15 +6074,15 @@ renderDraftEntrySummary=function(){
  const id=currentPlannedEntryDisplayId();
 
  if(!x.valid){
-   box.innerHTML=`<div class="fsCell"><b>Vorgesehene ID</b>${id}</div><div class="small">Noch keine vollständige Erfassung vorbereitet.</div>`;
+   box.innerHTML=`<div class="fsCell"><b>Nächste ID</b>${id}</div><div class="small">Noch keine vollständige Erfassung vorbereitet.</div>`;
    if(status){status.className="badge warn";status.textContent="noch nicht gespeichert"}
    return;
  }
  box.innerHTML=`
   <div class="fsCell"><b>ID</b><span class="entryIdBadge">${id}</span></div>
   <div class="fsCell"><b>Aufmaßblatt</b>${esc(x.sheet?.code||"–")}<br>${esc([x.sheet?.topArea,x.sheet?.area].filter(Boolean).join(" – "))}</div>
-  <div class="fsCell"><b>LV-Position</b>${esc(x.pos?.pos||"–")}<br>${esc(x.pos?.text||"")}</div>
-  <div class="fsCell"><b>Menge / Plan</b>${num(x.qty)} ${esc(x.pos?.unit||"")}<br>${esc(x.plan?.name||"kein Plan gewählt")} · ${anns.length} Markierung(en)</div>`;
+  <div class="fsCell"><b>LV-Unterposition</b>${esc(x.pos?.pos||"–")}<br>${esc(x.pos?.text||"")}</div>
+  <div class="fsCell"><b>Menge / Planmarkierung</b>${num(x.qty)} ${esc(x.pos?.unit||"")}<br>${esc(x.plan?.name||"kein Plan ausgewählt")} · ${anns.length} Markierung(en)</div>`;
  if(status){status.className=anns.length?"badge ok":"badge warn";status.textContent=anns.length?`${anns.length} Planmarkierung(en)`:"keine Planmarkierung"}
 };
 
@@ -6072,7 +6094,7 @@ renderSelectedAnnotation=function(){
  const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
  const id=draft?currentPlannedEntryDisplayId():(e?entryDisplayId(e):a.label);
  document.getElementById("selectedAnnTitle").textContent=`ID ${id} · ${annotationTypeName(a.type)}`;
- document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassung · noch nicht gespeichert":e?`Aufmaß ID ${id} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}<br>Farbe: <span style="display:inline-block;width:10px;height:10px;border:1px solid #999;vertical-align:middle;background:${esc(a.color||"#b83232")}"></span> · Linienstärke: ${Number(a.width||7)}`;
+ document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassungs-ID · noch nicht gespeichert":e?`Erfassungs-ID ${id} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}<br>Farbe: <span style="display:inline-block;width:10px;height:10px;border:1px solid #999;vertical-align:middle;background:${esc(a.color||"#b83232")}"></span> · Linienstärke: ${Number(a.width||7)}`;
  document.getElementById("goEntryBtn").style.display=e?"inline-block":"none";
 };
 
@@ -6088,7 +6110,7 @@ makePlanEvidenceHtml=async function(sh){
    blocks.push(`<div class="sheetPlanEvidence">
     <div class="sheetPlanEvidenceHead">
      <div><b>ID ${id} · ${esc(item.plan.name)}</b><div class="desc">${esc(item.ann.pos)} · ${esc(p?.text||"")}</div></div>
-     <div class="desc">${num(e.qty)} ${esc(e.unit)} · Aufmaß ID ${id}</div>
+     <div class="desc">${num(e.qty)} ${esc(e.unit)} · Erfassungs-ID ${id}</div>
     </div>
     <div class="sheetPlanEvidenceGrid">
      <div><img src="${pics.detail}"><div class="cap"> ID ${id}</div></div>
@@ -6118,7 +6140,7 @@ makeSheetPrintBlockV52=async function(sh,includeBilling){
     <div><b>Bereich</b><br>${esc([sh.topArea,sh.area].filter(Boolean).join(" – ")||"–")}</div>
     <div><b>Datum / Gewerk</b><br>${esc(sh.date||"–")} · ${esc(sh.trade||"–")}</div>
    </div>
-   <table><thead><tr><th>ID</th><th>Beschreibung</th><th>LV Pos.</th><th>LV-Leistung</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th></tr></thead><tbody>${body}</tbody></table>
+   <table><thead><tr><th>ID</th><th>Beschreibung</th><th>LV-Unterposition</th><th>Leistungsbeschreibung</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th></tr></thead><tbody>${body}</tbody></table>
    ${plansHtml}
    ${billing}
   </div>`;
@@ -6138,7 +6160,7 @@ printPlanAppendix=async function(){
     <div class="printMeta"><div><b>Projekt</b><br>${esc(project().meta.name)}</div><div><b>Projektnr.</b><br>${esc(project().meta.number||"–")}</div><div><b>Plan</b><br>${esc(pl.name)}${pl.number?" · "+esc(pl.number):""}</div><div><b>Bereich / Stand</b><br>${esc(pl.area||"–")} · ${esc(pl.date||"–")}</div></div>
     <img src="${dataUrl}">
     <h3>Legende / Zuordnung</h3>
-    <table><thead><tr><th>ID</th><th>LV-Pos.</th><th>Beschreibung</th><th>Menge</th><th>Aufmaß</th><th>Bemerkung</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Keine sichtbaren Markierungen.</td></tr>'}</tbody></table>`;
+    <table><thead><tr><th>ID</th><th>LV-Unterposition</th><th>Beschreibung</th><th>Menge</th><th>Aufmaß</th><th>Bemerkung</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Keine sichtbaren Markierungen.</td></tr>'}</tbody></table>`;
    document.body.classList.add("planPrintMode");
    const cleanup=()=>{document.body.classList.remove("planPrintMode");window.removeEventListener("afterprint",cleanup)};
    window.addEventListener("afterprint",cleanup);setTimeout(()=>window.print(),100);
@@ -6225,7 +6247,7 @@ function updateUnsavedPlanUi(){
    btn.textContent=`Ungespeicherte löschen (${all.length})`;
    btn.disabled=all.length===0;
    btn.title=all.length
-     ? `${all.length} noch nicht gespeicherte Planmarkierung(en) im Projekt löschen`
+     ? `${all.length} noch nicht gespeicherte Planmarkierung(en) im Projekt lokal löschen`
      : "Keine ungespeicherten Planmarkierungen vorhanden";
  }
 
@@ -6234,7 +6256,7 @@ function updateUnsavedPlanUi(){
    if(current.length){
      const id=typeof currentPlannedEntryDisplayId==="function" ? currentPlannedEntryDisplayId() : "";
      warning.style.display="block";
-     warning.innerHTML=`⚠ <b>${current.length} Planmarkierung(en) für ID ${esc(id)}</b> sind noch nicht gespeichert. Erst mit „Erfassung vollständig speichern“ werden sie endgültig der Erfassung zugeordnet.`;
+     warning.innerHTML=`⚠ <b>${current.length} Planmarkierung(en) für ID ${esc(id)}</b> sind noch nicht gespeichert. Erst mit „Erfassung speichern“ werden sie endgültig der Erfassung zugeordnet.`;
    }else{
      warning.style.display="none";
      warning.innerHTML="";
@@ -6607,7 +6629,7 @@ makePlanEvidenceHtml = async function(sh){
           <b>ID ${id} · ${esc(item.ann.pos)} · ${esc(p?.text || "")}</b>
           <div class="desc">Plan: ${esc(item.plan.name)}</div>
         </div>
-        <div class="desc">${num(e.qty)} ${esc(e.unit)} · Aufmaß ID ${id}</div>
+        <div class="desc">${num(e.qty)} ${esc(e.unit)} · Erfassungs-ID ${id}</div>
       </div>
       <div class="sheetPlanEvidenceGrid">
         <div><img src="${pics.detail}"><div class="cap"></div></div>
@@ -6922,7 +6944,7 @@ makePlanEvidenceHtml = async function(sh){
           <b>ID ${id} · ${esc(item.ann.pos)} · ${esc(p?.text||"")}</b>
           <div class="desc">Plan: ${esc(item.plan.name)}</div>
         </div>
-        <div class="desc">${num(e.qty)} ${esc(e.unit)} · Aufmaß ID ${id}</div>
+        <div class="desc">${num(e.qty)} ${esc(e.unit)} · Erfassungs-ID ${id}</div>
       </div>
 
       <div class="sheetPlanEvidenceGrid">
@@ -7173,7 +7195,7 @@ makePlanEvidenceHtml = async function(sh){
             <b>ID ${id} · ${esc(e.pos)} · ${esc(p?.text||"")}${clusterSuffix}</b>
             <div class="desc">Plan: ${esc(group.plan.name)}</div>
           </div>
-          <div class="desc">${num(e.qty)} ${esc(e.unit)} · Aufmaß ID ${id}</div>
+          <div class="desc">${num(e.qty)} ${esc(e.unit)} · Erfassungs-ID ${id}</div>
         </div>
 
         <div class="sheetPlanEvidenceGrid">
@@ -7528,7 +7550,7 @@ printPlanAppendix=async function(){
       <div class="printMeta"><div><b>Projekt</b><br>${esc(project().meta.name)}</div><div><b>Projektnr.</b><br>${esc(project().meta.number||"–")}</div><div><b>Plan</b><br>${esc(pl.name)}${pl.number?" · "+esc(pl.number):""}</div><div><b>Bereich / Stand</b><br>${esc(pl.area||"–")} · ${esc(pl.date||"–")}</div></div>
       <img src="${dataUrl}">
       <h3>Legende / Zuordnung</h3>
-      <table><thead><tr><th>ID</th><th>LV-Pos.</th><th>Beschreibung</th><th>Menge</th><th>Aufmaß</th><th>Bemerkung</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Keine sichtbaren Markierungen.</td></tr>'}</tbody></table>
+      <table><thead><tr><th>ID</th><th>LV-Unterposition</th><th>Beschreibung</th><th>Menge</th><th>Aufmaß</th><th>Bemerkung</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Keine sichtbaren Markierungen.</td></tr>'}</tbody></table>
       ${exportFooterHtml()}`;
     document.body.classList.add("planPrintMode");
     const cleanup=()=>{document.body.classList.remove("planPrintMode");window.removeEventListener("afterprint",cleanup)};
@@ -7803,7 +7825,7 @@ printPlanAppendix=async function(){
       </div>
       <img src="${dataUrl}">
       <h3>Legende / Zuordnung</h3>
-      <table><thead><tr><th>ID</th><th>LV-Pos.</th><th>Beschreibung</th><th>Menge</th><th>Aufmaß</th><th>Bemerkung</th></tr></thead>
+      <table><thead><tr><th>ID</th><th>LV-Unterposition</th><th>Beschreibung</th><th>Menge</th><th>Aufmaß</th><th>Bemerkung</th></tr></thead>
       <tbody>${rows||'<tr><td colspan="6">Keine sichtbaren Markierungen.</td></tr>'}</tbody></table>`;
 
     document.body.classList.add("planPrintMode");
@@ -7907,7 +7929,7 @@ function v519EntryRowsHtml(rows){
 function v519EntryTableHtml(rows){
   return `<table>
     <thead><tr>
-      <th>ID</th><th>Beschreibung</th><th>LV Pos.</th><th>LV-Leistung</th>
+      <th>ID</th><th>Beschreibung</th><th>LV-Unterposition</th><th>Leistungsbeschreibung</th>
       <th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th>
     </tr></thead>
     <tbody>${v519EntryRowsHtml(rows)}</tbody>
@@ -8118,7 +8140,7 @@ printPlanAppendix=async function(){
     });
     for(let i=0;i<rows.length;i+=24){
       pages.push(v519Page(
-        `<table><thead><tr><th>ID</th><th>LV-Pos.</th><th>Beschreibung</th><th>Menge</th><th>Aufmaß</th><th>Bemerkung</th></tr></thead><tbody>${rows.slice(i,i+24).join("")}</tbody></table>`,
+        `<table><thead><tr><th>ID</th><th>LV-Unterposition</th><th>Beschreibung</th><th>Menge</th><th>Aufmaß</th><th>Bemerkung</th></tr></thead><tbody>${rows.slice(i,i+24).join("")}</tbody></table>`,
         "Legende / Zuordnung",
         `${pl.name}${i?` · Fortsetzung ${Math.floor(i/24)+1}`:""}`
       ));
@@ -8140,7 +8162,7 @@ printPlanAppendix=async function(){
 v519EntryTableHtml=function(rows){
   return `<table class="v520EntryTable">
     <thead><tr>
-      <th>ID</th><th>Beschreibung</th><th>LV Pos.</th><th>LV-Leistung</th>
+      <th>ID</th><th>Beschreibung</th><th>LV-Unterposition</th><th>Leistungsbeschreibung</th>
       <th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th>
     </tr></thead>
     <tbody>${v519EntryRowsHtml(rows)}</tbody>
@@ -8523,7 +8545,7 @@ function renderMobilePositionResults(){
     : `${positions().length} Positionen · scrollen oder suchen`;
 
   if(!list.length){
-    box.innerHTML='<div class="mobilePosEmpty">Keine passende LV-Position gefunden.</div>';
+    box.innerHTML='<div class="mobilePosEmpty">Keine passende LV-Unterposition gefunden.</div>';
     return;
   }
 
@@ -8774,7 +8796,7 @@ function applyRoleRestrictions(){
  if(projectButtons && currentAccess().mode==="worker"){
    [...projectButtons.querySelectorAll("button")].forEach(b=>{
      const t=(b.textContent||"").trim();
-     const allow=t.includes("Plan") || t.includes("Projekt löschen") || t==="Löschen";
+     const allow=t.includes("Plan") || t.includes("Projekt lokal löschen") || t==="Löschen";
      b.style.display=allow?"":"none";
    });
  }
@@ -8825,7 +8847,7 @@ deleteCurrentProject=function(){
  const p=project(); if(!p)return;
 
  if(currentAccess().mode==="worker"){
-   const name=p.meta?.name||"Arbeitsprojekt";
+   const name=p.meta?.name||"Monteur-Arbeitsprojekt";
    const user=currentAccess().user?.name||"Monteur";
    const msg=`Lokale Arbeitskopie "${name}" für ${user} wirklich von diesem Gerät löschen?\n\n`+
              `Wichtig: Dadurch wird NICHT das Masterprojekt beim Projektleiter gelöscht.\n`+
@@ -8845,7 +8867,7 @@ deleteCurrentProject=function(){
  }
 
  if(!can("projectEdit")){
-   alert("Projekt löschen ist für dieses Profil nicht erlaubt.");
+   alert("Projekt lokal löschen ist für dieses Profil nicht erlaubt.");
    return;
  }
  return _v6DeleteCurrentProject();
@@ -8942,7 +8964,7 @@ function renderSyncView(){
  document.getElementById("syncProjectBadge").textContent=worker?"ARBEITSDATEI":"MASTERPROJEKT";
  document.getElementById("syncProjectBadge").className="badge "+(worker?"warn":"ok");
  document.getElementById("syncModeInfo").textContent=worker
-   ? `Arbeitsdatei für ${p.sync.assignedUser?.name||"Monteur"} · Übergabe ${p.sync.workPackageId||"–"}`
+   ? `Monteur-Arbeitsdatei für ${p.sync.assignedUser?.name||"Monteur"} · Übergabe ${p.sync.workPackageId||"–"}`
    : `Masterprojekt · interne Projekt-ID ${p.sync.projectUuid}`;
 
  if(worker){
@@ -9075,13 +9097,13 @@ async function importWorkerPackage(ev){
    catch(err){throw new Error("Die ausgewählte Datei ist keine lesbare JSON-Datei.")}
 
    if(x?.kollType==="WORKER_RETURN"){
-     throw new Error("Das ist eine MONTEUR-RÜCKGABE. Bitte diese Datei beim Projektleiter unter „Rückgaben in Master einspielen“ importieren.");
+     throw new Error("Das ist eine MONTEUR-RÜCKGABE. Bitte diese Datei beim Projektleiter unter „Rückgabedateien ins Masterprojekt einspielen“ importieren.");
    }
    if(x?.kollType!=="WORK_PACKAGE"){
      if(x?.projects || x?.version || x?.currentProjectId){
-       throw new Error("Das ist eine normale MASTER-/DATENSICHERUNG, keine Monteur-Arbeitsdatei. Bitte im Master zuerst ein Monteurprofil anlegen und über „Arbeitsdatei für Monteur erstellen“ eine neue Datei erzeugen.");
+       throw new Error("Das ist eine normale MASTER-/DATENSICHERUNG, keine Monteur-Arbeitsdatei. Bitte im Master zuerst ein Monteurprofil anlegen und über „Monteur-Arbeitsdatei erstellen“ eine neue Datei erzeugen.");
      }
-     throw new Error("Dateityp nicht erkannt. Bitte eine Datei verwenden, deren Name „ARBEITSDATEI“ enthält und die direkt über „Arbeitsdatei für Monteur erstellen“ erzeugt wurde.");
+     throw new Error("Dateityp nicht erkannt. Bitte eine Datei verwenden, deren Name „ARBEITSDATEI“ enthält und die direkt über „Monteur-Arbeitsdatei erstellen“ erzeugt wurde.");
    }
    if(x.formatVersion!==SYNC_PACKAGE_VERSION||!x.project){
      throw new Error("Die Arbeitsdatei hat nicht das erwartete V6-Format.");
@@ -9098,7 +9120,7 @@ async function importWorkerPackage(ev){
    state.currentProjectId=p.id;
    await restorePackageAssets(p,x.assets);
    persist();renderProject();showView("entry");
-   alert(`Arbeitsdatei für ${x.user?.name||"Monteur"} geladen.`);
+   alert(`Monteur-Arbeitsdatei für ${x.user?.name||"Monteur"} geladen.`);
  }catch(e){
    console.error(e);
    alert(e.message||"Arbeitsdatei konnte nicht geladen werden.");
@@ -9865,14 +9887,14 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.15 MULTI-LV ================= */
+/* ================= V6.17 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
  const p=getPos(document.getElementById("posSelect")?.value||"");
  const calc=document.getElementById("calc")?.value.trim()||"";
  const qty=previewCalc();
- if(!p)return{valid:false,message:"Bitte zuerst eine LV-Position auswählen."};
+ if(!p)return{valid:false,message:"Bitte zuerst eine LV-Unterposition auswählen."};
  if(qty===null || qty===0)return{valid:false,message:"Bitte einen gültigen Rechenansatz eingeben."};
  return{
    valid:true,
@@ -9886,7 +9908,7 @@ function v610CurrentLvCandidate(){
 
 function addCurrentLvToBatch(){
  if(editingEntryId){
-   alert("Während der Bearbeitung einer bestehenden Erfassung können keine weiteren LV-Positionen gesammelt werden. Bitte Bearbeitung zuerst speichern oder abbrechen.");
+   alert("Während der Bearbeitung einer bestehenden Erfassung können keine weiteren LV-Unterpositionen gesammelt werden. Bitte Bearbeitung zuerst speichern oder abbrechen.");
    return;
  }
  const c=v610CurrentLvCandidate();
@@ -9894,12 +9916,12 @@ function addCurrentLvToBatch(){
 
  const same=multiLvDraft.findIndex(x=>x.pos===c.pos);
  if(same>=0){
-   if(!confirm(`LV-Position ${c.pos} ist bereits vorgemerkt. Vorhandenen Rechenansatz ersetzen?`))return;
+   if(!confirm(`LV-Unterposition ${c.pos} ist bereits vorgemerkt. Vorhandenen Rechenansatz ersetzen?`))return;
    multiLvDraft[same]=c;
  }else multiLvDraft.push(c);
 
  renderMultiLvDraft();
- msg(`LV-Position ${c.pos} vorgemerkt.`);
+ msg(`LV-Unterposition ${c.pos} vorgemerkt.`);
  document.getElementById("calc").value="";
  document.getElementById("posSearch").value="";
  document.getElementById("posSelect").value="";
@@ -9913,7 +9935,7 @@ function removeLvFromBatch(index){
 }
 
 function clearMultiLvDraft(){
- if(multiLvDraft.length && !confirm("Alle vorgemerkten LV-Positionen entfernen?"))return;
+ if(multiLvDraft.length && !confirm("Alle vorgemerkten LV-Unterpositionen entfernen?"))return;
  multiLvDraft=[];
  renderMultiLvDraft();
 }
@@ -9922,7 +9944,7 @@ function renderMultiLvDraft(){
  const box=document.getElementById("multiLvList");
  if(!box)return;
  if(!multiLvDraft.length){
-   box.innerHTML='<div class="small">Noch keine zusätzlichen LV-Positionen vorgemerkt.</div>';
+   box.innerHTML='<div class="small">Noch keine zusätzlichen LV-Unterpositionen vorgemerkt.</div>';
    return;
  }
  box.innerHTML=multiLvDraft.map((x,i)=>`
@@ -9933,7 +9955,7 @@ function renderMultiLvDraft(){
     <div class="mliQty"><b>${num(x.qty)} ${esc(x.unit)}</b></div>
     <button type="button" class="danger" onclick="removeLvFromBatch(${i})">Entfernen</button>
    </div>`).join("")+
-   `<div class="toolbar"><button type="button" class="secondary" onclick="clearMultiLvDraft()">Liste leeren</button><span class="small">${multiLvDraft.length} LV-Position(en) vorgemerkt</span></div>`;
+   `<div class="toolbar"><button type="button" class="secondary" onclick="clearMultiLvDraft()">Liste leeren</button><span class="small">${multiLvDraft.length} LV-Unterposition(en) vorgemerkt</span></div>`;
 }
 
 /* One description -> several normal entries. Each stays independently billable/syncable. */
@@ -9995,7 +10017,7 @@ finalizeCurrentEntry=function(){
  }
 
  if(!items.length){
-   fm.style.color="#aa3030";fm.textContent="Bitte mindestens eine LV-Position mit Menge eingeben.";return;
+   fm.style.color="#aa3030";fm.textContent="Bitte mindestens eine LV-Unterposition mit Menge eingeben.";return;
  }
 
  const shared={
@@ -10028,7 +10050,7 @@ finalizeCurrentEntry=function(){
 
  const ids=saved.map(e=>entryDisplayId(e)).join(", ");
  fm.style.color="#1f7a4d";
- fm.innerHTML=`${saved.length} LV-Positionen gespeichert · IDs <b>${esc(ids)}</b>.<br>Die Planmarkierung kann jetzt bei jeder Position über <b>„Plan bearbeiten“</b> ergänzt oder geändert werden.`;
+ fm.innerHTML=`${saved.length} LV-Unterpositionen gespeichert · IDs <b>${esc(ids)}</b>.<br>Die Planmarkierung kann jetzt bei jeder Position über <b>„Planmarkierung bearbeiten“</b> ergänzt oder geändert werden.`;
 };
 
 /* Form clearing also clears batch only when starting a genuinely new description. */
@@ -10036,7 +10058,7 @@ const _v610ClearCurrentEntryDraft=clearCurrentEntryDraft;
 clearCurrentEntryDraft=function(){
  const had=multiLvDraft.length;
  if(had && !editingEntryId){
-   if(!confirm("Eingabe einschließlich aller vorgemerkten LV-Positionen leeren?"))return;
+   if(!confirm("Eingabe einschließlich aller vorgemerkten LV-Unterpositionen leeren?"))return;
    multiLvDraft=[];
  }
  _v610ClearCurrentEntryDraft();
@@ -10064,7 +10086,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.15 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.17 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10141,7 +10163,7 @@ renderMultiLvDraft=function(){
 
  const editMode=!!v612EditingGroupId;
  if(!multiLvDraft.length){
-   box.innerHTML=`<div class="small">${editMode?"Diese ID enthält derzeit noch keine LV-Position.":"Noch keine zusätzlichen LV-Positionen vorgemerkt."}</div>`;
+   box.innerHTML=`<div class="small">${editMode?"Diese ID enthält derzeit noch keine LV-Unterposition.":"Noch keine zusätzlichen LV-Unterpositionen vorgemerkt."}</div>`;
    return;
  }
 
@@ -10156,7 +10178,7 @@ renderMultiLvDraft=function(){
       <button type="button" class="danger" onclick="removeLvFromBatch(${i})">Entfernen</button>
     </div>
    </div>`).join("")+
-   `<div class="toolbar"><span class="small"><b>${multiLvDraft.length}</b> LV-Position(en) gehören zu ${editMode?`ID ${v612SharedDisplayIdForGroup(v612EditingAnchorId)}`:"dieser Erfassung"}.</span></div>`;
+   `<div class="toolbar"><span class="small"><b>${multiLvDraft.length}</b> LV-Unterposition(en) gehören zu ${editMode?`ID ${v612SharedDisplayIdForGroup(v612EditingAnchorId)}`:"dieser Erfassung"}.</span></div>`;
 };
 
 function v612LoadLvItem(index){
@@ -10164,7 +10186,7 @@ function v612LoadLvItem(index){
  multiLvDraft.splice(index,1);
  renderMultiLvDraft();
  v612SetFormPosition(item);
- msg(`LV-Position ${item.pos} zum Ändern geladen.`);
+ msg(`LV-Unterposition ${item.pos} zum Ändern geladen.`);
 }
 
 /* In edit mode adding/replacing LV is explicitly allowed. */
@@ -10174,14 +10196,14 @@ addCurrentLvToBatch=function(){
 
  const same=multiLvDraft.findIndex(x=>x.pos===c.pos);
  if(same>=0){
-   if(!confirm(`LV-Position ${c.pos} ist bereits enthalten. Rechenansatz und Menge ersetzen?`))return;
+   if(!confirm(`LV-Unterposition ${c.pos} ist bereits enthalten. Rechenansatz und Menge ersetzen?`))return;
    const prev=multiLvDraft[same];
    multiLvDraft[same]={...prev,...c};
  }else{
    multiLvDraft.push(c);
  }
  renderMultiLvDraft();
- msg(`LV-Position ${c.pos} übernommen.`);
+ msg(`LV-Unterposition ${c.pos} übernommen.`);
  document.getElementById("calc").value="";
  document.getElementById("posSearch").value="";
  document.getElementById("posSelect").value="";
@@ -10330,7 +10352,7 @@ finalizeCurrentEntry=function(){
    }
    if(!items.length){
      fm.style.color="#aa3030";
-     fm.textContent="Eine Erfassung muss mindestens eine LV-Position enthalten.";
+     fm.textContent="Eine Erfassung muss mindestens eine LV-Unterposition enthalten.";
      return;
    }
 
@@ -10414,7 +10436,7 @@ finalizeCurrentEntry=function(){
    persist();
    renderAll?.(); renderSheet?.(); renderRecent?.(); renderLV?.();
    fm.style.color="#1f7a4d";
-   fm.innerHTML=`ID <b>${sharedDisplayId}</b> aktualisiert · ${newEntries.length} LV-Position(en).`;
+   fm.innerHTML=`ID <b>${sharedDisplayId}</b> aktualisiert · ${newEntries.length} LV-Unterposition(en).`;
    return;
  }
 
@@ -10431,7 +10453,7 @@ finalizeCurrentEntry=function(){
      const ix=items.findIndex(x=>x.pos===current.pos);
      if(ix>=0)items[ix]={...items[ix],...current}; else items.push(current);
    }
-   if(!items.length){fm.style.color="#aa3030";fm.textContent="Bitte mindestens eine LV-Position eingeben.";return}
+   if(!items.length){fm.style.color="#aa3030";fm.textContent="Bitte mindestens eine LV-Unterposition eingeben.";return}
 
    const sharedDisplayId=peekNextEntryDisplayId();
    const shared={
@@ -10459,7 +10481,7 @@ finalizeCurrentEntry=function(){
    persist();
    renderAll?.(); renderRecent?.(); renderSheet?.(); renderLV?.();
    fm.style.color="#1f7a4d";
-   fm.innerHTML=`ID <b>${sharedDisplayId}</b> gespeichert · ${saved.length} LV-Position(en).`;
+   fm.innerHTML=`ID <b>${sharedDisplayId}</b> gespeichert · ${saved.length} LV-Unterposition(en).`;
    return;
  }
 
@@ -10472,7 +10494,7 @@ deleteEntry=function(id){
  const group=v612GroupEntries(e);
  const displayId=entryDisplayId(e);
  const text=group.length>1
-   ? `ID ${displayId} mit allen ${group.length} LV-Positionen wirklich löschen?`
+   ? `ID ${displayId} mit allen ${group.length} LV-Unterpositionen wirklich löschen?`
    : `ID ${displayId} wirklich löschen?`;
  if(!confirm(text))return;
 
@@ -10576,7 +10598,7 @@ renderRecent=function(){
   }
   const b=document.getElementById("recentBody");
   const head=b.closest("table")?.querySelector("thead");
-  if(head)head.innerHTML='<tr><th>ID</th><th>Beschreibung</th><th>LV-Position(en)</th><th>Mengen</th><th>Status</th><th>Anmerkung</th><th></th></tr>';
+  if(head)head.innerHTML='<tr><th>ID</th><th>Beschreibung</th><th>LV-Unterposition(en)</th><th>Mengen</th><th>Status</th><th>Anmerkung</th><th></th></tr>';
   if(!groups.length){
     b.innerHTML='<tr><td colspan="7" class="empty">Noch keine Erfassungen im aktiven Aufmaßblatt.</td></tr>';return;
   }
@@ -10589,7 +10611,7 @@ renderRecent=function(){
       <td class="wrap">${g.map(x=>`${num(x.qty)} ${esc(x.unit)} · ${esc(x.calc)}`).join("<br>")}</td>
       <td>${esc(a.reason||"")}</td>
       <td class="wrap">${esc(a.note||"")}</td>
-      <td><div class="toolbar"><button class="secondary" onclick="editEntry('${a.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${a.id}')">Plan bearbeiten</button></div></td>
+      <td><div class="toolbar"><button class="secondary" onclick="editEntry('${a.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${a.id}')">Planmarkierung bearbeiten</button></div></td>
     </tr>`;
   }).join("");
 };
@@ -10626,7 +10648,7 @@ renderSheet=function(){
        <td class="wrap">${esc(pos?.text||"")}</td>
        <td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td>
        <td>${first?esc(e.detail):""}</td><td>${first?esc(e.reason):""}</td><td class="wrap">${first?esc(e.note):""}</td>
-       <td class="noPrint">${first?`<div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan bearbeiten</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div>`:""}</td>
+       <td class="noPrint">${first?`<div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Planmarkierung bearbeiten</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div>`:""}</td>
      </tr>`;
    }).join("");
  }
@@ -10644,13 +10666,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.15 Gruppenmigration",e)}
+}catch(e){console.warn("V6.17 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.15 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.17 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -10756,7 +10778,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.15 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.17 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -10803,13 +10825,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.15 Migration",e)}
+}catch(e){console.warn("V6.17 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.15 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.17 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -10866,7 +10888,7 @@ renderRecent=function(){
   const table=b.closest("table");
   table?.classList.add("v614RecentTable");
   const head=table?.querySelector("thead");
-  if(head)head.innerHTML='<tr><th>ID</th><th>Beschreibung</th><th>LV-Position(en)</th><th>Menge / Ansatz</th><th>Status</th><th>Anmerkung</th><th></th></tr>';
+  if(head)head.innerHTML='<tr><th>ID</th><th>Beschreibung</th><th>LV-Unterposition(en)</th><th>Menge / Rechenansatz</th><th>Status</th><th>Anmerkung</th><th></th></tr>';
 
   if(!groups.length){
     b.innerHTML='<tr><td colspan="7" class="empty">Noch keine Erfassungen im aktiven Aufmaßblatt.</td></tr>';
@@ -10885,7 +10907,7 @@ renderRecent=function(){
       <td>
        <div class="toolbar" style="flex-direction:column;align-items:stretch">
         <button class="secondary" onclick="editEntry('${a.id}')">Bearbeiten</button>
-        <button class="okBtn" onclick="markEntryOnPlan('${a.id}')">Plan bearbeiten</button>
+        <button class="okBtn" onclick="markEntryOnPlan('${a.id}')">Planmarkierung bearbeiten</button>
        </div>
       </td>
     </tr>`;
@@ -10932,7 +10954,7 @@ renderSheet=function(){
         <td>${first?esc(a.detail||""):""}</td>
         <td>${first?esc(a.reason||""):""}</td>
         <td class="wrap">${first?esc(a.note||""):""}</td>
-        <td class="noPrint">${first?`<div class="toolbar"><button class="secondary" onclick="editEntry('${a.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${a.id}')">Plan bearbeiten</button><button class="danger" onclick="deleteEntry('${a.id}')">Löschen</button></div>`:""}</td>
+        <td class="noPrint">${first?`<div class="toolbar"><button class="secondary" onclick="editEntry('${a.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${a.id}')">Planmarkierung bearbeiten</button><button class="danger" onclick="deleteEntry('${a.id}')">Löschen</button></div>`:""}</td>
        </tr>`;
      }).join("");
    }).join("");
@@ -11045,13 +11067,13 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.15 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.17 Gruppendarstellung",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.15 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   V6.17 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
    ============================================================ */
 
 function v615OrderedEntryGroups(){
@@ -11173,7 +11195,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.15 ID-Kompaktierung",e)}
+  }catch(e){console.warn("V6.17 ID-Kompaktierung",e)}
   return r;
 };
 
@@ -11227,7 +11249,173 @@ try{
   renderDraftEntrySummary?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.15 Startmigration",e)}
+}catch(e){console.warn("V6.17 Startmigration",e)}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.17 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
+   ============================================================ */
+
+function v616DraftLvItems(){
+  let items = Array.isArray(multiLvDraft) ? multiLvDraft.map(x=>({...x})) : [];
+  try{
+    const current = typeof v610CurrentLvCandidate === "function" ? v610CurrentLvCandidate() : null;
+    if(current && current.valid){
+      const ix = items.findIndex(x=>x.pos===current.pos);
+      if(ix>=0) items[ix] = {...items[ix], ...current};
+      else items.push({...current});
+    }
+  }catch(e){}
+  return items;
+}
+function v616EntryGroupItems(){
+  if(v612EditingGroupId && editingEntryId){
+    return v612GroupEntries(editingEntryId);
+  }
+  return [];
+}
+function v616CurrentDescription(){
+  if(v612EditingGroupId && editingEntryId){
+    const g=v612GroupEntries(editingEntryId);
+    return g[0]?.lineDesc || "";
+  }
+  return document.getElementById("lineDesc")?.value.trim() || "";
+}
+function v616CurrentPlanName(){
+  const pid=document.getElementById("entryPlanSelect")?.value || activePlanId;
+  const pl=plans().find(x=>x.id===pid);
+  return pl?.name || "";
+}
+function v616CurrentSheetLabel(){
+  const sh=activeSheet();
+  return sh ? esc(sh.code || "AMBL") : "Kein Aufmaßblatt";
+}
+function v616ItemsLabel(items){
+  const n=items.length;
+  if(!n) return "noch keine LV-Unterposition vorbereitet";
+  const codes=items.map(x=>x.pos).filter(Boolean);
+  const preview=codes.slice(0,3).join(", ");
+  return `${n} LV-Unterposition(en)${preview?` · ${preview}${codes.length>3?" …":""}`:""}`;
+}
+
+/* User-facing hint box next to plan marking */
+renderAutoPlanLinkSummary=function(){
+  const title=document.getElementById("autoPlanLinkSummary");
+  const meta=document.getElementById("autoPlanLinkMeta");
+  if(!title||!meta)return;
+
+  const id=currentPlannedEntryDisplayId();
+  const planName=v616CurrentPlanName();
+  const lineDesc=v616CurrentDescription();
+
+  if(v612EditingGroupId && editingEntryId){
+    const group=v612GroupEntries(editingEntryId);
+    const anchor=group[0];
+    const sheet=project().sheets.find(x=>x.id===anchor?.sheetId);
+    title.textContent=`ID ${id} · Erfassung bearbeiten`;
+    meta.innerHTML=`${esc(sheet?.code||"AMBL")} · ${esc(anchor?.lineDesc||"ohne Beschreibung")}<br>${group.length} LV-Unterposition(en)${planName?` · Plan: ${esc(planName)}`:""}`;
+    return;
+  }
+
+  const items=v616DraftLvItems();
+  if(lineDesc || items.length){
+    title.textContent=`ID ${id} · aktuelle Erfassungs-ID`;
+    meta.innerHTML=`${v616CurrentSheetLabel()} · ${esc(lineDesc||"noch ohne Beschreibung")}<br>${esc(v616ItemsLabel(items))}${planName?` · Plan: ${esc(planName)}`:""}`;
+  }else{
+    title.textContent=`ID ${id} · aktuelle Erfassungs-ID`;
+    meta.textContent="Alle LV-Unterpositionen dieser Beschreibung werden gemeinsam unter derselben Erfassungs-ID gespeichert.";
+  }
+};
+
+/* Summary box in section 4 */
+renderDraftEntrySummary=function(){
+  const box=document.getElementById("draftEntrySummary");
+  const status=document.getElementById("draftPlanStatus");
+  if(!box)return;
+
+  const id=currentPlannedEntryDisplayId();
+  let anns=[];
+  if(editingEntryId){
+    plans().forEach(pl=>(pl.annotations||[]).forEach(a=>{ if(a.entryId===editingEntryId) anns.push({plan:pl,ann:a}) }));
+  }else{
+    anns=currentDraftAnnotations();
+  }
+
+  const lineDesc=v616CurrentDescription();
+  const sh=activeSheet();
+  const items=v612EditingGroupId && editingEntryId
+    ? v612GroupEntries(editingEntryId).map(e=>({pos:e.pos,text:getPos(e.pos)?.text||"",qty:e.qty,unit:e.unit,calc:e.calc}))
+    : v616DraftLvItems();
+
+  const planName=v616CurrentPlanName();
+
+  if(!lineDesc && !items.length){
+    box.innerHTML=`<div class="fsCell"><b>Nächste ID</b>${id}</div>
+                   <div class="small">Noch keine vollständige Erfassung vorbereitet. Alle LV-Unterpositionen dieser Beschreibung erhalten später dieselbe ID.</div>`;
+    if(status){status.className="badge warn";status.textContent="noch nicht gespeichert"}
+    return;
+  }
+
+  const itemLines = items.length
+    ? items.slice(0,4).map(it=>`${esc(it.pos||"")} ${it.qty!==undefined&&it.qty!==null?`· ${num(it.qty)} ${esc(it.unit||"")}`:""}`).join("<br>")
+    : "noch keine LV-Unterposition";
+
+  box.innerHTML=`
+    <div class="fsCell"><b>ID</b><span class="entryIdBadge">${id}</span><span class="smallHint">eine Erfassung = eine Erfassungs-ID</span></div>
+    <div class="fsCell"><b>Aufmaßblatt</b>${esc(sh?.code||"–")}<br>${esc([sh?.topArea,sh?.area].filter(Boolean).join(" – "))}</div>
+    <div class="fsCell"><b>Beschreibung</b>${esc(lineDesc||"noch ohne Beschreibung")}<br><span class="small">${items.length} LV-Unterposition(en)</span></div>
+    <div class="fsCell"><b>LV-Unterposition(en)</b>${itemLines}</div>
+    <div class="fsCell"><b>Plan / Planmarkierungen</b>${esc(planName||"kein Plan ausgewählt")}<br>${anns.length} Markierung(en)</div>`;
+
+  if(status){
+    status.className=anns.length?"badge ok":"badge warn";
+    status.textContent=anns.length?`${anns.length} Planmarkierung(en)`:"keine Planmarkierung";
+  }
+};
+
+/* Selected annotation wording */
+renderSelectedAnnotation=function(){
+ const box=document.getElementById("selectedAnnBox"),a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);
+ if(!a){box.style.display="none";return}
+ box.style.display="block";
+ const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
+ const id=draft?currentPlannedEntryDisplayId():(e?entryDisplayId(e):a.label);
+ document.getElementById("selectedAnnTitle").textContent=`ID ${id} · ${annotationTypeName(a.type)}`;
+ document.getElementById("selectedAnnInfo").innerHTML=
+   `<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>` +
+   `${draft?"Aktuelle Erfassungs-ID · noch nicht gespeichert"
+           :e?`Erfassungs-ID ${id} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`
+             :"keine gespeicherte Erfassung verknüpft"}` +
+   `${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}` +
+   `<br>Farbe: <span style="display:inline-block;width:10px;height:10px;border:1px solid #999;vertical-align:middle;background:${esc(a.color||"#b83232")}"></span> · Linienstärke: ${Number(a.width||7)}`;
+ document.getElementById("goEntryBtn").style.display=e?"inline-block":"none";
+};
+
+/* Draft marker text in plan list */
+try{
+  const _renderPlanAnnotations = renderPlanAnnotations;
+  renderPlanAnnotations = function(){
+    const r = _renderPlanAnnotations();
+    try{
+      const list = document.getElementById("planAnnList");
+      if(list){
+        list.innerHTML = list.innerHTML
+          .replaceAll("Aktuelle Erfassungs-ID (noch nicht gespeichert)", "Aktuelle Erfassungs-ID (noch nicht gespeichert)")
+          .replaceAll("Aktuelle Erfassungs-ID · ", "Aktuelle Erfassungs-ID · ");
+      }
+    }catch(e){}
+    return r;
+  };
+}catch(e){}
+
+/* Ensure updated wording is shown immediately */
+try{
+  renderAutoPlanLinkSummary?.();
+  renderDraftEntrySummary?.();
+  renderSelectedAnnotation?.();
+}catch(e){}
 </script>
 
 </body>
