@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.18</title>
+<title>Kollaudierung – V6.19</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.18 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.19 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.18 alter Testhinweis entfernt ===== */
+/* ===== V6.19 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.18 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.19 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1163,7 +1163,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.18 HINWEISE / TEXTE ===== */
+/* ===== V6.19 HINWEISE / TEXTE ===== */
 #autoPlanLinkSummary{line-height:1.25}
 #autoPlanLinkMeta{line-height:1.35}
 #draftEntrySummary .fsCell .smallHint{
@@ -1174,7 +1174,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.18 EINHEITLICHE BEGRIFFE ===== */
+/* ===== V6.19 EINHEITLICHE BEGRIFFE ===== */
 .terminologyHint{
   line-height:1.4;
 }
@@ -1193,7 +1193,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.18version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.19version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1209,7 +1209,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.18</h1>
+   <h1>Kollaudierung – V6.19</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -9887,7 +9887,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.18 MULTI-LV ================= */
+/* ================= V6.19 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10086,7 +10086,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.18 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.19 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10666,13 +10666,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.18 Gruppenmigration",e)}
+}catch(e){console.warn("V6.19 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.18 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.19 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -10778,7 +10778,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.18 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.19 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -10825,13 +10825,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.18 Migration",e)}
+}catch(e){console.warn("V6.19 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.18 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.19 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -11067,13 +11067,13 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.18 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.19 Gruppendarstellung",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.18 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   V6.19 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
    ============================================================ */
 
 function v615OrderedEntryGroups(){
@@ -11195,7 +11195,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.18 ID-Kompaktierung",e)}
+  }catch(e){console.warn("V6.19 ID-Kompaktierung",e)}
   return r;
 };
 
@@ -11249,13 +11249,13 @@ try{
   renderDraftEntrySummary?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.18 Startmigration",e)}
+}catch(e){console.warn("V6.19 Startmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.18 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
+   V6.19 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
    ============================================================ */
 
 function v616DraftLvItems(){
@@ -11421,7 +11421,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.18 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
+   V6.19 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
    ============================================================ */
 
 function v618GroupForId(id){
@@ -11581,7 +11581,7 @@ finalizeCurrentEntry=function(){
     }
     return result;
   }catch(err){
-    console.error("V6.18 Erfassung speichern",err);
+    console.error("V6.19 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -11606,7 +11606,7 @@ editEntry=function(id){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.18 Erfassung bearbeiten",err);
+    console.error("V6.19 Erfassung bearbeiten",err);
     alert("Erfassung konnte nicht zum Bearbeiten geöffnet werden: "+(err?.message||err));
   }
 };
@@ -11698,7 +11698,339 @@ try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.18 Datenkonsistenz",e)}
+}catch(e){console.warn("V6.19 Datenkonsistenz",e)}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.19 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
+   ============================================================ */
+
+let v619IdMaintenanceRunning=false;
+let v619NormalizeRunning=false;
+
+/* Stable group key without calling ID helpers. */
+function v619RawGroupKey(e){
+  if(!e)return "";
+  if(e.multiLvGroup)return "g:"+e.multiLvGroup;
+  const d=typeof v613NormDesc==="function"
+    ? v613NormDesc(e.lineDesc)
+    : String(e.lineDesc||"").trim().replace(/\s+/g," ").toLowerCase();
+  if(d)return `d:${e.sheetId||""}:${d}`;
+  return "e:"+e.id;
+}
+
+function v619RawGroups(p=project()){
+  if(!p)return[];
+  const map=new Map(),out=[];
+  for(const e of (p.entries||[])){
+    const key=v619RawGroupKey(e);
+    let g=map.get(key);
+    if(!g){g=[];map.set(key,g);out.push(g)}
+    g.push(e);
+  }
+  return out;
+}
+
+/* Replacement for old V5 ID migration.
+   Duplicate display IDs are VALID inside one Erfassungsgruppe.
+   They are only forbidden between DIFFERENT groups. */
+ensureEntryDisplayIds=function(p=project()){
+  if(!p || v619IdMaintenanceRunning)return;
+  v619IdMaintenanceRunning=true;
+  try{
+    if(!Array.isArray(p.entries))p.entries=[];
+
+    const groups=v619RawGroups(p);
+    const used=new Set();
+    let next=1;
+
+    /* First preserve valid group IDs, but only once per group. */
+    for(const g of groups){
+      const candidates=g.map(e=>Number(e.displayId))
+        .filter(n=>Number.isInteger(n)&&n>0)
+        .sort((a,b)=>a-b);
+
+      let chosen=candidates.find(n=>!used.has(n)) || null;
+      if(chosen===null){
+        while(used.has(next))next++;
+        chosen=next;
+      }
+
+      used.add(chosen);
+      if(chosen>=next)next=chosen+1;
+      g.forEach(e=>{e.displayId=chosen});
+    }
+
+    /* Master: next ID may be compacted elsewhere.
+       Worker: never move backwards below reserved/current next ID. */
+    const access=typeof currentAccess==="function"?currentAccess():{mode:"master"};
+    if(access?.mode==="worker"){
+      const stored=Number(p.nextEntryDisplayId);
+      const rangeStart=Number(p.sync?.idRangeStart);
+      p.nextEntryDisplayId=Math.max(
+        Number.isInteger(stored)&&stored>0?stored:1,
+        Number.isInteger(rangeStart)&&rangeStart>0?rangeStart:1,
+        used.size?Math.max(...used)+1:1
+      );
+    }else{
+      p.nextEntryDisplayId=used.size?Math.max(...used)+1:1;
+    }
+  }finally{
+    v619IdMaintenanceRunning=false;
+  }
+};
+
+entryDisplayId=function(e){
+  if(!e)return "";
+  ensureEntryDisplayIds();
+  return Number(e.displayId)||"";
+};
+
+assignEntryDisplayId=function(e,preferred=null){
+  if(!e)return null;
+  ensureEntryDisplayIds();
+
+  let n=Number(preferred);
+  if(!Number.isInteger(n)||n<=0){
+    n=Number(project()?.nextEntryDisplayId)||1;
+  }
+
+  /* Assign same visible ID to the whole current group. */
+  const key=v619RawGroupKey(e);
+  const p=project();
+  const members=(p?.entries||[]).filter(x=>v619RawGroupKey(x)===key);
+  if(!members.includes(e))members.push(e);
+  members.forEach(x=>{x.displayId=n});
+
+  if(p){
+    const access=typeof currentAccess==="function"?currentAccess():{mode:"master"};
+    if(access?.mode==="worker"){
+      p.nextEntryDisplayId=Math.max(Number(p.nextEntryDisplayId)||1,n+1);
+    }else{
+      p.nextEntryDisplayId=Math.max(Number(p.nextEntryDisplayId)||1,n+1);
+    }
+  }
+  return n;
+};
+
+/* No recursive ensure -> compact -> annotation -> ensure loop. */
+syncAnnotationLabelsToEntryIds=function(){
+  const p=project();if(!p)return;
+  ensureEntryDisplayIds(p);
+  plans().forEach(pl=>{
+    (pl.annotations||[]).forEach(a=>{
+      if(typeof isDraftEntryId==="function" && isDraftEntryId(a.entryId)){
+        a.label=String(currentPlannedEntryDisplayId());
+        return;
+      }
+      const e=p.entries.find(x=>x.id===a.entryId);
+      if(e)a.label=String(Number(e.displayId)||"");
+    });
+  });
+};
+
+/* Safe compacting: one number per GROUP, no recursive callbacks. */
+v615CompactVisibleIds=function(force=false){
+  const p=project();
+  if(!p || v619IdMaintenanceRunning)return false;
+
+  const access=typeof currentAccess==="function"?currentAccess():{mode:"master"};
+  if(access?.mode==="worker" && !force)return false;
+
+  v619IdMaintenanceRunning=true;
+  try{
+    const groups=v619RawGroups(p).slice().sort((ga,gb)=>{
+      const ai=Math.min(...ga.map(e=>Number(e.displayId)||999999999));
+      const bi=Math.min(...gb.map(e=>Number(e.displayId)||999999999));
+      if(ai!==bi)return ai-bi;
+      const at=String(ga[0]?.createdAt||ga[0]?.updated||ga[0]?.syncCreatedAt||"");
+      const bt=String(gb[0]?.createdAt||gb[0]?.updated||gb[0]?.syncCreatedAt||"");
+      return at.localeCompare(bt);
+    });
+
+    let changed=false;
+    groups.forEach((g,i)=>{
+      const id=i+1;
+      g.forEach(e=>{
+        if(Number(e.displayId)!==id){e.displayId=id;changed=true}
+      });
+
+      const anchor=g[0];
+      const memberIds=new Set(g.map(e=>e.id));
+      plans().forEach(pl=>{
+        (pl.annotations||[]).forEach(a=>{
+          if(memberIds.has(a.entryId)){
+            if(a.entryId!==anchor.id){a.entryId=anchor.id;changed=true}
+            if(String(a.label)!==String(id)){a.label=String(id);changed=true}
+          }
+        });
+      });
+    });
+
+    const next=groups.length+1;
+    if(Number(p.nextEntryDisplayId)!==next){
+      p.nextEntryDisplayId=next;
+      changed=true;
+    }
+    return changed;
+  }finally{
+    v619IdMaintenanceRunning=false;
+  }
+};
+
+v615NextVisibleId=function(){
+  const p=project();
+  if(!p)return 1;
+  const access=typeof currentAccess==="function"?currentAccess():{mode:"master"};
+
+  if(access?.mode==="worker"){
+    ensureEntryDisplayIds(p);
+    return Number(p.nextEntryDisplayId)||Number(p.sync?.idRangeStart)||1;
+  }
+
+  v615CompactVisibleIds();
+  return v619RawGroups(p).length+1;
+};
+
+peekNextEntryDisplayId=function(){
+  return v615NextVisibleId();
+};
+
+currentPlannedEntryDisplayId=function(){
+  if(editingEntryId){
+    const e=project()?.entries?.find(x=>x.id===editingEntryId);
+    if(e)return Number(e.displayId)||entryDisplayId(e);
+  }
+  return v615NextVisibleId();
+};
+
+/* Safe consistency pass with a hard re-entry guard. */
+v618NormalizeAllGroups=function(){
+  const p=project();
+  if(!p || v619NormalizeRunning)return;
+  v619NormalizeRunning=true;
+  try{
+    /* Group same descriptions without allowing helper recursion. */
+    const buckets=new Map();
+    for(const e of (p.entries||[])){
+      const d=typeof v613NormDesc==="function"
+        ? v613NormDesc(e.lineDesc)
+        : String(e.lineDesc||"").trim().replace(/\s+/g," ").toLowerCase();
+      if(!d)continue;
+      const key=`${e.sheetId||""}::${d}`;
+      if(!buckets.has(key))buckets.set(key,[]);
+      buckets.get(key).push(e);
+    }
+
+    for(const arr of buckets.values()){
+      if(!arr.length)continue;
+      const existingGroup=arr.find(e=>e.multiLvGroup)?.multiLvGroup;
+      const groupId=existingGroup||("mlv_"+cryptoSafeId());
+
+      const ids=arr.map(e=>Number(e.displayId))
+        .filter(n=>Number.isInteger(n)&&n>0);
+      const sharedId=ids.length?Math.min(...ids):null;
+
+      const anchor=arr[0];
+      const shared={
+        sheetId:anchor.sheetId,
+        lineDesc:anchor.lineDesc||"",
+        detail:anchor.detail||"",
+        reason:anchor.reason||"",
+        note:anchor.note||"",
+        planId:anchor.planId||""
+      };
+
+      arr.forEach(e=>{
+        e.multiLvGroup=groupId;
+        e.sheetId=shared.sheetId;
+        e.lineDesc=shared.lineDesc;
+        e.detail=shared.detail;
+        e.reason=shared.reason;
+        e.note=shared.note;
+        e.planId=shared.planId;
+        if(sharedId)e.displayId=sharedId;
+      });
+    }
+
+    ensureEntryDisplayIds(p);
+    if((typeof currentAccess!=="function"||currentAccess()?.mode!=="worker")){
+      v615CompactVisibleIds();
+    }
+
+    /* Now point markers to the first member of each group. */
+    for(const g of v619RawGroups(p)){
+      if(!g.length)continue;
+      const anchor=g[0];
+      const id=Number(anchor.displayId)||1;
+      const memberIds=new Set(g.map(e=>e.id));
+      plans().forEach(pl=>{
+        (pl.annotations||[]).forEach(a=>{
+          if(memberIds.has(a.entryId)){
+            a.entryId=anchor.id;
+            a.label=String(id);
+          }
+        });
+      });
+    }
+  }finally{
+    v619NormalizeRunning=false;
+  }
+};
+
+/* Avoid recursive project-render refresh chain introduced in V6.18.
+   This refreshes only views; it never calls renderProject/renderSyncView. */
+v618RefreshEverywhere=function(){
+  try{renderDraftEntrySummary?.()}catch(e){}
+  try{renderAutoPlanLinkSummary?.()}catch(e){}
+  try{renderRecent?.()}catch(e){}
+  try{renderSheet?.()}catch(e){}
+  try{renderLV?.()}catch(e){}
+  try{renderPlans?.()}catch(e){}
+  try{renderPlanAnnotations?.()}catch(e){}
+  try{populatePlanLinks?.()}catch(e){}
+  try{showPosInfo?.()}catch(e){}
+};
+
+/* Final save wrapper with explicit re-entry protection. */
+const _v619FinalizeBase=finalizeCurrentEntry;
+let v619SaveRunning=false;
+finalizeCurrentEntry=function(){
+  const fm=document.getElementById("finalizeMessage");
+  if(v619SaveRunning){
+    if(fm){
+      fm.style.color="#aa3030";
+      fm.textContent="Speichern läuft bereits. Bitte kurz warten.";
+    }
+    return;
+  }
+
+  v619SaveRunning=true;
+  try{
+    const r=_v619FinalizeBase();
+    v618NormalizeAllGroups();
+    persist();
+    v618RefreshEverywhere();
+    return r;
+  }catch(err){
+    console.error("V6.19 Erfassung speichern",err);
+    if(fm){
+      fm.style.color="#aa3030";
+      fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
+    }
+  }finally{
+    v619SaveRunning=false;
+  }
+};
+
+/* Repair current project once after loading V6.19. */
+try{
+  v618NormalizeAllGroups();
+  persist();
+  v618RefreshEverywhere();
+}catch(e){console.warn("V6.19 ID-Reparatur",e)}
 </script>
 
 </body>
