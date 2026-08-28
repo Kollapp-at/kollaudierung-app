@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.14</title>
+<title>Kollaudierung – V6.15</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.14 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.15 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.14 alter Testhinweis entfernt ===== */
+/* ===== V6.15 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.14 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.15 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1176,7 +1176,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.14version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.15version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1192,7 +1192,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.14</h1>
+   <h1>Kollaudierung – V6.15</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -9865,7 +9865,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.14 MULTI-LV ================= */
+/* ================= V6.15 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10064,7 +10064,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.14 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.15 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10644,13 +10644,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.14 Gruppenmigration",e)}
+}catch(e){console.warn("V6.15 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.14 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.15 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -10756,7 +10756,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.14 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.15 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -10803,13 +10803,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.14 Migration",e)}
+}catch(e){console.warn("V6.15 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.14 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.15 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -11045,7 +11045,189 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.14 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.15 Gruppendarstellung",e)}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.15 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   ============================================================ */
+
+function v615OrderedEntryGroups(){
+  const p=project();
+  if(!p)return [];
+
+  const groups=[];
+  const seen=new Set();
+
+  /* Reihenfolge stabil nach bisheriger sichtbarer ID, danach Erstell-/Updatezeit */
+  const sorted=(p.entries||[]).slice().sort((a,b)=>{
+    const ai=Number(a.displayId||999999999);
+    const bi=Number(b.displayId||999999999);
+    if(ai!==bi)return ai-bi;
+    const at=String(a.createdAt||a.updated||a.syncCreatedAt||"");
+    const bt=String(b.createdAt||b.updated||b.syncCreatedAt||"");
+    return at.localeCompare(bt);
+  });
+
+  for(const e of sorted){
+    const key=v612GroupKey(e);
+    if(seen.has(key))continue;
+    seen.add(key);
+    const entries=v612GroupEntries(e);
+    if(entries.length)groups.push(entries);
+  }
+  return groups;
+}
+
+function v615CompactVisibleIds(force=false){
+  const p=project();
+  if(!p?.entries?.length){
+    if(p)p.nextEntryDisplayId=1;
+    return false;
+  }
+
+  /* Arbeiterdateien behalten ihren reservierten ID-Bereich.
+     Kompaktierung erfolgt nur im Master, damit Offline-Sync nicht kollidiert. */
+  const access=typeof currentAccess==="function"?currentAccess():{mode:"master"};
+  if(access?.mode==="worker" && !force)return false;
+
+  const groups=v615OrderedEntryGroups();
+  let changed=false;
+  let next=1;
+
+  for(const g of groups){
+    for(const e of g){
+      if(Number(e.displayId)!==next){
+        assignEntryDisplayId(e,next);
+        changed=true;
+      }
+    }
+
+    const ids=new Set(g.map(e=>e.id));
+    const anchor=g[0];
+    plans().forEach(pl=>{
+      (pl.annotations||[]).forEach(a=>{
+        if(ids.has(a.entryId)){
+          if(a.entryId!==anchor.id){
+            a.entryId=anchor.id;
+            changed=true;
+          }
+          if(String(a.label)!==String(next)){
+            a.label=String(next);
+            changed=true;
+          }
+        }
+      });
+    });
+    next++;
+  }
+
+  if(Number(p.nextEntryDisplayId)!==next){
+    p.nextEntryDisplayId=next;
+    changed=true;
+  }
+
+  if(changed){
+    syncAnnotationLabelsToEntryIds?.();
+    persist();
+  }
+  return changed;
+}
+
+function v615NextVisibleId(){
+  const p=project();
+  if(!p)return 1;
+
+  const access=typeof currentAccess==="function"?currentAccess():{mode:"master"};
+  if(access?.mode==="worker"){
+    return Number(p.nextEntryDisplayId)||Number(p.sync?.idRangeStart)||1;
+  }
+
+  v615CompactVisibleIds();
+  const groups=v615OrderedEntryGroups();
+  return groups.length+1;
+}
+
+/* Neue ID-Vorschau nutzt die kompakte sichtbare Nummerierung. */
+peekNextEntryDisplayId=function(){
+  return v615NextVisibleId();
+};
+currentPlannedEntryDisplayId=function(){
+  if(editingEntryId){
+    const e=project()?.entries?.find(x=>x.id===editingEntryId);
+    if(e)return entryDisplayId(e);
+  }
+  return v615NextVisibleId();
+};
+
+/* Nach Speichern/Löschen/Zusammenführen im Master erneut kompaktieren. */
+const _v615Finalize=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const r=_v615Finalize();
+  try{
+    v613MergeSameDescriptions?.();
+    v615CompactVisibleIds();
+    renderDraftEntrySummary?.();
+    renderRecent?.();
+    renderSheet?.();
+    renderLV?.();
+  }catch(e){console.warn("V6.15 ID-Kompaktierung",e)}
+  return r;
+};
+
+const _v615DeleteEntry=deleteEntry;
+deleteEntry=function(id){
+  const before=(project()?.entries||[]).length;
+  const r=_v615DeleteEntry(id);
+  const after=(project()?.entries||[]).length;
+  if(after<before){
+    try{
+      v615CompactVisibleIds();
+      renderDraftEntrySummary?.();
+      renderRecent?.();
+      renderSheet?.();
+    }catch(e){}
+  }
+  return r;
+};
+
+/* Beim Laden eines Masterprojekts alte Lücken einmal bereinigen. */
+const _v615RenderProject=renderProject;
+renderProject=function(){
+  const r=_v615RenderProject();
+  try{
+    v613MergeSameDescriptions?.();
+    v615CompactVisibleIds();
+    renderDraftEntrySummary?.();
+    renderRecent?.();
+    renderSheet?.();
+  }catch(e){}
+  return r;
+};
+
+const _v615SwitchProject=switchProject;
+switchProject=function(){
+  const r=_v615SwitchProject();
+  try{
+    v613MergeSameDescriptions?.();
+    v615CompactVisibleIds();
+    renderDraftEntrySummary?.();
+    renderRecent?.();
+    renderSheet?.();
+  }catch(e){}
+  return r;
+};
+
+/* Einmalige Bereinigung des aktuell geladenen Masterprojekts. */
+try{
+  v613MergeSameDescriptions?.();
+  v615CompactVisibleIds();
+  renderDraftEntrySummary?.();
+  renderRecent?.();
+  renderSheet?.();
+}catch(e){console.warn("V6.15 Startmigration",e)}
 </script>
 
 </body>
