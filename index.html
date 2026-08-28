@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.17</title>
+<title>Kollaudierung – V6.18</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.17 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.18 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.17 alter Testhinweis entfernt ===== */
+/* ===== V6.18 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.17 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.18 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1163,7 +1163,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.17 HINWEISE / TEXTE ===== */
+/* ===== V6.18 HINWEISE / TEXTE ===== */
 #autoPlanLinkSummary{line-height:1.25}
 #autoPlanLinkMeta{line-height:1.35}
 #draftEntrySummary .fsCell .smallHint{
@@ -1174,7 +1174,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.17 EINHEITLICHE BEGRIFFE ===== */
+/* ===== V6.18 EINHEITLICHE BEGRIFFE ===== */
 .terminologyHint{
   line-height:1.4;
 }
@@ -1193,7 +1193,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.17version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.18version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1209,7 +1209,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.17</h1>
+   <h1>Kollaudierung – V6.18</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -2268,7 +2268,7 @@ function saveEntry(){
  const desc=document.getElementById("lineDesc").value.trim();if(!desc){msg("Bitte eine Beschreibung der Aufmaßzeile eingeben.",true);return}
  const qty=previewCalc();if(qty===null||qty===0){msg("Bitte einen gültigen Rechenansatz mit Ergebnis ungleich 0 eingeben.",true);return}
  const entry={id:editingEntryId||uid("e"),sheetId:s.id,lineDesc:desc,lineNo:lineNoFor(desc,s.id,editingEntryId),pos:p.pos,calc:document.getElementById("calc").value.trim(),qty,unit:p.unit,detail:document.getElementById("detail").value.trim(),reason:document.getElementById("reason").value,note:document.getElementById("note").value.trim(),updated:new Date().toISOString()};
- if(editingEntryId){const ix=project().entries.findIndex(e=>e.id===editingEntryId);if(ix>=0)project().entries[ix]=entry;editingEntryId=null;document.getElementById("entryCard").classList.remove("editing");document.getElementById("saveEntryBtn").textContent="Erfassung speichern";document.getElementById("cancelEditBtn").style.display="none";msg("Erfassung aktualisiert.");clearEntryForm(true)}
+ if(editingEntryId){const ix=project().entries.findIndex(e=>e.id===editingEntryId);if(ix>=0)project().entries[ix]=entry;editingEntryId=null;document.getElementById("entryCard").classList.remove("editing");if(document.getElementById("finalSaveEntryBtn"))document.getElementById("finalSaveEntryBtn").textContent="Erfassung speichern";document.getElementById("cancelEditBtn").style.display="none";msg("Erfassung aktualisiert.");clearEntryForm(true)}
  else{project().entries.push(entry);msg(`Gespeichert: Zeile ${entry.lineNo} · ${p.pos} · ${num(qty)} ${p.unit}`);document.getElementById("calc").value="";document.getElementById("detail").value="";document.getElementById("reason").value="";document.getElementById("note").value="";previewCalc()}
  persist();renderAll();showPosInfo();
 }
@@ -2279,7 +2279,7 @@ function editEntry(id){
  document.getElementById("calc").value=e.calc||String(e.qty);document.getElementById("detail").value=e.detail||"";document.getElementById("reason").value=e.reason||"";document.getElementById("note").value=e.note||"";
  editingEntryId=id;document.getElementById("entryCard").classList.add("editing");document.getElementById("saveEntryBtn").textContent="Änderung speichern";document.getElementById("cancelEditBtn").style.display="inline-block";previewCalc();showView("entry");window.scrollTo({top:document.getElementById("entryCard").offsetTop-80,behavior:"smooth"});
 }
-function cancelEdit(){editingEntryId=null;document.getElementById("entryCard").classList.remove("editing");document.getElementById("saveEntryBtn").textContent="Erfassung speichern";document.getElementById("cancelEditBtn").style.display="none";clearEntryForm(false);msg("")}
+function cancelEdit(){editingEntryId=null;document.getElementById("entryCard").classList.remove("editing");if(document.getElementById("finalSaveEntryBtn"))document.getElementById("finalSaveEntryBtn").textContent="Erfassung speichern";document.getElementById("cancelEditBtn").style.display="none";clearEntryForm(false);msg("")}
 function deleteEntry(id){if(!confirm("Diese Erfassung wirklich löschen?"))return;project().entries=project().entries.filter(e=>e.id!==id);persist();renderAll();showPosInfo()}
 function msg(t,bad=false){const m=document.getElementById("message");m.textContent=t;m.style.color=bad?"#aa3030":"#1f7a4d"}
 
@@ -9887,7 +9887,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.17 MULTI-LV ================= */
+/* ================= V6.18 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10086,7 +10086,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.17 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.18 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10152,7 +10152,7 @@ function v612SetFormPosition(item){
   previewCalc?.();
 }
 function v612RenderEditHeadline(){
-  const btn=document.getElementById("saveEntryBtn");
+  const btn=document.getElementById("finalSaveEntryBtn");
   if(btn && v612EditingGroupId)btn.textContent=`ID ${v612SharedDisplayIdForGroup(v612EditingAnchorId)} speichern`;
 }
 
@@ -10324,7 +10324,7 @@ cancelEdit=function(){
  v612EditingAnchorId=null;
  multiLvDraft=[];
  document.getElementById("entryCard").classList.remove("editing");
- document.getElementById("saveEntryBtn").textContent="Erfassung speichern";
+ if(document.getElementById("finalSaveEntryBtn"))document.getElementById("finalSaveEntryBtn").textContent="Erfassung speichern";
  document.getElementById("cancelEditBtn").style.display="none";
  clearEntryForm(false);
  renderMultiLvDraft();
@@ -10429,7 +10429,7 @@ finalizeCurrentEntry=function(){
    v612EditingAnchorId=null;
    multiLvDraft=[];
    document.getElementById("entryCard").classList.remove("editing");
-   document.getElementById("saveEntryBtn").textContent="Erfassung speichern";
+   if(document.getElementById("finalSaveEntryBtn"))document.getElementById("finalSaveEntryBtn").textContent="Erfassung speichern";
    document.getElementById("cancelEditBtn").style.display="none";
    clearEntryForm(false);
    renderMultiLvDraft();
@@ -10666,13 +10666,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.17 Gruppenmigration",e)}
+}catch(e){console.warn("V6.18 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.17 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.18 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -10778,7 +10778,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.17 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.18 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -10825,13 +10825,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.17 Migration",e)}
+}catch(e){console.warn("V6.18 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.17 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.18 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -11067,13 +11067,13 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.17 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.18 Gruppendarstellung",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.17 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   V6.18 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
    ============================================================ */
 
 function v615OrderedEntryGroups(){
@@ -11195,7 +11195,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.17 ID-Kompaktierung",e)}
+  }catch(e){console.warn("V6.18 ID-Kompaktierung",e)}
   return r;
 };
 
@@ -11249,13 +11249,13 @@ try{
   renderDraftEntrySummary?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.17 Startmigration",e)}
+}catch(e){console.warn("V6.18 Startmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.17 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
+   V6.18 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
    ============================================================ */
 
 function v616DraftLvItems(){
@@ -11416,6 +11416,289 @@ try{
   renderDraftEntrySummary?.();
   renderSelectedAnnotation?.();
 }catch(e){}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.18 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
+   ============================================================ */
+
+function v618GroupForId(id){
+  const e=project()?.entries?.find(x=>x.id===id);
+  return e ? v612GroupEntries(e) : [];
+}
+
+function v618GroupAnchor(group){
+  if(!group?.length)return null;
+  return group.slice().sort((a,b)=>{
+    const ai=Number(a.displayId||999999);
+    const bi=Number(b.displayId||999999);
+    if(ai!==bi)return ai-bi;
+    return String(a.id).localeCompare(String(b.id));
+  })[0];
+}
+
+/* One central consistency pass:
+   - same visible ID on all LV subpositions
+   - same description/detail/status/note/plan
+   - all plan markers point to group anchor
+   - marker labels equal visible ID
+*/
+function v618NormalizeAllGroups(){
+  const p=project();
+  if(!p)return;
+
+  try{v613MergeSameDescriptions?.()}catch(e){}
+
+  const seen=new Set();
+  for(const e of (p.entries||[])){
+    const key=v612GroupKey(e);
+    if(seen.has(key))continue;
+    seen.add(key);
+
+    const g=v612GroupEntries(e);
+    if(!g.length)continue;
+
+    const anchor=v618GroupAnchor(g);
+    if(!anchor)continue;
+
+    const sharedId=entryDisplayId(anchor);
+    const shared={
+      sheetId:anchor.sheetId,
+      lineDesc:anchor.lineDesc||"",
+      detail:anchor.detail||"",
+      reason:anchor.reason||"",
+      note:anchor.note||"",
+      planId:anchor.planId||"",
+      multiLvGroup:anchor.multiLvGroup || ("mlv_"+cryptoSafeId())
+    };
+
+    const memberIds=new Set(g.map(x=>x.id));
+
+    g.forEach(x=>{
+      x.sheetId=shared.sheetId;
+      x.lineDesc=shared.lineDesc;
+      x.detail=shared.detail;
+      x.reason=shared.reason;
+      x.note=shared.note;
+      x.planId=shared.planId;
+      x.multiLvGroup=shared.multiLvGroup;
+      assignEntryDisplayId(x,sharedId);
+    });
+
+    plans().forEach(pl=>{
+      (pl.annotations||[]).forEach(a=>{
+        if(memberIds.has(a.entryId)){
+          a.entryId=anchor.id;
+          a.label=String(sharedId);
+        }
+      });
+    });
+  }
+
+  try{v615CompactVisibleIds?.()}catch(e){}
+  try{syncAnnotationLabelsToEntryIds?.()}catch(e){}
+}
+
+/* Re-render every surface that is derived from an Erfassungs-ID. */
+function v618RefreshEverywhere(){
+  try{renderDraftEntrySummary?.()}catch(e){}
+  try{renderAutoPlanLinkSummary?.()}catch(e){}
+  try{renderRecent?.()}catch(e){}
+  try{renderSheet?.()}catch(e){}
+  try{renderLV?.()}catch(e){}
+  try{renderPlans?.()}catch(e){}
+  try{renderPlanAnnotations?.()}catch(e){}
+  try{populatePlanLinks?.()}catch(e){}
+  try{showPosInfo?.()}catch(e){}
+  try{renderSyncView?.()}catch(e){}
+}
+
+/* Record master-side deletion as tombstones as well.
+   This prevents an old Monteur return from silently re-creating a deleted ID. */
+function v618RecordDeletionTombstones(group){
+  if(!group?.length)return;
+  const sy=ensureProjectSync?.();
+  if(!sy)return;
+  if(!Array.isArray(sy.deletedEntries))sy.deletedEntries=[];
+
+  const existing=new Set(sy.deletedEntries.map(x=>x.syncUuid).filter(Boolean));
+  group.forEach(e=>{
+    if(!e.syncUuid || existing.has(e.syncUuid))return;
+    sy.deletedEntries.push({
+      syncUuid:e.syncUuid,
+      baseRevision:Number(e.syncRevision||1),
+      displayId:entryDisplayId(e),
+      deletedAt:new Date().toISOString(),
+      deletedBy:currentAccess?.().mode==="worker" ? (currentAccess().user?.id||"") : "MASTER",
+      deletedByName:currentAccess?.().mode==="worker" ? (syncUserName?.()||"") : "Master"
+    });
+    existing.add(e.syncUuid);
+  });
+}
+
+/* Clear edit state safely after a save/delete. */
+function v618ResetEditUi(){
+  editingEntryId=null;
+  v612EditingGroupId=null;
+  v612EditingAnchorId=null;
+  multiLvDraft=[];
+  const card=document.getElementById("entryCard");
+  if(card)card.classList.remove("editing");
+  const btn=document.getElementById("finalSaveEntryBtn");
+  if(btn)btn.textContent="Erfassung speichern";
+  const cancel=document.getElementById("cancelEditBtn");
+  if(cancel)cancel.style.display="none";
+  try{renderMultiLvDraft?.()}catch(e){}
+}
+
+/* ------------------ SAVE ------------------ */
+/* Keep V6.12 group save logic, but guarantee it completes and all dependent
+   surfaces are updated afterwards. */
+const _v618FinalizeBase=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const fm=document.getElementById("finalizeMessage");
+  const wasEditing=!!v612EditingGroupId;
+  const editedDisplayId=wasEditing && editingEntryId
+    ? entryDisplayId(project()?.entries?.find(x=>x.id===editingEntryId))
+    : null;
+
+  try{
+    const result=_v618FinalizeBase();
+
+    v618NormalizeAllGroups();
+    persist();
+    v618RefreshEverywhere();
+
+    /* The underlying grouped save resets edit state itself. This guarantees
+       button/state cleanup even if an older branch did not. */
+    if(wasEditing)v618ResetEditUi();
+
+    if(fm && wasEditing){
+      fm.style.color="#1f7a4d";
+      fm.innerHTML=`Erfassungs-ID <b>${editedDisplayId}</b> wurde vollständig aktualisiert.`;
+    }
+    return result;
+  }catch(err){
+    console.error("V6.18 Erfassung speichern",err);
+    if(fm){
+      fm.style.color="#aa3030";
+      fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
+    }else{
+      alert("Erfassung konnte nicht gespeichert werden: "+(err?.message||err));
+    }
+  }
+};
+
+/* ------------------ EDIT ------------------ */
+const _v618EditBase=editEntry;
+editEntry=function(id){
+  try{
+    v618NormalizeAllGroups();
+    const r=_v618EditBase(id);
+    const group=v618GroupForId(id);
+    const anchor=v618GroupAnchor(group);
+    if(anchor){
+      const btn=document.getElementById("finalSaveEntryBtn");
+      if(btn)btn.textContent=`Erfassungs-ID ${entryDisplayId(anchor)} speichern`;
+    }
+    v618RefreshEverywhere();
+    return r;
+  }catch(err){
+    console.error("V6.18 Erfassung bearbeiten",err);
+    alert("Erfassung konnte nicht zum Bearbeiten geöffnet werden: "+(err?.message||err));
+  }
+};
+
+/* ------------------ DELETE ------------------ */
+/* Delete the complete Erfassungs-ID, including every LV subposition and every
+   linked plan marker. */
+deleteEntry=function(id){
+  const p=project();
+  const e=p?.entries?.find(x=>x.id===id);
+  if(!e)return;
+
+  v618NormalizeAllGroups();
+  const group=v612GroupEntries(e);
+  if(!group.length)return;
+
+  const displayId=entryDisplayId(group[0]);
+  const desc=group[0].lineDesc||"";
+  const text=
+    `Erfassungs-ID ${displayId}${desc?` – "${desc}"`:""} wirklich vollständig löschen?\n\n`+
+    `Gelöscht werden:\n`+
+    `• ${group.length} LV-Unterposition(en)\n`+
+    `• alle zugehörigen Planmarkierungen\n`+
+    `• die Erfassung in Aufmaßblatt, Export und Synchronisierung`;
+
+  if(!confirm(text))return;
+
+  const ids=new Set(group.map(x=>x.id));
+  const syncUuids=new Set(group.map(x=>x.syncUuid).filter(Boolean));
+
+  /* Sync tombstones for master AND worker. */
+  v618RecordDeletionTombstones(group);
+
+  /* Remove all entry records. */
+  p.entries=(p.entries||[]).filter(x=>!ids.has(x.id));
+
+  /* Remove every linked marker. Also remove by sync relation if legacy data
+     happened to point to another member of the same group. */
+  plans().forEach(pl=>{
+    pl.annotations=(pl.annotations||[]).filter(a=>!ids.has(a.entryId));
+  });
+
+  /* Remove annotation tombstones only for currently deleted markers is not
+     needed here; worker return uses deletedEntries and entry-linked markers
+     disappear with the ID in master merge. */
+
+  if(v612EditingGroupId===group[0].multiLvGroup || ids.has(editingEntryId)){
+    v618ResetEditUi();
+    try{clearEntryForm(false)}catch(e){}
+  }
+
+  selectedAnnotationId=null;
+
+  v618NormalizeAllGroups();
+  persist();
+  v618RefreshEverywhere();
+
+  const fm=document.getElementById("finalizeMessage");
+  if(fm){
+    fm.style.color="#1f7a4d";
+    fm.textContent=`Erfassungs-ID ${displayId} wurde vollständig gelöscht.`;
+  }
+};
+
+/* ------------------ PLAN EDIT ------------------ */
+const _v618MarkPlanBase=markEntryOnPlan;
+markEntryOnPlan=function(id){
+  v618NormalizeAllGroups();
+  const group=v618GroupForId(id);
+  const anchor=v618GroupAnchor(group);
+  if(!anchor)return;
+  return _v618MarkPlanBase(anchor.id);
+};
+
+/* ------------------ PROJECT LOAD / IMPORT ------------------ */
+const _v618RenderProjectBase=renderProject;
+renderProject=function(){
+  const r=_v618RenderProjectBase();
+  try{
+    v618NormalizeAllGroups();
+    persist();
+    v618RefreshEverywhere();
+  }catch(e){}
+  return r;
+};
+
+/* Initial repair of existing data from prior versions. */
+try{
+  v618NormalizeAllGroups();
+  persist();
+  v618RefreshEverywhere();
+}catch(e){console.warn("V6.18 Datenkonsistenz",e)}
 </script>
 
 </body>
