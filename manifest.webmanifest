@@ -1,7 +1,7 @@
 {
   "name": "Kollaudierung",
   "short_name": "Kollaudierung",
-  "description": "Digitale Kollaudierung / Aufmaß – Offline Arbeitsdateien und Monteur-Rückgaben",
+  "description": "Digitale Kollaudierung und Aufmaß",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",

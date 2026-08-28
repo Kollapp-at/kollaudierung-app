@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.7 Test</title>
+<title>Kollaudierung – V6.9</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -882,22 +882,8 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 /* ===== V5.22 iOS RUNTIME-DIAGNOSE ===== */
-.iosRuntimeStatus{
- max-width:1320px;
- margin:8px auto 0;
- padding:8px 12px;
- border-radius:8px;
- font-size:12px;
- line-height:1.35;
- display:flex;
- gap:7px;
- align-items:center;
- flex-wrap:wrap;
-}
-.iosRuntimeBad{background:#fdecec;border:1px solid #e1a8a8;color:#8b2525}
-.iosRuntimeOk{background:#eaf7ef;border:1px solid #a8d2b8;color:#22633a}
 @media(max-width:600px){
- .iosRuntimeStatus{margin:6px 7px 0;padding:8px 9px;font-size:11px}
+ 
 }
 
 
@@ -1092,7 +1078,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.7 Testversion:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.9version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1108,7 +1094,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.7 Test</h1>
+   <h1>Kollaudierung – V6.9</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -1122,12 +1108,6 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   </div>
  </div>
 </header>
-<div id="iosRuntimeStatus" class="iosRuntimeStatus iosRuntimeBad">
- <b>JavaScript wurde noch nicht gestartet.</b>
- <span>Wenn diese Meldung stehen bleibt, wird die HTML-Datei nur als Vorschau geöffnet und die App kann dort nicht bedient werden.</span>
-</div>
-
-
 <main>
  <div id="xlsxOffline" class="offlineWarning notice" style="margin-bottom:14px">
   Excel-Importmodul konnte nicht geladen werden. Die Kollaudierung funktioniert weiter, für den direkten XLSX-Import ist aber eine Internetverbindung beim Öffnen dieser Datei erforderlich.
@@ -2866,7 +2846,11 @@ function ensurePlanData(){
 }
 function plans(){ensurePlanData();return project()?.plans||[]}
 function activePlan(){return plans().find(p=>p.id===activePlanId)||null}
-function planKey(planId){return `${project().id}:${planId}`}
+function planKey(planId,projectId=null){
+ const p=projectId ? state.projects?.[projectId] : project();
+ if(!p||!p.id)throw new Error("Kein aktives Projekt vorhanden.");
+ return `${p.id}:${planId}`;
+}
 
 function openPlanDb(){
  return new Promise((resolve,reject)=>{
@@ -2914,8 +2898,8 @@ function dataUrlToBlob(dataUrl){
  const bin=atob(data),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
  return new Blob([arr],{type:mime});
 }
-async function storePlanImage(plan,blob){
- const ok=await putPlanBlob(planKey(plan.id),blob);
+async function storePlanImage(plan,blob,projectId=null){
+ const ok=await putPlanBlob(planKey(plan.id,projectId),blob);
  if(ok){delete plan.inlineImage;return}
  if(blob.size<=2500000){plan.inlineImage=await blobToDataUrl(blob);return}
  throw new Error("Der Browser konnte die Plan-Datei lokal nicht speichern.");
@@ -2927,6 +2911,11 @@ async function loadPlanImageBlob(plan){
 }
 
 function openPlanUpload(){
+ const p=project();
+ if(!p||!p.id){
+   alert("Bitte zuerst ein Projekt anlegen oder eine Projekt-/Arbeitsdatei laden. Danach kann ein Plan hinzugefügt werden.");
+   return;
+ }
  planTempFile=null;planTempPdf=null;
  document.getElementById("puName").value="";
  document.getElementById("puNumber").value="";
@@ -2980,7 +2969,13 @@ async function pdfPageToBlob(pdf,pageNo){
  return{blob,width:c.width,height:c.height};
 }
 async function saveUploadedPlan(){
+ const p=project();
  const name=document.getElementById("puName").value.trim(),file=planTempFile,msg=document.getElementById("puMessage");
+ if(!p||!p.id){
+   msg.style.color="#aa3030";
+   msg.textContent="Kein aktives Projekt vorhanden. Bitte zuerst ein Projekt anlegen oder eine Projekt-/Arbeitsdatei laden.";
+   return;
+ }
  if(!name||!file){msg.style.color="#aa3030";msg.textContent="Bitte Planname und Datei auswählen.";return}
  document.getElementById("savePlanBtn").disabled=true;msg.style.color="#66727f";msg.textContent="Plan wird aufbereitet …";
  try{
@@ -2995,8 +2990,9 @@ async function saveUploadedPlan(){
      area:document.getElementById("puArea").value.trim(),date:document.getElementById("puDate").value,
      fileName:file.name,fileType,page,width:out.width,height:out.height,annotations:[],createdAt:new Date().toISOString()
    };
-   await storePlanImage(pl,out.blob);
-   project().plans.push(pl);activePlanId=pl.id;persist();closePlanUpload();renderPlans();await openPlan(pl.id);
+   if(!Array.isArray(p.plans))p.plans=[];
+   await storePlanImage(pl,out.blob,p.id);
+   p.plans.push(pl);activePlanId=pl.id;persist();closePlanUpload();renderPlans();await openPlan(pl.id);
  }catch(e){
    console.error(e);msg.style.color="#aa3030";msg.textContent="Plan konnte nicht gespeichert werden: "+(e.message||e);
  }finally{document.getElementById("savePlanBtn").disabled=false}
@@ -3015,7 +3011,12 @@ function renderPlanList(){
 async function deletePlan(id){
  const pl=plans().find(x=>x.id===id);if(!pl)return;
  if(!confirm(`Plan "${pl.name}" inklusive aller Markierungen löschen?`))return;
- project().plans=plans().filter(x=>x.id!==id);await deletePlanBlob(planKey(id));
+ {
+ const p=project();
+ if(!p||!p.id){alert("Kein aktives Projekt vorhanden.");return}
+ p.plans=plans().filter(x=>x.id!==id);
+ await deletePlanBlob(planKey(id,p.id));
+}
  if(activePlanId===id){activePlanId=null;selectedAnnotationId=null}
  persist();renderPlans();
 }
