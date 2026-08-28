@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.9</title>
+<title>Kollaudierung – V6.10</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1064,6 +1064,37 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 .emptyProjectStart h2{margin:0 0 6px}
 
+
+
+/* ===== V6.10 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+.multiLvBox{
+ margin-top:12px;
+ padding:10px;
+ border:1px solid #c8d7df;
+ border-radius:9px;
+ background:#f7fafb;
+}
+.multiLvList{margin-top:9px;display:flex;flex-direction:column;gap:6px}
+.multiLvItem{
+ display:grid;
+ grid-template-columns:minmax(110px,1fr) minmax(150px,2fr) minmax(110px,1fr) 90px auto;
+ gap:8px;
+ align-items:center;
+ background:#fff;
+ border:1px solid var(--line);
+ border-radius:7px;
+ padding:8px;
+ font-size:11px;
+}
+.multiLvItem .mliPos{font-weight:800}
+.multiLvItem .mliText{overflow-wrap:anywhere}
+@media(max-width:700px){
+ .multiLvItem{grid-template-columns:1fr auto}
+ .multiLvItem .mliText,.multiLvItem .mliCalc,.multiLvItem .mliQty{grid-column:1/-1}
+ .multiLvBox .toolbar{align-items:stretch!important}
+ .multiLvBox .toolbar button{width:100%}
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1078,7 +1109,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.9version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.10version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1094,7 +1125,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.9</h1>
+   <h1>Kollaudierung – V6.10</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -1202,6 +1233,18 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
      <div class="calcResult" id="calcResult">–</div>
      <div class="small" id="calcHint">+, −, ×, ÷ und Klammern sind möglich.</div>
     </div>
+    <div class="multiLvBox" id="multiLvBox">
+     <div class="toolbar" style="justify-content:space-between;align-items:center">
+      <div>
+       <b>Mehrere LV-Positionen zur selben Beschreibung</b>
+       <div class="small">Aktuelle LV-Position und Rechenansatz übernehmen, danach die nächste Position auswählen.</div>
+      </div>
+      <button type="button" class="secondary" onclick="addCurrentLvToBatch()">+ LV-Position übernehmen</button>
+     </div>
+     <div id="multiLvList" class="multiLvList">
+      <div class="small">Noch keine zusätzlichen LV-Positionen vorgemerkt.</div>
+     </div>
+    </div>
 
     <div class="grid2">
      <div>
@@ -1244,7 +1287,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
      <button class="danger" id="cancelEditBtn" style="display:none" onclick="cancelEdit()">Bearbeitung abbrechen</button>
     </div>
     <div id="message" class="small" style="margin-top:9px"></div>
-    <div class="small" style="margin-top:5px"><b>Noch keine Speicherung:</b> Plan auswählen, direkt darunter markieren und erst in Punkt 4 alles gemeinsam speichern.</div>
+    <div class="small" style="margin-top:5px"><b>Planmarkierung:</b> Sie kann sofort gesetzt oder nach dem Speichern jederzeit über „Plan bearbeiten“ ergänzt bzw. geändert werden.</div>
    </div>
   </div>
 
@@ -3244,7 +3287,7 @@ function renderRecent(){
  const head=b.closest("table")?.querySelector("thead");
  if(head)head.innerHTML='<tr><th>ID</th><th>Beschreibung</th><th>Pos.</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Status</th><th>Anmerkung</th><th></th></tr>';
  if(!rows.length){b.innerHTML='<tr><td colspan="9" class="empty">Noch keine Erfassungen im aktiven Aufmaßblatt.</td></tr>';return}
- b.innerHTML=rows.map(e=>`<tr><td>${e.lineNo}</td><td class="wrap">${esc(e.lineDesc)}</td><td><b>${esc(e.pos)}</b></td><td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td><td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td><td><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan</button></div></td></tr>`).join("");
+ b.innerHTML=rows.map(e=>`<tr><td>${e.lineNo}</td><td class="wrap">${esc(e.lineDesc)}</td><td><b>${esc(e.pos)}</b></td><td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td><td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td><td><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan bearbeiten</button></div></td></tr>`).join("");
 }
 
 /* Planbeilage: Plan + sichtbare Markierungen + Legende; PDF über Browser-Druck */
@@ -3308,7 +3351,7 @@ function renderSheet(){
    body.innerHTML=rows.map(e=>{
      const first=e.lineNo!==last;last=e.lineNo;const pos=getPos(e.pos);
      const tag=pos?.manual?`<span class="badge manual">${esc(pos.manualType||"manuell")}</span> `:"";
-     return `<tr class="${first?'lineStart':'lineGroup'}"><td>${first?e.lineNo:""}</td><td class="wide">${first?esc(e.lineDesc):""}</td><td>${tag}<b>${esc(e.pos)}</b></td><td class="wrap">${esc(pos?.text||"")}</td><td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td><td>${esc(e.detail)}</td><td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td><td class="noPrint"><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div></td></tr>`;
+     return `<tr class="${first?'lineStart':'lineGroup'}"><td>${first?e.lineNo:""}</td><td class="wide">${first?esc(e.lineDesc):""}</td><td>${tag}<b>${esc(e.pos)}</b></td><td class="wrap">${esc(pos?.text||"")}</td><td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td><td>${esc(e.detail)}</td><td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td><td class="noPrint"><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan bearbeiten</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div></td></tr>`;
    }).join("");
  }
  const used=[...new Set(rows.map(e=>e.pos))];
@@ -5858,7 +5901,7 @@ renderRecent=function(){
    <td>${esc(e.calc)}</td>
    <td>${num(e.qty)}</td><td>${esc(e.unit)}</td>
    <td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td>
-   <td><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan</button></div></td>
+   <td><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan bearbeiten</button></div></td>
   </tr>`).join("");
 };
 
@@ -5894,7 +5937,7 @@ renderSheet=function(){
     <td class="wrap">${esc(pos?.text||"")}</td>
     <td>${esc(e.calc)}</td><td>${num(e.qty)}</td><td>${esc(e.unit)}</td>
     <td>${esc(e.detail)}</td><td>${esc(e.reason)}</td><td class="wrap">${esc(e.note)}</td>
-    <td class="noPrint"><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div></td>
+    <td class="noPrint"><div class="toolbar"><button class="secondary" onclick="editEntry('${e.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${e.id}')">Plan bearbeiten</button><button class="danger" onclick="deleteEntry('${e.id}')">Löschen</button></div></td>
    </tr>`;
  }).join("");
 
@@ -9751,6 +9794,204 @@ window.addEventListener("load",()=>{
   registerKollaudierungPwa();
   setTimeout(updatePwaInstallUi,350);
 });
+</script>
+
+
+<script>
+/* ================= V6.10 MULTI-LV ================= */
+let multiLvDraft=[];
+
+function v610CurrentLvCandidate(){
+ const p=getPos(document.getElementById("posSelect")?.value||"");
+ const calc=document.getElementById("calc")?.value.trim()||"";
+ const qty=previewCalc();
+ if(!p)return{valid:false,message:"Bitte zuerst eine LV-Position auswählen."};
+ if(qty===null || qty===0)return{valid:false,message:"Bitte einen gültigen Rechenansatz eingeben."};
+ return{
+   valid:true,
+   pos:p.pos,
+   text:p.text||"",
+   unit:p.unit||"",
+   calc,
+   qty:Number(qty)
+ };
+}
+
+function addCurrentLvToBatch(){
+ if(editingEntryId){
+   alert("Während der Bearbeitung einer bestehenden Erfassung können keine weiteren LV-Positionen gesammelt werden. Bitte Bearbeitung zuerst speichern oder abbrechen.");
+   return;
+ }
+ const c=v610CurrentLvCandidate();
+ if(!c.valid){msg(c.message,true);return}
+
+ const same=multiLvDraft.findIndex(x=>x.pos===c.pos);
+ if(same>=0){
+   if(!confirm(`LV-Position ${c.pos} ist bereits vorgemerkt. Vorhandenen Rechenansatz ersetzen?`))return;
+   multiLvDraft[same]=c;
+ }else multiLvDraft.push(c);
+
+ renderMultiLvDraft();
+ msg(`LV-Position ${c.pos} vorgemerkt.`);
+ document.getElementById("calc").value="";
+ document.getElementById("posSearch").value="";
+ document.getElementById("posSelect").value="";
+ filterPositions();
+ previewCalc();
+}
+
+function removeLvFromBatch(index){
+ multiLvDraft.splice(index,1);
+ renderMultiLvDraft();
+}
+
+function clearMultiLvDraft(){
+ if(multiLvDraft.length && !confirm("Alle vorgemerkten LV-Positionen entfernen?"))return;
+ multiLvDraft=[];
+ renderMultiLvDraft();
+}
+
+function renderMultiLvDraft(){
+ const box=document.getElementById("multiLvList");
+ if(!box)return;
+ if(!multiLvDraft.length){
+   box.innerHTML='<div class="small">Noch keine zusätzlichen LV-Positionen vorgemerkt.</div>';
+   return;
+ }
+ box.innerHTML=multiLvDraft.map((x,i)=>`
+   <div class="multiLvItem">
+    <div class="mliPos">${esc(x.pos)}</div>
+    <div class="mliText">${esc(x.text)}</div>
+    <div class="mliCalc"><b>Ansatz:</b> ${esc(x.calc)}</div>
+    <div class="mliQty"><b>${num(x.qty)} ${esc(x.unit)}</b></div>
+    <button type="button" class="danger" onclick="removeLvFromBatch(${i})">Entfernen</button>
+   </div>`).join("")+
+   `<div class="toolbar"><button type="button" class="secondary" onclick="clearMultiLvDraft()">Liste leeren</button><span class="small">${multiLvDraft.length} LV-Position(en) vorgemerkt</span></div>`;
+}
+
+/* One description -> several normal entries. Each stays independently billable/syncable. */
+function v610CreateBatchEntry(item,shared){
+ const sh=activeSheet();
+ const pos=getPos(item.pos);
+ const e={
+   id:uid("e"),
+   sheetId:sh.id,
+   lineDesc:shared.lineDesc,
+   lineNo:lineNoFor(shared.lineDesc,sh.id,null),
+   pos:item.pos,
+   calc:item.calc,
+   qty:Number(item.qty),
+   unit:item.unit||pos?.unit||"",
+   detail:shared.detail,
+   reason:shared.reason,
+   note:shared.note,
+   planId:shared.planId||"",
+   updated:new Date().toISOString(),
+   multiLvGroup:shared.groupId
+ };
+ project().entries.push(e);
+ assignEntryDisplayId(e);
+ if(typeof markEntrySyncDirty==="function" && currentAccess?.().mode==="worker"){
+   markEntrySyncDirty(e,true);
+ }else{
+   if(!e.syncUuid)e.syncUuid="entry_"+cryptoSafeId();
+   e.syncRevision=1;
+   e.syncUpdatedAt=new Date().toISOString();
+   e.syncDirty=false;
+ }
+ return e;
+}
+
+/* Wrap final save. If multiple items are staged, save all under same description. */
+const _v610FinalizeCurrentEntry=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+ if(editingEntryId || !multiLvDraft.length){
+   return _v610FinalizeCurrentEntry();
+ }
+
+ const sh=activeSheet();
+ const lineDesc=document.getElementById("lineDesc")?.value.trim()||"";
+ const fm=document.getElementById("finalizeMessage");
+ if(!sh){
+   fm.style.color="#aa3030";fm.textContent="Bitte zuerst ein Aufmaßblatt auswählen.";return;
+ }
+ if(!lineDesc){
+   fm.style.color="#aa3030";fm.textContent="Bitte eine Positionsbeschreibung eingeben.";return;
+ }
+
+ /* Current still-filled position is automatically included as the last item. */
+ const current=v610CurrentLvCandidate();
+ let items=multiLvDraft.slice();
+ if(current.valid){
+   const ix=items.findIndex(x=>x.pos===current.pos);
+   if(ix>=0)items[ix]=current; else items.push(current);
+ }
+
+ if(!items.length){
+   fm.style.color="#aa3030";fm.textContent="Bitte mindestens eine LV-Position mit Menge eingeben.";return;
+ }
+
+ const shared={
+   lineDesc,
+   detail:document.getElementById("detail")?.value.trim()||"",
+   reason:document.getElementById("reason")?.value||"",
+   note:document.getElementById("note")?.value.trim()||"",
+   planId:document.getElementById("entryPlanSelect")?.value||"",
+   groupId:"mlv_"+cryptoSafeId()
+ };
+
+ const saved=items.map(item=>v610CreateBatchEntry(item,shared));
+
+ /* Batch entries are intentionally saved first; plan can be edited afterwards per ID. */
+ if(typeof removeDraftAnnotations==="function")removeDraftAnnotations();
+ multiLvDraft=[];
+ newDraftToken?.();
+ persist();
+
+ clearEntryForm(false);
+ const eps=document.getElementById("entryPlanSelect");if(eps)eps.value="";
+ selectedAnnotationId=null;
+ renderMultiLvDraft();
+ populatePlanLinks?.();
+ renderPlanAnnotations?.();
+ renderDraftEntrySummary?.();
+ renderRecent();
+ renderSheet();
+ renderLV();
+
+ const ids=saved.map(e=>entryDisplayId(e)).join(", ");
+ fm.style.color="#1f7a4d";
+ fm.innerHTML=`${saved.length} LV-Positionen gespeichert · IDs <b>${esc(ids)}</b>.<br>Die Planmarkierung kann jetzt bei jeder Position über <b>„Plan bearbeiten“</b> ergänzt oder geändert werden.`;
+};
+
+/* Form clearing also clears batch only when starting a genuinely new description. */
+const _v610ClearCurrentEntryDraft=clearCurrentEntryDraft;
+clearCurrentEntryDraft=function(){
+ const had=multiLvDraft.length;
+ if(had && !editingEntryId){
+   if(!confirm("Eingabe einschließlich aller vorgemerkten LV-Positionen leeren?"))return;
+   multiLvDraft=[];
+ }
+ _v610ClearCurrentEntryDraft();
+ renderMultiLvDraft();
+};
+
+const _v610EditEntry=editEntry;
+editEntry=function(id){
+ multiLvDraft=[];
+ renderMultiLvDraft();
+ return _v610EditEntry(id);
+};
+
+const _v610CancelEdit=cancelEdit;
+cancelEdit=function(){
+ const r=_v610CancelEdit();
+ multiLvDraft=[];
+ renderMultiLvDraft();
+ return r;
+};
+
+window.addEventListener("load",()=>renderMultiLvDraft());
 </script>
 
 </body>
