@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.13</title>
+<title>Kollaudierung – V6.14</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.13 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.14 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,9 +1096,70 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.13 alter Testhinweis entfernt ===== */
+/* ===== V6.14 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
+}
+
+
+
+/* ===== V6.14 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+#recentBody td{vertical-align:top}
+.v614RecentTable{table-layout:fixed}
+.v614RecentTable th:nth-child(1){width:5%}
+.v614RecentTable th:nth-child(2){width:18%}
+.v614RecentTable th:nth-child(3){width:36%}
+.v614RecentTable th:nth-child(4){width:17%}
+.v614RecentTable th:nth-child(5){width:8%}
+.v614RecentTable th:nth-child(6){width:9%}
+.v614RecentTable th:nth-child(7){width:7%}
+
+.v614LvStack,.v614QtyStack{display:flex;flex-direction:column}
+.v614LvLine,.v614QtyLine{
+ min-height:28px;
+ padding:4px 0;
+ border-bottom:1px solid #e5ecef;
+ box-sizing:border-box;
+}
+.v614LvLine:last-child,.v614QtyLine:last-child{border-bottom:0}
+.v614LvLine{
+ display:grid;
+ grid-template-columns:minmax(82px,105px) 1fr;
+ gap:8px;
+ align-items:start;
+}
+.v614LvCode{font-weight:800;white-space:nowrap}
+.v614LvText{line-height:1.25;overflow-wrap:anywhere}
+.v614QtyLine{line-height:1.25}
+.v614QtyMain{font-weight:700}
+.v614QtyCalc{font-size:10px;color:var(--muted);margin-top:1px}
+
+.v614GroupStart td{border-top:1.5px solid #b9c8d0!important}
+.v614GroupSub td{border-top:0!important}
+.v614GroupSub td:nth-child(3){padding-left:14px}
+
+@media(max-width:700px){
+ .v614LvLine{grid-template-columns:1fr}
+ .v614LvText{font-size:11px}
+}
+
+/* Druck: eine Erfassung bildet einen optischen Block */
+.v520EntryTable .v614PrintGroupStart td{
+ border-top:1.2px solid #879ba6!important;
+}
+.v520EntryTable .v614PrintSub td{
+ border-top:0!important;
+}
+.v520EntryTable td[rowspan]{
+ vertical-align:top;
+ background:#fbfcfd;
+}
+.v520EntryTable .v614PrintId{
+ font-size:8.5pt;
+ text-align:center;
+}
+.v520EntryTable .v614PrintDescription{
+ font-weight:600;
 }
 
 </style>
@@ -1115,7 +1176,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.13version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.14version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1131,7 +1192,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.13</h1>
+   <h1>Kollaudierung – V6.14</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -9804,7 +9865,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.13 MULTI-LV ================= */
+/* ================= V6.14 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10003,7 +10064,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.13 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.14 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10583,13 +10644,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.13 Gruppenmigration",e)}
+}catch(e){console.warn("V6.14 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.13 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.14 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -10695,7 +10756,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.13 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.14 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -10742,7 +10803,249 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.13 Migration",e)}
+}catch(e){console.warn("V6.14 Migration",e)}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.14 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   ============================================================ */
+
+function v614SheetGroups(sh){
+  const rows=entriesForSheet(sh);
+  const groups=[];
+  const byKey=new Map();
+  for(const e of rows){
+    const key=v612GroupKey(e);
+    let g=byKey.get(key);
+    if(!g){
+      g={key,entries:[]};
+      byKey.set(key,g);
+      groups.push(g);
+    }
+    g.entries.push(e);
+  }
+  groups.forEach(g=>g.entries.sort((a,b)=>(a.pos||"").localeCompare(b.pos||"")));
+  return groups;
+}
+
+function v614RecentLvHtml(g){
+  return `<div class="v614LvStack">${g.map(x=>{
+    const p=getPos(x.pos);
+    return `<div class="v614LvLine">
+      <div class="v614LvCode">${esc(x.pos)}</div>
+      <div class="v614LvText">${esc(p?.text||"")}</div>
+    </div>`;
+  }).join("")}</div>`;
+}
+function v614RecentQtyHtml(g){
+  return `<div class="v614QtyStack">${g.map(x=>`
+    <div class="v614QtyLine">
+      <div class="v614QtyMain">${num(x.qty)} ${esc(x.unit||"")}</div>
+      <div class="v614QtyCalc">${esc(x.calc||"")}</div>
+    </div>`).join("")}</div>`;
+}
+
+/* Bildschirm: eine Zeile pro Erfassungs-ID, Unterpositionen sauber gestapelt. */
+renderRecent=function(){
+  const all=sortedSheetEntries();
+  const groups=[];
+  const seen=new Set();
+
+  for(const e of all.slice().reverse()){
+    const key=v612GroupKey(e);
+    if(seen.has(key))continue;
+    seen.add(key);
+    const g=v612GroupEntries(e);
+    if(g.length)groups.push(g);
+    if(groups.length>=12)break;
+  }
+
+  const b=document.getElementById("recentBody");
+  const table=b.closest("table");
+  table?.classList.add("v614RecentTable");
+  const head=table?.querySelector("thead");
+  if(head)head.innerHTML='<tr><th>ID</th><th>Beschreibung</th><th>LV-Position(en)</th><th>Menge / Ansatz</th><th>Status</th><th>Anmerkung</th><th></th></tr>';
+
+  if(!groups.length){
+    b.innerHTML='<tr><td colspan="7" class="empty">Noch keine Erfassungen im aktiven Aufmaßblatt.</td></tr>';
+    return;
+  }
+
+  b.innerHTML=groups.map(g=>{
+    const a=g[0],id=entryDisplayId(a);
+    return `<tr>
+      <td><span class="entryIdBadge">${id}</span></td>
+      <td class="wrap"><b>${esc(a.lineDesc)}</b>${a.detail?`<div class="small" style="margin-top:4px">${esc(a.detail)}</div>`:""}</td>
+      <td>${v614RecentLvHtml(g)}</td>
+      <td>${v614RecentQtyHtml(g)}</td>
+      <td>${esc(a.reason||"")}</td>
+      <td class="wrap">${esc(a.note||"")}</td>
+      <td>
+       <div class="toolbar" style="flex-direction:column;align-items:stretch">
+        <button class="secondary" onclick="editEntry('${a.id}')">Bearbeiten</button>
+        <button class="okBtn" onclick="markEntryOnPlan('${a.id}')">Plan bearbeiten</button>
+       </div>
+      </td>
+    </tr>`;
+  }).join("");
+};
+
+/* Aufmaßblatt im Browser: ID/Beschreibung nur in erster Unterzeile. */
+renderSheet=function(){
+ const sh=activeSheet(),body=document.getElementById("sheetBody"),totals=document.getElementById("sheetTotalsBody");
+ if(!sh){
+   document.getElementById("sheetTitle").textContent="Kein Aufmaßblatt ausgewählt.";
+   document.getElementById("sheetPrintHead").innerHTML="";
+   body.innerHTML='<tr><td colspan="11" class="empty">Kein Aufmaßblatt vorhanden.</td></tr>';
+   totals.innerHTML="";return;
+ }
+
+ const title=[sh.code,sh.topArea,sh.area].filter(Boolean).join(" · ");
+ document.getElementById("sheetTitle").textContent=title;
+ document.getElementById("sheetPrintHead").innerHTML=`<div class="projectMeta">
+  <div class="metaCell"><b>Projekt</b>${esc(project().meta.name)}</div>
+  <div class="metaCell"><b>Projektnr.</b>${esc(project().meta.number||"–")}</div>
+  <div class="metaCell"><b>Kollaudierungsblatt</b>${esc(sh.code)}</div>
+  <div class="metaCell"><b>Datum / Gewerk</b>${esc(sh.date||"–")} · ${esc(sh.trade||"–")}</div>
+  <div class="metaCell"><b>Bereich</b>${esc([sh.topArea,sh.area].filter(Boolean).join(" – "))}</div>
+  <div class="metaCell"><b>Auftragnehmer</b>${esc(project().meta.contractor||"–")}</div>
+ </div>`;
+
+ const groups=v614SheetGroups(sh);
+ if(!groups.length){
+   body.innerHTML='<tr><td colspan="11" class="empty">Noch keine Erfassungen.</td></tr>';
+ }else{
+   body.innerHTML=groups.map(group=>{
+     const g=group.entries,a=g[0],span=g.length;
+     return g.map((e,i)=>{
+       const first=i===0,p=getPos(e.pos),tag=p?.manual?`<span class="badge manual">${esc(p.manualType||"manuell")}</span> `:"";
+       return `<tr class="${first?"v614GroupStart":"v614GroupSub"}">
+        <td>${first?`<span class="entryIdBadge">${entryDisplayId(a)}</span>`:""}</td>
+        <td class="wide">${first?`<b>${esc(a.lineDesc)}</b>`:""}</td>
+        <td>${tag}<b>${esc(e.pos)}</b></td>
+        <td class="wrap">${esc(p?.text||"")}</td>
+        <td>${esc(e.calc||"")}</td>
+        <td>${num(e.qty)}</td>
+        <td>${esc(e.unit||"")}</td>
+        <td>${first?esc(a.detail||""):""}</td>
+        <td>${first?esc(a.reason||""):""}</td>
+        <td class="wrap">${first?esc(a.note||""):""}</td>
+        <td class="noPrint">${first?`<div class="toolbar"><button class="secondary" onclick="editEntry('${a.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${a.id}')">Plan bearbeiten</button><button class="danger" onclick="deleteEntry('${a.id}')">Löschen</button></div>`:""}</td>
+       </tr>`;
+     }).join("");
+   }).join("");
+ }
+
+ const rows=entriesForSheet(sh);
+ const used=[...new Set(rows.map(e=>e.pos))];
+ totals.innerHTML=used.length?used.map(code=>{
+   const pos=getPos(code),st=sheetTotal(code,sh.id),pt=projectTotal(code),target=typeof hasTargetQty==="function"?hasTargetQty(pos):true,rest=target?Number(pos.lv_qty)-pt:null;
+   return `<tr><td><b>${esc(code)}</b></td><td class="wrap">${esc(pos?.text||"")}</td><td>${num(st)}</td><td>${esc(pos?.unit||"")}</td><td>${num(pt)}</td><td>${target?num(pos.lv_qty):"–"}</td><td>${target?num(rest):"–"}</td></tr>`;
+ }).join(""):'<tr><td colspan="7" class="empty">Keine Summen vorhanden.</td></tr>';
+};
+
+/* Druckzeilen: ID/Beschreibung/Detail/Status/Anmerkung als echte rowspan-Zellen. */
+v519EntryRowsHtml=function(rows){
+  if(!rows.length)return "";
+  const groups=[];
+  const map=new Map();
+  for(const e of rows){
+    const key=v612GroupKey(e);
+    let g=map.get(key);
+    if(!g){g=[];map.set(key,g);groups.push(g)}
+    g.push(e);
+  }
+
+  return groups.map(g=>{
+    g.sort((a,b)=>(a.pos||"").localeCompare(b.pos||""));
+    const a=g[0],span=g.length;
+    const plan=g.map(x=>x.planId).find(Boolean);
+    const pl=plan?plans().find(x=>x.id===plan):null;
+
+    return g.map((e,i)=>{
+      const p=getPos(e.pos),first=i===0;
+      return `<tr class="${first?"v614PrintGroupStart":"v614PrintSub"}">
+        ${first?`<td rowspan="${span}" class="v614PrintId"><b>${entryDisplayId(a)}</b></td>`:""}
+        ${first?`<td rowspan="${span}" class="v614PrintDescription">${esc(a.lineDesc)}</td>`:""}
+        <td><b>${esc(e.pos)}</b></td>
+        <td>${esc(p?.text||"")}</td>
+        <td>${esc(e.calc||"")}</td>
+        <td>${num(e.qty)}</td>
+        <td>${esc(e.unit||"")}</td>
+        ${first?`<td rowspan="${span}">${esc(a.detail||"")}</td>`:""}
+        ${first?`<td rowspan="${span}">${esc(a.reason||"")}</td>`:""}
+        ${first?`<td rowspan="${span}">${esc(a.note||"")}${pl?`<br><span style="font-size:6pt">Plan: ${esc(pl.name)}</span>`:""}</td>`:""}
+      </tr>`;
+    }).join("");
+  }).join("");
+};
+
+/* Druckseiten nach Erfassungsgruppen teilen, niemals absichtlich mitten in einer ID. */
+function v614ChunkGroups(groups,maxRows=18){
+  const chunks=[];
+  let current=[],count=0;
+
+  for(const g of groups){
+    const n=Math.max(1,g.entries.length);
+    if(current.length && count+n>maxRows){
+      chunks.push(current.flatMap(x=>x.entries));
+      current=[];count=0;
+    }
+    current.push(g);count+=n;
+  }
+  if(current.length)chunks.push(current.flatMap(x=>x.entries));
+  return chunks.length?chunks:[[]];
+}
+
+v519BuildSheetPages=async function(sh,includeBilling){
+  const pages=[];
+  const groups=v614SheetGroups(sh);
+  const entryChunks=v614ChunkGroups(groups,18);
+
+  entryChunks.forEach((chunk,idx)=>{
+    const body=`${v519MetaHtml(sh)}
+      ${v519EntryTableHtml(chunk)}
+      ${idx===entryChunks.length-1?`<div style="margin-top:2mm;font-size:6.5pt;color:#555">Erfassungen im Aufmaßblatt: ${groups.length} · LV-Unterpositionen: ${groups.reduce((n,g)=>n+g.entries.length,0)}</div>`:""}`;
+    pages.push(v519Page(
+      body,
+      `Aufmaßblatt ${sh.code}`,
+      idx?`Fortsetzung ${idx+1} · ${[sh.topArea,sh.area].filter(Boolean).join(" – ")}`:[sh.topArea,sh.area].filter(Boolean).join(" – "),
+      "v520LandscapePage"
+    ));
+  });
+
+  const evidence=await v519EvidencePagesForSheet(sh);
+  evidence.forEach(pg=>pg.extraClass=((pg.extraClass||"")+" v520PortraitPage").trim());
+  pages.push(...evidence);
+
+  if(includeBilling){
+    const totals=sheetTotalsForSheet(sh);
+    const BILL_ROWS=16;
+    const chunks=[];
+    if(!totals.length)chunks.push([]);
+    else for(let i=0;i<totals.length;i+=BILL_ROWS)chunks.push(totals.slice(i,i+BILL_ROWS));
+    chunks.forEach((chunk,idx)=>{
+      pages.push(v519Page(
+        `<div class="v519SectionTitle">Abrechnungsaufstellung</div>
+         <div class="v519SectionSub">Aufmaßblatt ${esc(sh.code)}${idx?` · Fortsetzung ${idx+1}`:""}</div>
+         ${v519BillingTableHtml(sh,chunk,idx===chunks.length-1)}`,
+        "Abrechnungsaufstellung",
+        `Aufmaßblatt ${sh.code}`,
+        "v520LandscapePage v519BillingPage"
+      ));
+    });
+  }
+  return pages;
+};
+
+/* Keep current project consistent before displaying/exporting. */
+try{
+  v613MergeSameDescriptions?.();
+  renderRecent?.();
+  renderSheet?.();
+}catch(e){console.warn("V6.14 Gruppendarstellung",e)}
 </script>
 
 </body>
