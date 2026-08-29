@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.24</title>
+<title>Kollaudierung – V6.25</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.24 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.25 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.24 alter Testhinweis entfernt ===== */
+/* ===== V6.25 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.24 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.25 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1163,7 +1163,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.24 HINWEISE / TEXTE ===== */
+/* ===== V6.25 HINWEISE / TEXTE ===== */
 #autoPlanLinkSummary{line-height:1.25}
 #autoPlanLinkMeta{line-height:1.35}
 #draftEntrySummary .fsCell .smallHint{
@@ -1174,13 +1174,13 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.24 EINHEITLICHE BEGRIFFE ===== */
+/* ===== V6.25 EINHEITLICHE BEGRIFFE ===== */
 .terminologyHint{
   line-height:1.4;
 }
 
 
-/* ===== V6.24 LETZTE ERFASSUNGEN ===== */
+/* ===== V6.25 LETZTE ERFASSUNGEN ===== */
 .v620RecentTable{
  table-layout:fixed!important;
  width:100%!important;
@@ -1288,7 +1288,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.24 ID-AUSWAHL IM AUFMASSBLATT ===== */
+/* ===== V6.25 ID-AUSWAHL IM AUFMASSBLATT ===== */
 .v621SheetIdToolbar{
  display:flex;
  align-items:flex-end;
@@ -1316,7 +1316,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.24 LV-ÜBERSICHT / NEUE POSITION ===== */
+/* ===== V6.25 LV-ÜBERSICHT / NEUE POSITION ===== */
 .v623AddLvCard{
  margin-bottom:12px;
  border:1px solid #b9cfda;
@@ -1356,7 +1356,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.24version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.25version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1372,7 +1372,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.24</h1>
+   <h1>Kollaudierung – V6.25</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -10074,7 +10074,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.24 MULTI-LV ================= */
+/* ================= V6.25 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10273,7 +10273,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.24 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.25 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10853,13 +10853,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.24 Gruppenmigration",e)}
+}catch(e){console.warn("V6.25 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.24 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.25 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -10965,7 +10965,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.24 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.25 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -11012,13 +11012,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.24 Migration",e)}
+}catch(e){console.warn("V6.25 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.24 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.25 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -11254,13 +11254,13 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.24 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.25 Gruppendarstellung",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.24 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   V6.25 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
    ============================================================ */
 
 function v615OrderedEntryGroups(){
@@ -11382,7 +11382,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.24 ID-Kompaktierung",e)}
+  }catch(e){console.warn("V6.25 ID-Kompaktierung",e)}
   return r;
 };
 
@@ -11436,13 +11436,13 @@ try{
   renderDraftEntrySummary?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.24 Startmigration",e)}
+}catch(e){console.warn("V6.25 Startmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.24 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
+   V6.25 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
    ============================================================ */
 
 function v616DraftLvItems(){
@@ -11608,7 +11608,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.24 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
+   V6.25 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
    ============================================================ */
 
 function v618GroupForId(id){
@@ -11768,7 +11768,7 @@ finalizeCurrentEntry=function(){
     }
     return result;
   }catch(err){
-    console.error("V6.24 Erfassung speichern",err);
+    console.error("V6.25 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -11793,7 +11793,7 @@ editEntry=function(id){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.24 Erfassung bearbeiten",err);
+    console.error("V6.25 Erfassung bearbeiten",err);
     alert("Erfassung konnte nicht zum Bearbeiten geöffnet werden: "+(err?.message||err));
   }
 };
@@ -11885,13 +11885,13 @@ try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.24 Datenkonsistenz",e)}
+}catch(e){console.warn("V6.25 Datenkonsistenz",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.24 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
+   V6.25 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
    ============================================================ */
 
 let v619IdMaintenanceRunning=false;
@@ -12202,7 +12202,7 @@ finalizeCurrentEntry=function(){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.24 Erfassung speichern",err);
+    console.error("V6.25 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -12212,18 +12212,18 @@ finalizeCurrentEntry=function(){
   }
 };
 
-/* Repair current project once after loading V6.24. */
+/* Repair current project once after loading V6.25. */
 try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.24 ID-Reparatur",e)}
+}catch(e){console.warn("V6.25 ID-Reparatur",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.24 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
+   V6.25 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
    ============================================================ */
 
 function v620RecentLvHtml(group){
@@ -12321,7 +12321,7 @@ try{renderRecent?.()}catch(e){}
 
 <script>
 /* ============================================================
-   V6.24 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
+   V6.25 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
    ============================================================ */
 
 function v621CurrentSheetViewIds(){
@@ -12454,7 +12454,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.24 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
+   V6.25 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
    ============================================================ */
 
 function v622PrepareCurrentDataForExport(){
@@ -12513,7 +12513,7 @@ printSheetsV52=async function(selected){
     if(progress)progress.classList.remove("show");
     v519PrintPrepared("sheetMultiPrintArea",pages,"sheetMultiPrintMode");
   }catch(err){
-    console.error("V6.24 PDF Export",err);
+    console.error("V6.25 PDF Export",err);
     const progress=document.getElementById("sheetExportProgress");
     if(progress)progress.classList.remove("show");
     alert("Export nicht möglich: "+(err?.message||err));
@@ -12662,7 +12662,7 @@ v519BuildSheetPages=async function(sh,includeBilling){
 
 <script>
 /* ============================================================
-   V6.24 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
+   V6.25 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
    ============================================================ */
 
 function v623OpenNewLvPosition(){
@@ -12691,6 +12691,174 @@ showView=function(name){
   }
   return _v623ShowViewBase(name);
 };
+</script>
+
+
+<script>
+/* ============================================================
+   V6.25 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
+   ============================================================ */
+
+/* A missing position can never have a target/LV quantity. */
+hasTargetQty=function(p){
+  if(!p)return false;
+  if(p.manual===true && (p.lv_qty===null || p.lv_qty==="" || typeof p.lv_qty==="undefined"))return false;
+  return Number.isFinite(Number(p.lv_qty));
+};
+
+function v625PosFallback(code,entry=null){
+  const p=getPos(code);
+  if(p)return p;
+  return {
+    pos:code||"",
+    text:entry?.posText||entry?.positionText||"LV-Unterposition nicht mehr in der LV-Übersicht vorhanden",
+    unit:entry?.unit||"",
+    lv_qty:null,
+    labor:0,
+    material:0,
+    ep:0,
+    manual:true,
+    manualType:"manuell",
+    missingReference:true
+  };
+}
+
+/* Make common position lookup displays robust even if a referenced position
+   was removed or has not yet been added to the current LV list. */
+const _v625GetPosBase=getPos;
+getPos=function(code){
+  const p=_v625GetPosBase(code);
+  return p||null;
+};
+
+/* Final safe sheet rendering – especially totals. */
+const _v625RenderSheetBase=renderSheet;
+renderSheet=function(){
+  try{
+    return _v625RenderSheetBase();
+  }catch(err){
+    console.warn("V6.25 renderSheet fallback",err);
+
+    const sh=activeSheet();
+    const body=document.getElementById("sheetBody");
+    const totals=document.getElementById("sheetTotalsBody");
+    if(!sh||!body||!totals)return;
+
+    const rows=entriesForSheet(sh);
+    const groups=[];
+    const seen=new Set();
+    for(const e of rows){
+      const key=v612GroupKey(e);
+      if(seen.has(key))continue;
+      seen.add(key);
+      groups.push(v612GroupEntries(e));
+    }
+
+    body.innerHTML=groups.length?groups.map(g=>{
+      const a=g[0];
+      return g.map((e,i)=>{
+        const p=v625PosFallback(e.pos,e);
+        const first=i===0;
+        return `<tr class="${first?"v614GroupStart":"v614GroupSub"}">
+          <td>${first?`<span class="entryIdBadge">${entryDisplayId(a)}</span>`:""}</td>
+          <td class="wide">${first?`<b>${esc(a.lineDesc||"")}</b>`:""}</td>
+          <td><b>${esc(e.pos)}</b>${p.missingReference?' <span class="badge warn">ohne LV-Referenz</span>':''}</td>
+          <td class="wrap">${esc(p.text||"")}</td>
+          <td>${esc(e.calc||"")}</td>
+          <td>${num(e.qty)}</td>
+          <td>${esc(e.unit||p.unit||"")}</td>
+          <td>${first?esc(a.detail||""):""}</td>
+          <td>${first?esc(a.reason||""):""}</td>
+          <td class="wrap">${first?esc(a.note||""):""}</td>
+          <td class="noPrint">${first?`<div class="toolbar"><button class="secondary" onclick="editEntry('${a.id}')">Bearbeiten</button><button class="okBtn" onclick="markEntryOnPlan('${a.id}')">Planmarkierung bearbeiten</button><button class="danger" onclick="deleteEntry('${a.id}')">ID löschen</button></div>`:""}</td>
+        </tr>`;
+      }).join("");
+    }).join(""):'<tr><td colspan="11" class="empty">Noch keine Erfassungen.</td></tr>';
+
+    const used=[...new Set(rows.map(e=>e.pos))];
+    totals.innerHTML=used.length?used.map(code=>{
+      const related=rows.find(e=>e.pos===code);
+      const p=v625PosFallback(code,related);
+      const st=sheetTotal(code,sh.id);
+      const pt=projectTotal(code);
+      const target=hasTargetQty(p);
+      const rest=target?Number(p.lv_qty)-pt:null;
+      return `<tr>
+        <td><b>${esc(code)}</b>${p.missingReference?' <span class="badge warn">ohne LV-Referenz</span>':''}</td>
+        <td class="wrap">${esc(p.text||"")}</td>
+        <td>${num(st)}</td>
+        <td>${esc(p.unit||related?.unit||"")}</td>
+        <td>${num(pt)}</td>
+        <td>${target?num(p.lv_qty):"–"}</td>
+        <td>${target?num(rest):"–"}</td>
+      </tr>`;
+    }).join(""):'<tr><td colspan="7" class="empty">Keine Summen vorhanden.</td></tr>';
+  }
+};
+
+/* Safe recent list descriptions for missing LV refs. */
+const _v625RecentLvHtmlBase=typeof v620RecentLvHtml==="function"?v620RecentLvHtml:null;
+if(_v625RecentLvHtmlBase){
+  v620RecentLvHtml=function(group){
+    return `<div class="v620LvWrap">${group.map(e=>{
+      const p=v625PosFallback(e.pos,e);
+      return `<div class="v620LvRow">
+        <div class="v620LvCode">${esc(e.pos)}</div>
+        <div class="v620LvText">${esc(p.text||"")}${p.missingReference?' <span class="badge warn">ohne LV-Referenz</span>':''}</div>
+      </div>`;
+    }).join("")}</div>`;
+  };
+}
+
+/* Export rows also tolerate a removed/missing LV reference. */
+if(typeof v622CsvRowsForSheets==="function"){
+  const _v625CsvBase=v622CsvRowsForSheets;
+  v622CsvRowsForSheets=function(selected){
+    const result=_v625CsvBase(selected);
+    return result;
+  };
+}
+
+/* Save wrapper: if later rendering fails, the saved entry must remain saved.
+   Re-render errors must not turn a successful data save into a failed save. */
+const _v625FinalizeBase=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const before=JSON.stringify((project()?.entries||[]).map(e=>[e.id,e.syncRevision,e.updated,e.qty,e.calc,e.pos,e.lineDesc]));
+  try{
+    return _v625FinalizeBase();
+  }catch(err){
+    console.error("V6.25 finalize fallback",err);
+
+    const after=JSON.stringify((project()?.entries||[]).map(e=>[e.id,e.syncRevision,e.updated,e.qty,e.calc,e.pos,e.lineDesc]));
+    const fm=document.getElementById("finalizeMessage");
+
+    if(before!==after){
+      /* Data changed => save itself happened, only a later UI refresh failed. */
+      try{persist()}catch(e){}
+      try{renderRecent?.()}catch(e){}
+      try{renderSheet?.()}catch(e){}
+      try{renderLV?.()}catch(e){}
+      if(fm){
+        fm.style.color="#1f7a4d";
+        fm.textContent="Erfassung wurde gespeichert. Die Anzeige wurde anschließend aktualisiert.";
+      }
+      return;
+    }
+
+    if(fm){
+      fm.style.color="#aa3030";
+      fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
+    }else{
+      alert("Erfassung konnte nicht gespeichert werden: "+(err?.message||err));
+    }
+  }
+};
+
+/* One immediate safe refresh. */
+try{
+  renderRecent?.();
+  renderSheet?.();
+}catch(e){}
 </script>
 
 </body>

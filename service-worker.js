@@ -1,4 +1,4 @@
-const CACHE_NAME="kollaudierung-v6.24-shell-1";
+const CACHE_NAME="kollaudierung-v6.25-shell-1";
 const APP_SHELL=[
   "./",
   "./index.html",
