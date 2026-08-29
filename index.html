@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.62</title>
+<title>Kollaudierung – V6.64</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2211,6 +2211,77 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
  }
 }
 
+
+/* ===== V6.63 BROWSER-/BAUSTELLEN-STABILITÄT ===== */
+html{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+body{
+  min-width:320px;
+  overflow-x:hidden;
+}
+button,input,select,textarea{
+  font-family:Arial,Helvetica,sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+button{
+  touch-action:manipulation;
+}
+.tablewrap,
+.previewTable,
+.planTools{
+  -webkit-overflow-scrolling:touch;
+}
+img,canvas,svg{
+  max-width:100%;
+}
+.headerRow>*,
+.grid2>*,
+.grid3>*,
+.grid4>*,
+.sheetBar>*{
+  min-width:0;
+}
+#compatBanner{
+  display:none;
+  margin:0 0 14px;
+}
+#compatBanner.show{
+  display:block;
+}
+.v663Fatal{
+  position:fixed;
+  left:12px;
+  right:12px;
+  bottom:12px;
+  z-index:100000;
+  max-width:900px;
+  margin:auto;
+  box-shadow:0 8px 30px rgba(0,0,0,.24);
+}
+@supports not (display:grid){
+  .grid2,.grid3,.grid4,.stats,.projectMeta,.sheetBar{
+    display:block!important;
+  }
+  .grid2>*,
+  .grid3>*,
+  .grid4>*,
+  .stats>*,
+  .projectMeta>*,
+  .sheetBar>*{
+    margin-bottom:10px;
+  }
+}
+@media(max-width:700px){
+  body{overflow-x:hidden}
+  main{padding-left:8px;padding-right:8px}
+  .card{padding:12px}
+  .headerTools{width:100%}
+  .headerTools select{width:100%;min-width:0}
+  input,select,textarea{font-size:16px} /* prevents iOS zoom-on-focus */
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -2238,7 +2309,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.62</h1>
+     <h1>Kollaudierung – V6.64</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -2256,6 +2327,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
  </div>
 </header>
 <main>
+ <div id="compatBanner" class="notice"></div>
  <div id="xlsxOffline" class="offlineWarning notice" style="margin-bottom:14px">
   Excel-Importmodul konnte nicht geladen werden. Die Kollaudierung funktioniert weiter, für den direkten XLSX-Import ist aber eine Internetverbindung beim Öffnen dieser Datei erforderlich.
  </div>
@@ -19082,6 +19154,197 @@ setPlanTool=function(tool){
 window.addEventListener("load",()=>{
   setTimeout(()=>{try{v662SetupTouchShapes()}catch(e){}},0);
 });
+</script>
+
+
+<script>
+/* ============================================================
+   V6.63 – BROWSER-/BAUSTELLEN-STABILITÄT
+   ============================================================ */
+
+function v663BrowserInfo(){
+  const ua=navigator.userAgent||"";
+  let family="Browser";
+  if(/SamsungBrowser/i.test(ua))family="Samsung Internet";
+  else if(/Edg\//i.test(ua))family="Microsoft Edge";
+  else if(/CriOS|Chrome\//i.test(ua))family="Google Chrome";
+  else if(/FxiOS|Firefox\//i.test(ua))family="Firefox";
+  else if(/Safari\//i.test(ua) && !/Chrome|CriOS|Android/i.test(ua))family="Safari";
+
+  const ios=/iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  const android=/Android/i.test(ua);
+
+  return {family,ios,android,ua};
+}
+
+function v663StorageTest(){
+  try{
+    const k="__kollapp_test__";
+    localStorage.setItem(k,"1");
+    localStorage.removeItem(k);
+    return true;
+  }catch(e){return false}
+}
+
+function v663IndexedDbAvailable(){
+  try{return !!window.indexedDB}catch(e){return false}
+}
+
+function v663ShowCompat(){
+  const b=document.getElementById("compatBanner");
+  if(!b)return;
+
+  const info=v663BrowserInfo();
+  const warnings=[];
+
+  if(!v663StorageTest()){
+    warnings.push("Lokaler Gerätespeicher ist blockiert. Projektdaten können dadurch nicht zuverlässig gespeichert werden.");
+  }
+  if(!v663IndexedDbAvailable()){
+    warnings.push("IndexedDB ist nicht verfügbar. Plan-/Dateispeicherung kann eingeschränkt sein.");
+  }
+  if(typeof pdfjsLib==="undefined"){
+    warnings.push("PDF-Modul wurde nicht geladen. PDF-Import und PDF-Pläne benötigen beim ersten Laden eine Internetverbindung.");
+  }
+  if(typeof XLSX==="undefined"){
+    warnings.push("Excel-Modul wurde nicht geladen. Excel-Import benötigt beim ersten Laden eine Internetverbindung.");
+  }
+  if((info.ios||info.android) && (typeof html2canvas!=="function" || !window.jspdf?.jsPDF)){
+    warnings.push("Mobiler PDF-Export ist noch nicht vollständig geladen. Bitte die App einmal mit Internetverbindung neu öffnen.");
+  }
+
+  if(warnings.length){
+    b.classList.add("show");
+    b.innerHTML="<b>Browser-Hinweis:</b> "+warnings.map(esc).join("<br>");
+  }else{
+    b.classList.remove("show");
+    b.innerHTML="";
+  }
+}
+
+function v663FatalMessage(msg){
+  if(document.querySelector(".v663Fatal"))return;
+  const el=document.createElement("div");
+  el.className="error v663Fatal";
+  el.innerHTML="<b>Kollapp-Fehler</b><br>"+esc(msg)+"<br><span class='small'>Die bereits gespeicherten Projektdaten werden dadurch nicht automatisch gelöscht. Bitte die Seite neu laden.</span>";
+  document.body.appendChild(el);
+}
+
+window.addEventListener("error",ev=>{
+  const message=ev?.message||"Unbekannter JavaScript-Fehler";
+  console.error("Kollapp V6.63",ev.error||message);
+  /* Do not cover the app for harmless third-party load errors. */
+  if(!/Script error\.?/i.test(message)){
+    v663FatalMessage(message);
+  }
+});
+
+window.addEventListener("unhandledrejection",ev=>{
+  const reason=ev?.reason?.message||String(ev?.reason||"Unbekannter Fehler");
+  console.error("Kollapp V6.63 Promise",ev.reason);
+  if(!/AbortError/i.test(reason)){
+    v663FatalMessage(reason);
+  }
+});
+
+/* Safari / Samsung can leave a tool in a stale touch state after app switching.
+   Reset temporary drawing state when returning to the page. */
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState!=="visible")return;
+  try{
+    freehandPointerId=null;
+    v655TouchFreehandActive=false;
+    v655TouchFreehandIdentifier=null;
+    v662ShapeTouchActive=false;
+    v662ShapeTouchId=null;
+    planShapeDraft=null;
+    planDrag=null;
+    renderPlanAnnotations?.();
+  }catch(e){}
+});
+
+/* Orientation changes on tablets need a delayed plan resize. */
+window.addEventListener("orientationchange",()=>{
+  setTimeout(()=>{
+    try{
+      setPlanStageSize?.();
+      renderPlanAnnotations?.();
+    }catch(e){}
+  },250);
+});
+window.addEventListener("resize",()=>{
+  clearTimeout(window.__v663ResizeTimer);
+  window.__v663ResizeTimer=setTimeout(()=>{
+    try{
+      if(activePlan?.()){
+        setPlanStageSize?.();
+        renderPlanAnnotations?.();
+      }
+    }catch(e){}
+  },180);
+});
+
+/* More defensive PDF worker configuration. */
+try{
+  if(typeof pdfjsLib!=="undefined"){
+    pdfjsLib.GlobalWorkerOptions.workerSrc=
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  }
+}catch(e){}
+
+/* PWA/service-worker updates: activate a newly uploaded GitHub version quickly. */
+async function v663UpdateServiceWorker(){
+  if(!("serviceWorker" in navigator))return;
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    reg.update?.();
+  }catch(e){}
+}
+
+window.addEventListener("load",()=>{
+  setTimeout(v663ShowCompat,300);
+  setTimeout(v663UpdateServiceWorker,1200);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.64 – LV-UNTERPOSITION WIRKLICH ENTFERNEN
+   ============================================================ */
+
+function v664ClearCurrentLvIfSame(pos){
+  const current=document.getElementById("posSelect")?.value||"";
+  if(!pos || current!==pos)return;
+
+  const calc=document.getElementById("calc");
+  const search=document.getElementById("posSearch");
+  const sel=document.getElementById("posSelect");
+
+  if(calc)calc.value="";
+  if(search)search.value="";
+  if(sel)sel.value="";
+
+  try{filterPositions?.()}catch(e){}
+  try{previewCalc?.()}catch(e){}
+  try{showPosInfo?.()}catch(e){}
+}
+
+/* Replace the historic remove function.
+   Important: in edit mode finalizeCurrentEntry() automatically includes the
+   currently selected LV position. Therefore the form must be cleared too,
+   otherwise an explicitly removed zero/template item would be added again. */
+removeLvFromBatch=function(index){
+  const item=multiLvDraft?.[index];
+  if(!item)return;
+
+  multiLvDraft.splice(index,1);
+  v664ClearCurrentLvIfSame(item.pos);
+  renderMultiLvDraft();
+
+  msg(`LV-Unterposition ${item.pos} entfernt. Änderung wird mit „Erfassung speichern“ übernommen.`);
+};
 </script>
 
 </body>
