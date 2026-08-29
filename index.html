@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.66</title>
+<title>Kollaudierung – V6.67</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2426,6 +2426,362 @@ img,canvas,svg{
   }
 }
 
+
+/* ============================================================
+   V6.67 – EINHEITLICHES UI FÜR ALLE HAUPTREITER
+   ============================================================ */
+
+:root{
+ --v667-blue:#527f9d;
+ --v667-green:#6d9480;
+ --v667-sand:#a68b60;
+ --v667-purple:#7c789b;
+ --v667-slate:#6f8290;
+ --v667-soft:#f7f9fb;
+}
+
+/* ----- Hauptnavigation ----- */
+.tabs{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  gap:6px!important;
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+  scrollbar-width:none;
+  padding:6px!important;
+  margin-bottom:12px!important;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 2px 7px rgba(27,47,62,.05);
+  -webkit-overflow-scrolling:touch;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  flex:0 0 auto;
+  min-height:42px;
+  padding:9px 13px!important;
+  border-radius:8px!important;
+  white-space:nowrap;
+  font-weight:750;
+  transition:background .12s ease,box-shadow .12s ease;
+}
+.tab.active{
+  box-shadow:0 2px 6px rgba(25,75,108,.15);
+}
+.v667TabIcon{
+  width:18px;
+  text-align:center;
+  font-size:15px;
+  line-height:1;
+  opacity:.82;
+}
+
+/* ----- View-Farbakzente, bewusst sehr dezent ----- */
+#view-entry{--v667-accent:var(--v667-blue)}
+#view-sheet{--v667-accent:#648aa4}
+#view-lv{--v667-accent:var(--v667-green)}
+#view-export{--v667-accent:var(--v667-sand)}
+#view-sync{--v667-accent:var(--v667-purple)}
+#view-project{--v667-accent:var(--v667-slate)}
+
+.v667ManagedView > .v667MainCard,
+.v667ManagedView > .v667ActionCard{
+  position:relative;
+  overflow:hidden;
+}
+.v667ManagedView > .v667MainCard::before,
+.v667ManagedView > .v667ActionCard::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:4px;
+  background:var(--v667-accent);
+}
+.v667ManagedView > .v667MainCard{
+  background:linear-gradient(180deg,#fff 0,#fbfcfd 100%);
+}
+.v667ActionCard{
+  background:#f8fbfc!important;
+}
+
+/* ----- Einheitliche Überschriften / Bereiche ----- */
+.v667ManagedView h2{
+  color:#20303b;
+}
+.v667ManagedView h3{
+  color:#2c3e49;
+}
+.v667ManagedView .spacer{
+  height:14px;
+}
+.v667ManagedView .syncPanel,
+.v667ManagedView .v630ClientCard,
+.v667ManagedView .sheetSelectPanel{
+  border-radius:10px!important;
+  border:1px solid #d7e0e5!important;
+  background:#fafcfd!important;
+  box-shadow:none!important;
+}
+#view-sync .syncPanel:nth-of-type(odd){
+  background:#fbfafd!important;
+}
+#view-export .v630ClientCard{
+  background:#fcfaf6!important;
+}
+
+/* ----- Buttons: wichtigste Aktion sofort erkennbar ----- */
+.v667ManagedView button,
+#view-entry button{
+  min-height:40px;
+}
+.v667ManagedView .primary,
+#view-entry .primary{
+  font-weight:750;
+}
+.v667ManagedView .toolbar{
+  row-gap:7px;
+}
+.v667ManagedView .toolbar > button{
+  white-space:nowrap;
+}
+
+/* ----- Filter / Steuerleisten ----- */
+#view-lv #lvFilter,
+#view-lv #lvMode{
+  min-height:40px;
+}
+#view-sheet .v621SheetIdToolbar{
+  margin-top:12px;
+  padding:10px;
+  border-radius:9px;
+  border:1px solid #d7e1e7;
+  background:#f7fafc;
+}
+#view-sheet .sheetSelectPanel{
+  margin-top:12px;
+  padding:12px!important;
+}
+#view-export .grid2 > div,
+#view-sync .grid2 > .syncPanel{
+  min-width:0;
+}
+
+/* ----- Tabellen: leichter scanbar ----- */
+.v667ManagedView .tablewrap,
+#view-entry .tablewrap{
+  border:1px solid #dce3e8;
+  border-radius:9px;
+  background:#fff;
+  overflow:auto;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+}
+.v667ManagedView table thead th,
+#view-entry table thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#eef3f6!important;
+  color:#263944;
+  border-bottom:1px solid #ccd8df;
+}
+.v667ManagedView tbody tr:nth-child(even),
+#view-entry tbody tr:nth-child(even){
+  background:rgba(239,244,247,.38);
+}
+.v667ManagedView tbody tr:hover,
+#view-entry tbody tr:hover{
+  background:#edf5f9;
+}
+
+/* ----- Projektkarten / Exportvorschau ----- */
+#view-project #projectDetails{
+  margin-top:12px;
+  padding:10px;
+  border-radius:9px;
+  background:#f7f9fa;
+  border:1px solid #dde4e8;
+}
+#view-project #projectSourceInfo{
+  border-radius:9px;
+}
+#view-export .exportLogoPreviewBox,
+#view-export .exportBrandPreview{
+  border-radius:10px!important;
+}
+
+/* ----- Terminologie im Übergabereiter als klare Infozeile ----- */
+#view-sync .terminologyHint{
+  padding:9px 11px;
+  margin-top:0!important;
+  border-radius:9px;
+  background:#f6f4fa;
+  border:1px solid #dfdcea;
+}
+
+/* ----- Tablet ----- */
+@media (min-width:601px) and (max-width:1100px){
+  .tabs{
+    gap:4px!important;
+    padding:5px!important;
+  }
+  .tab{
+    min-height:44px;
+    padding:8px 10px!important;
+    font-size:12px!important;
+  }
+
+  .v667ManagedView > .card{
+    padding:12px!important;
+  }
+
+  /* Toolbars brechen kontrolliert statt zu überlaufen */
+  .v667ManagedView > .card > .toolbar,
+  #view-sheet > .card > .toolbar,
+  #view-project > .card > .toolbar{
+    align-items:stretch!important;
+    gap:8px!important;
+  }
+
+  #view-sheet > .card > .toolbar:first-child{
+    display:grid!important;
+    grid-template-columns:minmax(260px,1fr) minmax(300px,1.25fr)!important;
+  }
+  #view-sheet > .card > .toolbar:first-child > .toolbar{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    align-content:start;
+  }
+  #view-sheet > .card > .toolbar:first-child > .toolbar .exportOption{
+    grid-column:1/-1;
+  }
+  #view-sheet > .card > .toolbar:first-child button{
+    width:100%;
+  }
+
+  #view-lv .v667MainCard > .toolbar{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+  }
+  #view-lv .v667MainCard > .toolbar > .toolbar{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(150px,.55fr) auto!important;
+  }
+  #view-lv #lvFilter,
+  #view-lv #lvMode{
+    width:100%!important;
+  }
+
+  #view-export > .card > .toolbar:first-child,
+  #view-project > .card > .toolbar:first-child{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+  }
+
+  #view-sync .grid2{
+    grid-template-columns:1fr 1fr!important;
+    gap:10px!important;
+  }
+
+  .v667ManagedView button{
+    min-height:44px;
+  }
+}
+
+/* ----- Handy ----- */
+@media(max-width:600px){
+  .tabs{
+    margin-left:-2px;
+    margin-right:-2px;
+  }
+  .tab{
+    min-height:44px;
+    padding:8px 11px!important;
+    font-size:12px!important;
+  }
+
+  .v667ManagedView > .card{
+    padding:11px!important;
+  }
+
+  /* Haupttoolbars untereinander und volle Breite */
+  .v667ManagedView > .card > .toolbar,
+  .v667ManagedView .syncPanel > .toolbar,
+  #view-project > .card > .toolbar{
+    flex-direction:column!important;
+    align-items:stretch!important;
+  }
+  .v667ManagedView .toolbar > button,
+  .v667ManagedView .toolbar > label.filePickLabel{
+    width:100%!important;
+  }
+
+  #view-sheet > .card > .toolbar:first-child{
+    display:block!important;
+  }
+  #view-sheet > .card > .toolbar:first-child > .toolbar{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    margin-top:10px;
+  }
+  #view-sheet > .card > .toolbar:first-child > .toolbar .exportOption{
+    grid-column:1/-1;
+  }
+  #view-sheet > .card > .toolbar:first-child > .toolbar button{
+    width:100%;
+  }
+  #view-sheet .v621SheetIdActions{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:7px;
+  }
+
+  #view-lv .v623AddLvToolbar,
+  #view-lv .v667MainCard > .toolbar,
+  #view-lv .v667MainCard > .toolbar > .toolbar{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+  }
+  #view-lv #lvFilter,
+  #view-lv #lvMode,
+  #view-lv .v623AddLvBtn{
+    width:100%!important;
+  }
+
+  #view-export .grid2,
+  #view-sync .grid2{
+    grid-template-columns:1fr!important;
+  }
+
+  #view-export input[type="file"]{
+    max-width:100%;
+  }
+
+  #view-project .projectPlanGrid{
+    grid-template-columns:1fr!important;
+  }
+
+  .v667ManagedView table{
+    font-size:12px;
+  }
+}
+
+/* ----- Kleine Bedienhinweise ----- */
+.v667ManagedView input:focus,
+.v667ManagedView select:focus,
+.v667ManagedView textarea:focus,
+#view-entry input:focus,
+#view-entry select:focus,
+#view-entry textarea:focus{
+  outline:2px solid color-mix(in srgb,var(--v667-accent,#527f9d) 35%,transparent);
+  outline-offset:1px;
+  border-color:var(--v667-accent,#527f9d);
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -2453,7 +2809,7 @@ img,canvas,svg{
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.66</h1>
+     <h1>Kollaudierung – V6.67</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -2485,12 +2841,12 @@ img,canvas,svg{
  </div>
 
  <div class="tabs noPrint">
-  <button id="tab-entry" class="tab active" onclick="showView('entry')">Erfassen</button>
-  <button id="tab-sheet" class="tab" onclick="showView('sheet')">Aufmaßblatt</button>
-  <button id="tab-lv" class="tab" onclick="showView('lv')">LV-Übersicht</button>
-  <button id="tab-export" class="tab" onclick="showView('export')">Export</button>
-  <button id="tab-sync" class="tab" onclick="showView('sync')">Benutzer & Projektübergabe</button>
-  <button id="tab-project" class="tab" onclick="showView('project')">Projekt</button>
+  <button id="tab-entry" class="tab active" onclick="showView('entry')"><span class="v667TabIcon">✎</span><span>Erfassen</span></button>
+  <button id="tab-sheet" class="tab" onclick="showView('sheet')"><span class="v667TabIcon">▤</span><span>Aufmaßblatt</span></button>
+  <button id="tab-lv" class="tab" onclick="showView('lv')"><span class="v667TabIcon">≡</span><span>LV-Übersicht</span></button>
+  <button id="tab-export" class="tab" onclick="showView('export')"><span class="v667TabIcon">⇩</span><span>Export</span></button>
+  <button id="tab-sync" class="tab" onclick="showView('sync')"><span class="v667TabIcon">⇄</span><span>Benutzer & Projektübergabe</span></button>
+  <button id="tab-project" class="tab" onclick="showView('project')"><span class="v667TabIcon">⌂</span><span>Projekt</span></button>
  </div>
 
  <section id="view-entry" class="view active">
@@ -2847,8 +3203,8 @@ img,canvas,svg{
   </div>
  </section>
 
- <section id="view-sheet" class="view">
-  <div class="card">
+ <section id="view-sheet" class="view v667ManagedView">
+  <div class="card v667MainCard">
    <div class="toolbar noPrint" style="justify-content:space-between;align-items:flex-end">
     <div style="min-width:320px">
      <h2 style="margin:0">Digitales Aufmaßblatt</h2>
@@ -2918,9 +3274,9 @@ img,canvas,svg{
   </div>
  </section>
 
- <section id="view-lv" class="view">
+ <section id="view-lv" class="view v667ManagedView">
 
-  <div class="card v623AddLvCard noPrint">
+  <div class="card v623AddLvCard v667ActionCard noPrint">
    <div class="toolbar v623AddLvToolbar">
     <div>
      <h2 style="margin:0">LV-Unterposition hinzufügen</h2>
@@ -2930,7 +3286,7 @@ img,canvas,svg{
    </div>
   </div>
 
-  <div class="card">
+  <div class="card v667MainCard">
    <div class="toolbar" style="justify-content:space-between">
     <div><h2 style="margin:0">LV-Übersicht / Kollaudierungsstand</h2><div class="small" style="margin-top:4px">Projektweite Summe über alle Aufmaßblätter</div></div>
     <div class="toolbar noPrint">
@@ -2954,8 +3310,8 @@ img,canvas,svg{
  </section>
 
  
- <section id="view-export" class="view">
-  <div class="card">
+ <section id="view-export" class="view v667ManagedView">
+  <div class="card v667MainCard">
    <div class="toolbar" style="justify-content:space-between;align-items:flex-start">
     <div>
      <h2 style="margin:0">Export / Firmenlayout</h2>
@@ -3073,13 +3429,13 @@ img,canvas,svg{
  </section>
 
  
- <section id="view-sync" class="view">
+ <section id="view-sync" class="view v667ManagedView">
 
 <div class="small terminologyHint noPrint" style="margin:8px 0 12px;color:var(--muted)">
  <b>Begriffe:</b> Erfassung = eine Erfassungs-ID · LV-Unterposition = einzelne abrechenbare LV-Zeile innerhalb einer Erfassung · Planmarkierung = grafische Kennzeichnung im Plan.
 </div>
 
-  <div class="card">
+  <div class="card v667MainCard">
    <div class="toolbar" style="justify-content:space-between;align-items:flex-start">
     <div>
      <h2 style="margin:0">Benutzer & Projektübergabe</h2>
@@ -3161,8 +3517,8 @@ img,canvas,svg{
   </div>
  </section>
 
- <section id="view-project" class="view">
-  <div class="card">
+ <section id="view-project" class="view v667ManagedView">
+  <div class="card v667MainCard">
    <div class="toolbar" style="justify-content:space-between">
     <div>
      <h2 style="margin:0">Projektverwaltung</h2>
@@ -19584,6 +19940,30 @@ finalizeCurrentEntry=function(){
   }
   return r;
 };
+</script>
+
+
+<script>
+/* V6.67 – Navigation accessibility/visual state */
+function v667SyncTabState(){
+  document.querySelectorAll(".tabs .tab").forEach(btn=>{
+    if(btn.classList.contains("active"))btn.setAttribute("aria-current","page");
+    else btn.removeAttribute("aria-current");
+  });
+}
+const _v667ShowViewBase=showView;
+showView=function(name){
+  const r=_v667ShowViewBase.apply(this,arguments);
+  v667SyncTabState();
+  /* Keep selected tab visible on phones/tablets. */
+  setTimeout(()=>{
+    document.getElementById("tab-"+name)?.scrollIntoView?.({
+      behavior:"smooth",block:"nearest",inline:"nearest"
+    });
+  },0);
+  return r;
+};
+window.addEventListener("load",()=>setTimeout(v667SyncTabState,0));
 </script>
 
 </body>
