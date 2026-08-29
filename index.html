@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.96</title>
+<title>Kollaudierung – V6.97</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -5903,6 +5903,124 @@ main > section.view,
   transform:none!important;
 }
 
+
+/* ============================================================
+   V6.97 – ERFASSUNG: SCHRITTE 5/6/7 NUTZEN VOLLE BREITE
+   ============================================================ */
+
+#view-entry .v697LowerEntry{
+  display:grid;
+  gap:12px;
+  margin-top:12px;
+}
+
+#view-entry .v697SupportCard,
+#view-entry .v697PhotoActionsCard{
+  padding:14px!important;
+  border:1px solid #dce5ea!important;
+  background:#fff!important;
+  box-shadow:0 2px 8px rgba(30,48,60,.04)!important;
+}
+
+#view-entry .v697SupportGrid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:14px;
+  align-items:start;
+}
+
+#view-entry .v697SupportSection{
+  min-width:0;
+}
+
+#view-entry .v697PlanSupport{
+  padding-right:14px;
+  border-right:1px solid #e2eaee;
+}
+
+#view-entry .v697SupportSection .v692SectionTitle{
+  margin-top:0!important;
+}
+
+#view-entry .v697SupportSection .entryPlanBox,
+#view-entry .v697SupportSection .v666NoteSection{
+  margin-top:8px!important;
+  min-height:150px;
+}
+
+#view-entry .v697SupportSection .entryPlanBox{
+  height:100%;
+  margin-bottom:0!important;
+}
+
+#view-entry .v697SupportSection .v666NoteSection{
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+
+#view-entry .v697SupportSection #note{
+  min-height:118px!important;
+}
+
+#view-entry .v697PhotoActionsCard{
+  border-left:4px solid #9c8557!important;
+  background:linear-gradient(180deg,#fffdf8 0%,#fff 100%)!important;
+}
+
+#view-entry .v697PhotoActionsCard > .v692SectionTitle{
+  margin-top:0!important;
+}
+
+#view-entry .v697PhotoActionsCard .v637PhotoBox{
+  margin-top:8px!important;
+  border:0!important;
+  border-left:0!important;
+  padding:0!important;
+  background:transparent!important;
+}
+
+#view-entry .v697PhotoActionsCard > .toolbar{
+  margin-top:10px!important;
+  padding-top:10px!important;
+  border-top:1px solid #e6e1d5!important;
+}
+
+#view-entry .v697PhotoActionsCard #message{
+  margin-top:8px!important;
+}
+
+/* Top right card now really ends after step 4. */
+#view-entry #entryCard{
+  align-self:start!important;
+}
+
+/* Desktop: lower row makes full use of the freed width. */
+@media(min-width:1101px){
+  #view-entry .v697SupportGrid{
+    grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+    gap:16px;
+  }
+}
+
+/* Tablet/phone: plan and note stack cleanly. */
+@media(max-width:900px){
+  #view-entry .v697SupportGrid{
+    grid-template-columns:1fr!important;
+    gap:12px;
+  }
+  #view-entry .v697PlanSupport{
+    padding-right:0;
+    padding-bottom:12px;
+    border-right:0;
+    border-bottom:1px solid #e2eaee;
+  }
+  #view-entry .v697SupportSection .entryPlanBox,
+  #view-entry .v697SupportSection .v666NoteSection{
+    min-height:0;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -5933,7 +6051,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V6.96 <span class="v693BuildStamp">Build 6.96</span></h1>
+     <h1>Kollaudierung – V6.97 <span class="v693BuildStamp">Build 6.97</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -6110,7 +6228,15 @@ main > section.view,
      <div class="small">Kein Plan oder Foto erforderlich? Die Erfassung kann hier direkt gespeichert werden. Planmarkierungen und Bilder können später jederzeit ergänzt werden.</div>
     </div>
 
-    <div class="v692SectionTitle"><span>5</span><div><b>Plan zuordnen</b><small>Optionaler Lageplan zur Erfassungs-ID</small></div></div>
+
+   </div>
+  </div>
+
+  <div class="v697LowerEntry">
+   <div class="card v697SupportCard">
+    <div class="v697SupportGrid">
+     <section class="v697SupportSection v697PlanSupport">
+<div class="v692SectionTitle"><span>5</span><div><b>Plan zuordnen</b><small>Optionaler Lageplan zur Erfassungs-ID</small></div></div>
     <div class="entryPlanBox v666PlanSection">
      <div class="grid2">
       <div>
@@ -6129,14 +6255,19 @@ main > section.view,
      </div>
      <div class="small" style="margin-top:6px">Der ausgewählte Plan wird mit der Aufmaßerfassung gespeichert und beim Plan-Nachweis verwendet.</div>
     </div>
-
-    <div class="v692SectionTitle"><span>6</span><div><b>Anmerkung</b><small>Zusätzliche Information zur Position</small></div></div>
+     </section>
+     <section class="v697SupportSection v697NoteSupport">
+<div class="v692SectionTitle"><span>6</span><div><b>Anmerkung</b><small>Zusätzliche Information zur Position</small></div></div>
     <div class="v666NoteSection">
      <label>Anmerkung zur Position</label>
      <textarea id="note" placeholder="optional"></textarea>
     </div>
+     </section>
+    </div>
+   </div>
 
-    <div class="v692SectionTitle"><span>7</span><div><b>Fotodokumentation</b><small>Optionaler Bildnachweis zur Erfassungs-ID</small></div></div>
+   <div class="card v697PhotoActionsCard">
+<div class="v692SectionTitle"><span>7</span><div><b>Fotodokumentation</b><small>Optionaler Bildnachweis zur Erfassungs-ID</small></div></div>
     <div class="v637PhotoBox v666PhotoSection">
      <div class="toolbar" style="justify-content:space-between;align-items:flex-start">
       <div>
@@ -6162,7 +6293,6 @@ main > section.view,
     <div class="small" style="margin-top:5px"><b>Planmarkierung:</b> Sie kann sofort gesetzt oder nach dem Speichern jederzeit über „Planmarkierung bearbeiten“ ergänzt bzw. geändert werden.</div>
    </div>
   </div>
-
 
   <div class="spacer"></div>
   <div id="entryPlanWorkspace" class="entryIntegratedPlan">
@@ -14858,7 +14988,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=6.96",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=6.97",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -24639,7 +24769,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="6.96";
+const KOLLAPP_VERSION="6.97";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
