@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.81</title>
+<title>Kollaudierung – V6.84</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -4733,6 +4733,136 @@ main{
   }
 }
 
+
+/* ============================================================
+   V6.82 – PROJEKTÜBERGABE TABLET + VORLAGENHINWEIS
+   ============================================================ */
+
+/* Schrittzahl ist jetzt Teil der Überschrift – nie mehr über Buttons. */
+#view-sync .v682SyncCardHead{
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  margin-bottom:11px;
+}
+#view-sync .v682SyncCardHead .v675SyncStep{
+  position:static!important;
+  inset:auto!important;
+  width:27px!important;
+  min-width:27px!important;
+  height:27px!important;
+  padding:0!important;
+  margin:0!important;
+  align-self:start;
+}
+#view-sync .v682SyncHeadText{
+  min-width:0;
+}
+#view-sync .v682SyncHeadText h3{
+  margin:0 0 3px!important;
+  padding:0!important;
+}
+#view-sync .v682HeadAction{
+  justify-self:end;
+  min-width:0;
+}
+#view-sync .v682HeadAction.filePickLabel,
+#view-sync .v682HeadAction .filePickLabel{
+  margin:0!important;
+}
+#view-sync .v675SyncCard > h3{
+  padding-right:0!important;
+}
+
+/* Rechenansatz: Vorlage sofort verständlich. */
+.v682TemplateHint{
+  margin:6px 0 8px;
+  padding:8px 10px;
+  border:1px solid #e4d7ac;
+  border-left:3px solid #ac8c42;
+  border-radius:8px;
+  background:#fffaf0;
+  color:#66541f;
+  font-size:11.5px;
+  line-height:1.35;
+}
+
+/* Tablet: Aktionen bei Bedarf in eigene Zeile statt Überlagerung. */
+@media(min-width:601px) and (max-width:1100px){
+  #view-sync .v682SyncCardHead{
+    grid-template-columns:30px minmax(0,1fr);
+    align-items:start;
+  }
+  #view-sync .v682SyncCardHead > .v682HeadAction{
+    grid-column:2;
+    justify-self:start;
+    width:auto;
+    margin-top:3px;
+  }
+  #view-sync .v682SyncCardHead > button.v682HeadAction{
+    min-width:140px;
+  }
+  #view-sync .v682SyncCardHead .filePickLabel{
+    width:auto!important;
+    min-width:190px;
+  }
+}
+
+/* Handy: Headeraktion volle Breite, Nummer bleibt links. */
+@media(max-width:600px){
+  #view-sync .v682SyncCardHead{
+    grid-template-columns:28px minmax(0,1fr);
+    gap:8px;
+  }
+  #view-sync .v682SyncCardHead > .v682HeadAction{
+    grid-column:1/-1;
+    width:100%!important;
+  }
+  #view-sync .v682SyncCardHead > button.v682HeadAction,
+  #view-sync .v682SyncCardHead .filePickLabel{
+    width:100%!important;
+  }
+  .v682TemplateHint{
+    font-size:11px;
+  }
+}
+
+
+/* ============================================================
+   V6.84 – VORLAGE PRO LV-UNTERPOSITION
+   ============================================================ */
+.v684TemplatePosList{
+  display:grid;
+  gap:4px;
+  margin-top:5px;
+}
+.v684TemplatePos{
+  display:flex;
+  gap:7px;
+  align-items:flex-start;
+  padding:5px 7px;
+  border-radius:7px;
+  background:#fff9e8;
+  border:1px solid #eee0b8;
+  font-size:11px;
+}
+.v684TemplatePos b{
+  flex:0 0 auto;
+  color:#755e1d;
+}
+.v684MixedBadge{
+  display:inline-flex;
+  align-items:center;
+  margin-top:5px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:#fff4cf;
+  color:#765d17;
+  font-size:10.5px;
+  font-weight:800;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -4763,7 +4893,7 @@ main{
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V6.81</h1>
+     <h1>Kollaudierung – V6.84</h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -4876,7 +5006,10 @@ main{
    <div class="card v666Section v666MeasureSection" id="entryCard">
     <h2>2. Menge / Rechenansatz</h2>
     <label>Rechenansatz</label>
-    <input id="calc" placeholder="Rechenansatz" oninput="previewCalc()">
+    <input id="calc" placeholder="z. B. 2,50 + 1,20 oder 0 für Vorlage" oninput="previewCalc()">
+    <div class="v682TemplateHint">
+     <b>Vorlage:</b> Rechenansatz <b>0</b> eingeben. Die Erfassungs-ID wird mit Menge 0 als Vorlage gespeichert und kann später fertig ausgefüllt werden.
+    </div>
     <div id="calcPreview" class="calcPreview">
      <div class="small">Ergebnis</div>
      <div class="calcResult" id="calcResult">–</div>
@@ -5490,20 +5623,22 @@ main{
     </div>
     <div class="grid2">
      <div class="syncPanel v675SyncCard v675UserCard">
-      <div class="v675SyncStep">1</div>
-      <div class="toolbar" style="justify-content:space-between">
-       <div>
-        <h3 style="margin:0">Benutzerprofile</h3>
-        <div class="small" style="margin-top:3px">Profile gelten lokal für die Erstellung von Arbeitsdateien.</div>
+      <div class="v682SyncCardHead">
+       <div class="v675SyncStep">1</div>
+       <div class="v682SyncHeadText">
+        <h3>Benutzerprofile</h3>
+        <div class="small">Profile gelten lokal für die Erstellung von Arbeitsdateien.</div>
        </div>
-       <button class="primary" onclick="openUserEditor()">+ Benutzer</button>
+       <button class="primary v682HeadAction" onclick="openUserEditor()">+ Benutzer</button>
       </div>
       <div id="userList" class="syncUserList"></div>
      </div>
 
      <div class="syncPanel v675SyncCard v675WorkCard">
-      <div class="v675SyncStep">2</div>
-      <h3>Arbeitsdatei erstellen</h3>
+      <div class="v682SyncCardHead">
+       <div class="v675SyncStep">2</div>
+       <div class="v682SyncHeadText"><h3>Arbeitsdatei erstellen</h3></div>
+      </div>
       <label>Monteur / Benutzer</label>
       <select id="handoffUserSelect" onchange="renderHandoffPermissions()"></select>
       <div id="handoffPermissionPreview" class="info" style="margin-top:8px"></div>
@@ -5521,13 +5656,13 @@ main{
 
     <div class="spacer"></div>
     <div class="syncPanel v675SyncCard v675ReturnCard">
-     <div class="v675SyncStep">3</div>
-     <div class="toolbar" style="justify-content:space-between">
-      <div>
-       <h3 style="margin:0">Rückgabedatei ins Masterprojekt einspielen</h3>
-       <div class="small" style="margin-top:3px">Das Masterprojekt wird nicht ersetzt. Änderungen werden datensatzweise geprüft und zusammengeführt.</div>
+     <div class="v682SyncCardHead">
+      <div class="v675SyncStep">3</div>
+      <div class="v682SyncHeadText">
+       <h3>Rückgabedatei ins Masterprojekt einspielen</h3>
+       <div class="small">Das Masterprojekt wird nicht ersetzt. Änderungen werden datensatzweise geprüft und zusammengeführt.</div>
       </div>
-      <div class="toolbar">
+      <div class="v682HeadAction">
        <label for="returnImportFile" class="primary filePickLabel" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer">Rückgabedatei auswählen</label>
        <input id="returnImportFile" type="file" accept=".json,application/json,text/plain,.koll" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="importWorkerReturn(event)">
       </div>
@@ -5543,8 +5678,10 @@ main{
   </div>
     <div class="spacer"></div>
     <div class="syncPanel v675SyncCard v675WorkerCard">
-     <div class="v675SyncStep">1</div>
-     <h3>Meine Arbeitsdatei</h3>
+     <div class="v682SyncCardHead">
+      <div class="v675SyncStep">1</div>
+      <div class="v682SyncHeadText"><h3>Meine Arbeitsdatei</h3></div>
+     </div>
      <div id="workerIdentity" class="projectMeta"></div>
      <div id="workerPermissionInfo" class="info" style="margin-top:9px"></div>
      <button class="primary" style="margin-top:12px" onclick="exportWorkerReturn()">Rückgabedatei erstellen</button>
@@ -5555,8 +5692,10 @@ main{
 
    <div class="spacer"></div>
    <div class="syncPanel v675SyncCard v675LoadCard">
-    <div class="v675SyncStep">4</div>
-    <h3>Arbeitsdatei auf diesem Gerät laden</h3>
+    <div class="v682SyncCardHead">
+     <div class="v675SyncStep">4</div>
+     <div class="v682SyncHeadText"><h3>Arbeitsdatei auf diesem Gerät laden</h3></div>
+    </div>
     <div class="small">Auf dem Monteurgerät wird hier ausschließlich die vom Projektleiter erzeugte <b>ARBEITSDATEI</b> geladen.</div>
     <div class="notice" style="margin-top:8px"><b>Wichtig:</b> Keine Datensicherung auswählen. Der Dateiname der richtigen Datei enthält deutlich <b>ARBEITSDATEI</b> und endet auf <b>.json</b>.</div>
     <label for="workImportFile" class="secondary filePickLabel" style="margin-top:9px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">Monteur-Arbeitsdatei auswählen</label>
@@ -22404,7 +22543,7 @@ window.addEventListener("load",()=>{
    V6.72 – ERZWUNGENE VERSIONSAKTUALISIERUNG / CACHE-SYNC
    ============================================================ */
 
-const KOLLAPP_VERSION="6.81";
+const KOLLAPP_VERSION="6.84";
 const KOLLAPP_VERSION_KEY="kollapp_loaded_version";
 const KOLLAPP_RELOAD_KEY="kollapp_update_reload_guard";
 
@@ -22874,6 +23013,384 @@ showView = function(name){
 
   return r;
 };
+</script>
+
+
+<script>
+/* ============================================================
+   V6.83 – HARTE EXPORTREGEL: MENGE 0 WIRD NIE EXPORTIERT
+   ============================================================ */
+
+let v683ExportDepth=0;
+function v683InExport(){ return v683ExportDepth>0; }
+function v683QtyIsExportable(e){
+  return !!e && Math.abs(Number(e.qty||0)) > 1e-12;
+}
+
+async function v683RunExport(fn){
+  v683ExportDepth++;
+  try{
+    return await fn();
+  }finally{
+    v683ExportDepth=Math.max(0,v683ExportDepth-1);
+  }
+}
+
+function v683GroupEntriesForAnnotation(a){
+  const p=project?.();
+  if(!p || !a)return [];
+  let e=null;
+  if(a.lvEntryId)e=p.entries.find(x=>x.id===a.lvEntryId)||null;
+  if(!e && a.lvSyncUuid)e=p.entries.find(x=>x.syncUuid===a.lvSyncUuid)||null;
+  if(!e && a.entryId)e=p.entries.find(x=>x.id===a.entryId)||null;
+  if(!e)return [];
+  try{
+    return typeof v612GroupEntries==="function" ? v612GroupEntries(e) : [e];
+  }catch(err){
+    return [e];
+  }
+}
+
+function v683AnnotationExportable(a){
+  const group=v683GroupEntriesForAnnotation(a);
+  const nonZero=group.filter(v683QtyIsExportable);
+  if(!nonZero.length)return false;
+
+  /* Whole-ID / background annotation: allowed if any position in the ID has quantity. */
+  if(a?.groupScope || a?.background || a?.type==="scribble")return true;
+
+  /* Specific LV link: that concrete LV position itself must be non-zero. */
+  let specific=null;
+  if(a?.lvEntryId)specific=group.find(x=>x.id===a.lvEntryId)||null;
+  if(!specific && a?.lvSyncUuid)specific=group.find(x=>x.syncUuid===a.lvSyncUuid)||null;
+  if(!specific && a?.pos)specific=group.find(x=>x.pos===a.pos)||null;
+  if(!specific && a?.entryId)specific=group.find(x=>x.id===a.entryId)||null;
+
+  return specific ? v683QtyIsExportable(specific) : true;
+}
+
+/* ---------- Entry source for reports/billing/photo grouping ---------- */
+const _v683EntriesForSheetBase=entriesForSheet;
+entriesForSheet=function(sh){
+  const rows=_v683EntriesForSheetBase.apply(this,arguments)||[];
+  return v683InExport() ? rows.filter(v683QtyIsExportable) : rows;
+};
+
+/* ---------- Plan evidence: skip zero IDs / zero specific LV links ---------- */
+const _v683AnnotationsForSheetBase=annotationsForSheet;
+annotationsForSheet=function(sh){
+  const links=_v683AnnotationsForSheetBase.apply(this,arguments)||[];
+  if(!v683InExport())return links;
+  return links.filter(x=>v683AnnotationExportable(x?.ann));
+};
+
+/* Direct plan appendix uses annVisible() rather than annotationsForSheet(). */
+const _v683AnnVisibleBase=annVisible;
+annVisible=function(a){
+  if(!_v683AnnVisibleBase.apply(this,arguments))return false;
+  if(v683InExport() && !v683AnnotationExportable(a))return false;
+  return true;
+};
+
+/* ---------- Photos ----------
+   Whole-ID photo is allowed when the ID has at least one non-zero LV entry.
+   Position-specific photo is exported only when that LV position is non-zero. */
+const _v683PhotosForEntryBase=v637PhotosForEntry;
+v637PhotosForEntry=function(entry){
+  const photos=_v683PhotosForEntryBase.apply(this,arguments)||[];
+  if(!v683InExport())return photos;
+
+  let group=[];
+  try{
+    group=typeof v612GroupEntries==="function" ? v612GroupEntries(entry) : [entry];
+  }catch(e){group=[entry]}
+
+  const nonZero=group.filter(v683QtyIsExportable);
+  if(!nonZero.length)return [];
+  const validPos=new Set(nonZero.map(x=>String(x.pos||"")).filter(Boolean));
+
+  return photos.filter(ph=>{
+    const target=String(ph?.targetPos||"");
+    return !target || validPos.has(target);
+  });
+};
+
+/* ---------- CSV row builders ---------- */
+const _v683GroupedRowsBase=v622GroupedRowsForSheet;
+v622GroupedRowsForSheet=function(sh){
+  const rows=_v683GroupedRowsBase.apply(this,arguments)||[];
+  return v683InExport() ? rows.filter(v683QtyIsExportable) : rows;
+};
+
+/* LV overview CSV: no row with kollaudierte Menge 0. */
+exportLVCSV=function(){
+  return v683RunExport(async()=>{
+    const p=project?.();
+    if(!p){alert("Kein Projekt geladen.");return}
+
+    const rows=[[
+      "LG","Pos.","Leistung","LV-Menge","EH","Kollaudiert","Rest","Prozent",
+      "EH-Preis","Kollaudierungswert","Lohn/EH","Sonstiges/EH"
+    ]];
+
+    positions().forEach(pos=>{
+      const done=Number(projectTotal(pos.pos)||0);
+      if(Math.abs(done)<=1e-12)return;
+
+      const lvQty=Number(pos.lv_qty||0);
+      const rest=lvQty-done;
+      const pc=lvQty ? done/lvQty*100 : 0;
+
+      rows.push([
+        pos.lg,pos.pos,pos.text,pos.lv_qty,pos.unit,
+        done,rest,pc,pos.ep,done*Number(pos.ep||0),pos.labor,pos.material
+      ]);
+    });
+
+    if(rows.length===1){
+      alert("Es gibt keine Position mit einer Menge ungleich 0 für den CSV-Export.");
+      return;
+    }
+
+    download(
+      new Blob([csv(rows)],{type:"text/csv;charset=utf-8"}),
+      `${p.meta.number||"Projekt"}_LV_Kollaudierungsstand.csv`
+    );
+  });
+};
+
+/* ---------- Wrap every user-facing report/export entry point ---------- */
+function v683WrapExportFunction(name){
+  const base=window[name];
+  if(typeof base!=="function")return;
+  window[name]=function(...args){
+    return v683RunExport(()=>base.apply(this,args));
+  };
+}
+
+[
+  "exportCurrentSheetPDF",
+  "exportSelectedSheetsPDF",
+  "exportCurrentPlanAppendixPDF",
+  "exportSelectedPlanAppendixPDF",
+  "exportCurrentPhotoDocPDF",
+  "exportSelectedPhotoDocPDF",
+  "exportEntriesCSV",
+  "exportSelectedSheetsCSV",
+  "printPlanAppendix"
+].forEach(v683WrapExportFunction);
+
+/* Extra protection for lower-level report builders if called directly later. */
+[
+  "printSheetsV52",
+  "printPlanAppendicesForSheets",
+  "printPhotoDocsForSheets"
+].forEach(v683WrapExportFunction);
+
+</script>
+
+
+<script>
+/* ============================================================
+   V6.84 – JEDE LV-UNTERPOSITION MIT MENGE 0 IST EINE VORLAGE
+   ============================================================ */
+
+function v684EntryIsTemplate(e){
+  return !!e && Math.abs(Number(e.qty||0)) <= 1e-12;
+}
+
+function v684GroupTemplateStats(entryOrGroup){
+  const group=Array.isArray(entryOrGroup)
+    ? entryOrGroup
+    : (typeof v612GroupEntries==="function" ? v612GroupEntries(entryOrGroup) : [entryOrGroup]);
+
+  const templates=group.filter(v684EntryIsTemplate);
+  const measured=group.filter(e=>!v684EntryIsTemplate(e));
+
+  return {
+    group,
+    templates,
+    measured,
+    allTemplate:group.length>0 && templates.length===group.length,
+    mixed:templates.length>0 && measured.length>0
+  };
+}
+
+/* Internal template flag is now per LV-underposition, not per whole ID. */
+v656RefreshTemplateFlags=function(){
+  const p=project?.();
+  if(!p?.entries)return;
+  p.entries.forEach(e=>{
+    e.template=v684EntryIsTemplate(e);
+  });
+};
+
+/* Keep the historical group helper meaning "whole ID is template". */
+v656GroupIsTemplate=function(entryOrGroup){
+  return v684GroupTemplateStats(entryOrGroup).allTemplate;
+};
+
+/* Badge can also communicate a mixed ID. */
+v656TemplateBadgeHtml=function(entry){
+  const st=v684GroupTemplateStats(entry);
+  if(st.allTemplate){
+    return '<div class="v656TemplateBadge">✎ Vorlage · Menge 0</div>';
+  }
+  if(st.mixed){
+    return `<div class="v684MixedBadge">✎ ${st.templates.length} LV-Unterposition${st.templates.length===1?"":"en"} als Vorlage</div>`;
+  }
+  return "";
+};
+
+
+/* ---------- Aufmaßblatt: zero positions grouped under their existing ID ---------- */
+function v671SheetTemplateGroups(){
+  const p=project?.();
+  const sh=activeSheet?.();
+  if(!p || !sh)return [];
+
+  const seen=new Set();
+  const out=[];
+
+  for(const e of (p.entries||[])){
+    if(e.sheetId!==sh.id)continue;
+
+    const key=e.multiLvGroup || e.id;
+    if(seen.has(key))continue;
+    seen.add(key);
+
+    const group=typeof v612GroupEntries==="function" ? v612GroupEntries(e) : [e];
+    const templates=group.filter(v684EntryIsTemplate);
+    if(!templates.length)continue;
+
+    const anchor=typeof v612AnchorEntry==="function" ? (v612AnchorEntry(e)||e) : e;
+    const measured=group.filter(x=>!v684EntryIsTemplate(x));
+
+    out.push({
+      key,
+      anchor,
+      group,
+      templates,
+      measured,
+      allTemplate:measured.length===0
+    });
+  }
+
+  return out.sort((a,b)=>
+    (Number(a.anchor.displayId)||999999) -
+    (Number(b.anchor.displayId)||999999)
+  );
+}
+
+v671RenderTemplates=function(){
+  const panel=document.getElementById("sheetTemplatePanel");
+  const list=document.getElementById("sheetTemplateList");
+  const count=document.getElementById("sheetTemplateCount");
+  if(!panel||!list||!count)return;
+
+  const groups=v671SheetTemplateGroups();
+  const templateCount=groups.reduce((n,g)=>n+g.templates.length,0);
+  count.textContent=String(templateCount);
+
+  if(!groups.length){
+    panel.style.display="none";
+    list.innerHTML="";
+    return;
+  }
+
+  panel.style.display="block";
+
+  list.innerHTML=groups.map(({anchor,templates,measured,allTemplate})=>{
+    const id=entryDisplayId(anchor);
+    const planCount=typeof v642PlanMarkerCount==="function" ? v642PlanMarkerCount(anchor) : 0;
+    const photoCount=typeof v642PhotoCount==="function" ? v642PhotoCount(anchor) : 0;
+
+    const assets=[
+      planCount?`${planCount} Planmarkierung${planCount===1?"":"en"}`:"",
+      photoCount?`${photoCount} Bild${photoCount===1?"":"er"}`:""
+    ].filter(Boolean).join(" · ");
+
+    const posRows=templates.map(e=>{
+      const pos=getPos(e.pos);
+      return `<div class="v684TemplatePos">
+        <b>${esc(e.pos||"–")}</b>
+        <span>${esc(pos?.text||"")} · Menge 0</span>
+      </div>`;
+    }).join("");
+
+    return `<div class="v671TemplateItem">
+      <div class="v671TemplateId">ID ${esc(id)}</div>
+      <div>
+       <div class="v671TemplateMain">${esc(anchor.lineDesc||"Ohne Beschreibung")}</div>
+       <div class="v684TemplatePosList">${posRows}</div>
+       <div class="v671TemplateSub">
+        ${measured.length?`${measured.length} weitere LV-Unterposition${measured.length===1?"":"en"} dieser ID bereits erfasst`:"Gesamte ID ist noch Vorlage"}
+        ${assets?` · ${esc(assets)}`:""}
+       </div>
+      </div>
+      <div class="v671TemplateActions">
+       <button class="secondary" onclick="v671EditTemplate('${esc(anchor.id)}')">Bearbeiten</button>
+       ${allTemplate?`<button class="danger" onclick="deleteEntry('${esc(anchor.id)}')">ID löschen</button>`:""}
+      </div>
+    </div>`;
+  }).join("");
+};
+
+
+/* ---------- Standard-Aufmaßtabelle: jede einzelne Menge-0-Unterposition ausblenden ----------
+   Mixed IDs can therefore appear in BOTH sections:
+   zero LV rows above as templates, non-zero rows below as measured positions. */
+const _v684RenderSheetBase=renderSheet;
+renderSheet=function(){
+  const p=project?.();
+  const sh=activeSheet?.();
+
+  if(!p || !sh){
+    const r=_v684RenderSheetBase.apply(this,arguments);
+    try{v671RenderTemplates()}catch(e){}
+    return r;
+  }
+
+  const original=p.entries;
+  try{
+    p.entries=original.filter(e=>!v684EntryIsTemplate(e));
+    return _v684RenderSheetBase.apply(this,arguments);
+  }finally{
+    p.entries=original;
+    try{
+      v656RefreshTemplateFlags();
+      v671RenderTemplates();
+    }catch(e){}
+  }
+};
+
+
+/* Keep flags correct after save/load/edit. */
+const _v684FinalizeBase=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const r=_v684FinalizeBase.apply(this,arguments);
+  try{
+    v656RefreshTemplateFlags();
+    persist?.();
+  }catch(e){}
+  setTimeout(()=>{
+    try{
+      renderSheet?.();
+      renderRecent?.();
+    }catch(e){}
+  },0);
+  return r;
+};
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    try{
+      v656RefreshTemplateFlags();
+      persist?.();
+      v671RenderTemplates?.();
+    }catch(e){}
+  },120);
+});
 </script>
 
 </body>
