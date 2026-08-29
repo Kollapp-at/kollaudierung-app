@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.65</title>
+<title>Kollaudierung – V6.66</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2282,6 +2282,150 @@ img,canvas,svg{
   input,select,textarea{font-size:16px} /* prevents iOS zoom-on-focus */
 }
 
+
+/* ===== V6.66 TABLET-KOMPAKTHEIT + DEZENTE EINGABEABSCHNITTE ===== */
+
+/* Grundstil der Eingabeabschnitte */
+#view-entry .v666Section{
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 1px 5px rgba(24,43,58,.045);
+}
+#view-entry .v666Section::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:4px;
+  border-radius:12px 0 0 12px;
+}
+#view-entry .v666ProjectSection{
+  background:#fbfcfd;
+}
+#view-entry .v666ProjectSection::before{
+  background:#7893a7;
+}
+#view-entry .v666LvSection{
+  background:#fbfcfe;
+}
+#view-entry .v666LvSection::before{
+  background:#5f86a1;
+}
+#view-entry .v666MeasureSection{
+  background:#fbfdfc;
+}
+#view-entry .v666MeasureSection::before{
+  background:#6f9b86;
+}
+
+#view-entry .v666Section > h2{
+  padding-bottom:8px;
+  margin-bottom:10px;
+  border-bottom:1px solid rgba(80,105,123,.12);
+}
+
+/* Unterabschnitte innerhalb "Menge / Rechenansatz" */
+.v666SaveSection{
+  background:#f2f8f4!important;
+  border-color:#c8ddd0!important;
+}
+.v666PlanSection{
+  background:#f4f7fb!important;
+  border-color:#cbd8e4!important;
+  border-left:4px solid #819bb2!important;
+}
+.v666NoteSection{
+  margin:12px 0;
+  padding:10px 12px 12px;
+  border:1px solid #dce3e7;
+  border-left:4px solid #a0aeb8;
+  border-radius:9px;
+  background:#fafcfd;
+}
+.v666NoteSection label{
+  margin-top:0;
+}
+.v666PhotoSection{
+  background:#fbf8f2!important;
+  border-color:#e2d6bf!important;
+  border-left:4px solid #b89b68!important;
+}
+
+/* Tablet: fünf Kennzahlen kompakt in EINER Zeile */
+@media (min-width:601px) and (max-width:1100px){
+  .stats{
+    display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:6px!important;
+    margin-bottom:9px!important;
+    overflow:visible!important;
+    padding-bottom:0!important;
+  }
+  .stat{
+    min-width:0!important;
+    padding:7px 9px!important;
+    border-radius:8px!important;
+  }
+  .stat .k{
+    font-size:9.5px!important;
+    line-height:1.15!important;
+    white-space:normal!important;
+  }
+  .stat .v{
+    font-size:14px!important;
+    line-height:1.1!important;
+    margin-top:3px!important;
+  }
+
+  /* Projekt-Metadaten im Erfassen-Tab ebenfalls weniger hoch */
+  #view-entry .projectMeta{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:7px!important;
+  }
+  #view-entry .projectMeta > *{
+    min-width:0!important;
+    padding:8px 9px!important;
+  }
+  #view-entry .sheetBar{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto!important;
+    align-items:end!important;
+    gap:8px!important;
+  }
+
+  #view-entry .card{
+    padding:12px!important;
+  }
+  #view-entry .v666EntryGrid{
+    gap:10px!important;
+  }
+  #view-entry label{
+    margin-top:7px!important;
+  }
+}
+
+/* Phone: keep horizontal stat scrolling, but even more compact */
+@media (max-width:600px){
+  .stats{
+    gap:6px!important;
+  }
+  .stat{
+    min-width:112px!important;
+    padding:7px 8px!important;
+  }
+  .stat .k{font-size:9.5px!important}
+  .stat .v{font-size:14px!important}
+
+  #view-entry .v666Section::before,
+  .v666PlanSection,
+  .v666PhotoSection,
+  .v666NoteSection{
+    border-left-width:3px!important;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -2309,7 +2453,7 @@ img,canvas,svg{
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.65</h1>
+     <h1>Kollaudierung – V6.66</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -2350,7 +2494,7 @@ img,canvas,svg{
  </div>
 
  <section id="view-entry" class="view active">
-  <div class="card">
+  <div class="card v666Section v666ProjectSection">
    <h2>Projekt / Aufmaßblatt</h2>
    <div id="projectMeta" class="projectMeta"></div>
    <div class="hr"></div>
@@ -2389,8 +2533,8 @@ img,canvas,svg{
 
   <div class="spacer"></div>
 
-  <div class="grid2">
-   <div class="card">
+  <div class="grid2 v666EntryGrid">
+   <div class="card v666Section v666LvSection">
     <h2>1. Aufmaßzeile</h2>
     <label>Positionsbeschreibung / Anmerkung der Aufmaßzeile</label>
     <input id="lineDesc" placeholder="Beschreibung der Leistung">
@@ -2412,7 +2556,7 @@ img,canvas,svg{
     <div id="posInfo" class="info"><span class="small">LV-Unterposition auswählen.</span></div>
    </div>
 
-   <div class="card" id="entryCard">
+   <div class="card v666Section v666MeasureSection" id="entryCard">
     <h2>2. Menge / Rechenansatz</h2>
     <label>Rechenansatz</label>
     <input id="calc" placeholder="Rechenansatz" oninput="previewCalc()">
@@ -2467,12 +2611,12 @@ img,canvas,svg{
      </div>
     </div>
 
-    <div class="v655QuickSave noPrint">
+    <div class="v655QuickSave v666SaveSection noPrint">
      <button type="button" class="primary v655QuickSaveBtn" onclick="finalizeCurrentEntry()">Erfassung speichern</button>
      <div class="small">Kein Plan oder Foto erforderlich? Die Erfassung kann hier direkt gespeichert werden. Planmarkierungen und Bilder können später jederzeit ergänzt werden.</div>
     </div>
 
-    <div class="entryPlanBox">
+    <div class="entryPlanBox v666PlanSection">
      <div class="grid2">
       <div>
        <label style="margin-top:0">Plan für diese Erfassung</label>
@@ -2491,10 +2635,12 @@ img,canvas,svg{
      <div class="small" style="margin-top:6px">Der ausgewählte Plan wird mit der Aufmaßerfassung gespeichert und beim Plan-Nachweis verwendet.</div>
     </div>
 
-    <label>Anmerkung zur Position</label>
-    <textarea id="note" placeholder="optional"></textarea>
+    <div class="v666NoteSection">
+     <label>Anmerkung zur Position</label>
+     <textarea id="note" placeholder="optional"></textarea>
+    </div>
 
-    <div class="v637PhotoBox">
+    <div class="v637PhotoBox v666PhotoSection">
      <div class="toolbar" style="justify-content:space-between;align-items:flex-start">
       <div>
        <label style="margin:0">Zusatzbilder / Fotodokumentation</label>
