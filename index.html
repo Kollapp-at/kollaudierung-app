@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.74</title>
+<title>Kollaudierung – V6.75</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -3349,6 +3349,224 @@ main > section.view.active{
  }
 }
 
+
+/* ============================================================
+   V6.75 – LV-ÜBERSICHT + PROJEKTÜBERGABE
+   ============================================================ */
+
+/* ---------- LV ---------- */
+.v675LvTools{
+ display:grid;
+ grid-template-columns:minmax(280px,1.5fr) minmax(175px,.55fr) auto;
+ gap:10px;
+ align-items:end;
+ margin-top:10px;
+}
+.v675LvTools label{
+ margin:0 0 5px!important;
+}
+.v675SearchRow{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) 42px;
+ gap:5px;
+}
+.v675LvSearch input,
+.v675LvMode select{
+ width:100%!important;
+ min-height:42px;
+}
+.v675ClearSearch{
+ width:42px;
+ min-width:42px;
+ padding:0!important;
+ font-size:22px!important;
+ line-height:1;
+}
+.v675LvExport button{
+ min-height:42px!important;
+ white-space:nowrap;
+}
+.v675LvResultBar{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px;
+ margin-top:12px;
+ padding:8px 10px;
+ border:1px solid #d8e3dd;
+ border-radius:9px;
+ background:#f7faf8;
+}
+#v675LvResultHint{
+ margin-left:8px;
+ color:#68757d;
+}
+.v675LvLegend{
+ display:flex;
+ gap:10px;
+ flex-wrap:wrap;
+ font-size:10.5px;
+ color:#64717a;
+}
+.v675LvLegend span{
+ display:inline-flex;
+ align-items:center;
+ gap:4px;
+ white-space:nowrap;
+}
+.v675Dot{
+ width:8px;height:8px;border-radius:50%;display:inline-block;
+}
+.v675Open{background:#c59443}
+.v675Done{background:#53916b}
+.v675Over{background:#b65c5c}
+.v675Manual{background:#7486a5}
+
+/* LV status gets a subtle left indicator per row */
+#lvBody tr.v675RowOpen td:first-child{box-shadow:inset 3px 0 #c59443}
+#lvBody tr.v675RowDone td:first-child{box-shadow:inset 3px 0 #53916b}
+#lvBody tr.v675RowOver td:first-child{box-shadow:inset 3px 0 #b65c5c}
+#lvBody tr.v675RowManual td:first-child{box-shadow:inset 3px 0 #7486a5}
+
+/* ---------- Projektübergabe ---------- */
+#view-sync .v667MainCard{
+ background:#fff!important;
+}
+.v675FlowIntro{
+ margin:12px 0 10px;
+ padding:10px 12px;
+ border:1px solid #ddd9e9;
+ border-left:4px solid #837b9e;
+ border-radius:9px;
+ background:#faf9fc;
+}
+.v675WorkerIntro{
+ border-color:#d4e2d8;
+ border-left-color:#6f9379;
+ background:#f8fbf9;
+}
+.v675FlowTitle{
+ font-size:13px;
+ font-weight:800;
+ margin-bottom:2px;
+}
+.v675SyncCard{
+ position:relative;
+ padding:14px!important;
+ padding-top:16px!important;
+ background:#fbfcfd!important;
+ overflow:hidden;
+}
+.v675SyncCard::before{
+ content:"";
+ position:absolute;
+ left:0;top:0;bottom:0;
+ width:4px;
+ background:#827b9c;
+}
+.v675SyncStep{
+ position:absolute;
+ right:10px;
+ top:9px;
+ min-width:25px;
+ height:25px;
+ padding:0 7px;
+ border-radius:999px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:#eeebf4;
+ color:#655d7d;
+ font-size:11px;
+ font-weight:800;
+}
+.v675WorkCard::before{background:#6f8ea5}
+.v675WorkCard .v675SyncStep{background:#eaf1f5;color:#4b6b81}
+.v675ReturnCard::before{background:#6f947c}
+.v675ReturnCard .v675SyncStep{background:#eaf3ed;color:#4e7258}
+.v675LoadCard::before{background:#9b8666}
+.v675LoadCard .v675SyncStep{background:#f4efe7;color:#766448}
+.v675WorkerCard::before{background:#6f947c}
+.v675WorkerCard .v675SyncStep{background:#eaf3ed;color:#4e7258}
+
+.v675SyncCard h3{
+ padding-right:36px;
+}
+.v675SyncCard .info,
+.v675SyncCard .notice{
+ border-radius:9px;
+}
+.v675SyncCard > button.primary,
+.v675SyncCard .filePickLabel{
+ min-height:44px!important;
+ font-weight:750;
+}
+#view-sync .syncUserList{
+ margin-top:10px;
+}
+#view-sync .syncHistory{
+ margin-top:10px;
+}
+
+/* Master: first two workflow cards balanced */
+#masterSyncArea > .grid2{
+ align-items:stretch;
+}
+#masterSyncArea > .grid2 > .v675SyncCard{
+ height:100%;
+}
+
+/* Tablet */
+@media(min-width:601px) and (max-width:1100px){
+ .v675LvTools{
+   grid-template-columns:minmax(0,1fr) minmax(170px,.45fr);
+ }
+ .v675LvExport{
+   grid-column:1/-1;
+ }
+ .v675LvExport label{display:none}
+ .v675LvExport button{
+   width:100%;
+ }
+ .v675LvResultBar{
+   align-items:flex-start;
+   flex-direction:column;
+ }
+ #view-sync #masterSyncArea > .grid2{
+   grid-template-columns:1fr 1fr!important;
+ }
+ .v675SyncCard{
+   padding:12px!important;
+   padding-top:15px!important;
+ }
+}
+
+/* Phone */
+@media(max-width:600px){
+ .v675LvTools{
+   grid-template-columns:1fr;
+ }
+ .v675LvExport label{display:none}
+ .v675LvExport button{width:100%}
+ .v675LvResultBar{
+   flex-direction:column;
+   align-items:flex-start;
+ }
+ .v675LvLegend{
+   gap:7px;
+ }
+ #view-sync #masterSyncArea > .grid2{
+   grid-template-columns:1fr!important;
+ }
+ .v675SyncCard .toolbar{
+   align-items:stretch!important;
+ }
+ .v675SyncCard .filePickLabel,
+ .v675SyncCard button{
+   width:100%;
+ }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -3376,7 +3594,7 @@ main > section.view.active{
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.74</h1>
+     <h1>Kollaudierung – V6.75</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -3761,7 +3979,16 @@ main > section.view.active{
     <h2 style="margin:0">Letzte Erfassungen im aktiven Aufmaßblatt</h2>
     <button class="secondary" onclick="showView('sheet')">Gesamtes Aufmaßblatt anzeigen</button>
    </div>
-   <div class="tablewrap" style="margin-top:12px">
+   <div class="v675LvResultBar noPrint">
+    <div><b id="v675LvResultCount">0 Positionen</b><span id="v675LvResultHint" class="small"></span></div>
+    <div class="v675LvLegend">
+     <span><i class="v675Dot v675Open"></i> offen</span>
+     <span><i class="v675Dot v675Done"></i> vollständig</span>
+     <span><i class="v675Dot v675Over"></i> über Menge</span>
+     <span><i class="v675Dot v675Manual"></i> manuell / Regie</span>
+    </div>
+   </div>
+   <div class="tablewrap" style="margin-top:8px">
     <table>
      <thead><tr><th>ID</th><th>Beschreibung</th><th>Pos.</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Status</th><th>Anmerkung</th><th></th></tr></thead>
      <tbody id="recentBody"></tbody>
@@ -3912,15 +4139,28 @@ main > section.view.active{
   <div class="card v667MainCard">
    <div class="toolbar" style="justify-content:space-between">
     <div><h2 style="margin:0">LV-Übersicht / Kollaudierungsstand</h2><div class="small" style="margin-top:4px">Projektweite Summe über alle Aufmaßblätter</div></div>
-    <div class="toolbar noPrint">
-     <input id="lvFilter" placeholder="Position oder Text filtern" oninput="renderLV()" style="width:260px">
-     <select id="lvMode" onchange="renderLV()" style="width:180px">
-      <option value="all">alle Positionen</option>
-      <option value="used">nur kollaudierte</option>
-      <option value="open">nur Restmenge ≠ 0</option>
-      <option value="over">nur über LV-Menge</option>
-     </select>
-     <button class="secondary" onclick="exportLVCSV()">CSV LV-Übersicht</button>
+    <div class="v675LvTools noPrint">
+     <div class="v675LvSearch">
+      <label for="lvFilter">LV durchsuchen</label>
+      <div class="v675SearchRow">
+       <input id="lvFilter" placeholder="z. B. 120312 potential 16mm" oninput="renderLV()">
+       <button type="button" class="secondary v675ClearSearch" onclick="v675ClearLvSearch()" title="Suche löschen">×</button>
+      </div>
+      <div class="small">Sucht gleichzeitig in LG, Position, Leistung, Einheit und Positionstyp. Mehrere Wörter werden kombiniert.</div>
+     </div>
+     <div class="v675LvMode">
+      <label for="lvMode">Anzeige</label>
+      <select id="lvMode" onchange="renderLV()">
+       <option value="all">Alle Positionen</option>
+       <option value="used">Nur kollaudierte</option>
+       <option value="open">Nur offene Restmenge</option>
+       <option value="over">Nur über LV-Menge</option>
+      </select>
+     </div>
+     <div class="v675LvExport">
+      <label>&nbsp;</label>
+      <button class="secondary" onclick="exportLVCSV()">CSV exportieren</button>
+     </div>
     </div>
    </div>
    <div class="tablewrap" style="margin-top:12px">
@@ -4068,9 +4308,13 @@ main > section.view.active{
    </div>
 
    <div id="masterSyncArea">
-    <div class="spacer"></div>
+    <div class="v675FlowIntro">
+     <div class="v675FlowTitle">Master-Workflow</div>
+     <div class="small">1 Benutzer wählen → 2 Arbeitsdatei ausgeben → 3 Rückgabedatei später wieder einspielen.</div>
+    </div>
     <div class="grid2">
-     <div class="syncPanel">
+     <div class="syncPanel v675SyncCard v675UserCard">
+      <div class="v675SyncStep">1</div>
       <div class="toolbar" style="justify-content:space-between">
        <div>
         <h3 style="margin:0">Benutzerprofile</h3>
@@ -4081,7 +4325,8 @@ main > section.view.active{
       <div id="userList" class="syncUserList"></div>
      </div>
 
-     <div class="syncPanel">
+     <div class="syncPanel v675SyncCard v675WorkCard">
+      <div class="v675SyncStep">2</div>
       <h3>Arbeitsdatei erstellen</h3>
       <label>Monteur / Benutzer</label>
       <select id="handoffUserSelect" onchange="renderHandoffPermissions()"></select>
@@ -4099,10 +4344,11 @@ main > section.view.active{
     </div>
 
     <div class="spacer"></div>
-    <div class="syncPanel">
+    <div class="syncPanel v675SyncCard v675ReturnCard">
+     <div class="v675SyncStep">3</div>
      <div class="toolbar" style="justify-content:space-between">
       <div>
-       <h3 style="margin:0">Rückgabedateien ins Masterprojekt einspielen</h3>
+       <h3 style="margin:0">Rückgabedatei ins Masterprojekt einspielen</h3>
        <div class="small" style="margin-top:3px">Das Masterprojekt wird nicht ersetzt. Änderungen werden datensatzweise geprüft und zusammengeführt.</div>
       </div>
       <div class="toolbar">
@@ -4115,12 +4361,14 @@ main > section.view.active{
    </div>
 
    <div id="workerSyncArea" style="display:none">
-  <div class="notice" style="margin-bottom:10px">
-   <b>Projektübergabe:</b> Hier kannst du deine Arbeitsdatei prüfen und eine Rückgabedatei für den Projektleiter erstellen.
+  <div class="v675FlowIntro v675WorkerIntro">
+   <div class="v675FlowTitle">Monteur-Workflow</div>
+   <div class="small">Arbeitsdatei prüfen → Aufmaß erfassen → Rückgabedatei für den Projektleiter erstellen.</div>
   </div>
     <div class="spacer"></div>
-    <div class="syncPanel">
-     <h3>Monteur-Arbeitsdatei</h3>
+    <div class="syncPanel v675SyncCard v675WorkerCard">
+     <div class="v675SyncStep">1</div>
+     <h3>Meine Arbeitsdatei</h3>
      <div id="workerIdentity" class="projectMeta"></div>
      <div id="workerPermissionInfo" class="info" style="margin-top:9px"></div>
      <button class="primary" style="margin-top:12px" onclick="exportWorkerReturn()">Rückgabedatei erstellen</button>
@@ -4130,8 +4378,9 @@ main > section.view.active{
    </div>
 
    <div class="spacer"></div>
-   <div class="syncPanel">
-    <h3>Monteur-Arbeitsdatei laden</h3>
+   <div class="syncPanel v675SyncCard v675LoadCard">
+    <div class="v675SyncStep">4</div>
+    <h3>Arbeitsdatei auf diesem Gerät laden</h3>
     <div class="small">Auf dem Monteurgerät wird hier ausschließlich die vom Projektleiter erzeugte <b>ARBEITSDATEI</b> geladen.</div>
     <div class="notice" style="margin-top:8px"><b>Wichtig:</b> Keine Datensicherung auswählen. Der Dateiname der richtigen Datei enthält deutlich <b>ARBEITSDATEI</b> und endet auf <b>.json</b>.</div>
     <label for="workImportFile" class="secondary filePickLabel" style="margin-top:9px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer">Monteur-Arbeitsdatei auswählen</label>
@@ -21196,6 +21445,121 @@ window.addEventListener("load",()=>{
     }
   },130);
 });
+</script>
+
+
+<script>
+/* ============================================================
+   V6.75 – VERBESSERTE LV-SUCHE
+   ============================================================ */
+function v675Norm(v){
+ return String(v??"")
+   .toLocaleLowerCase("de")
+   .normalize("NFD")
+   .replace(/[\u0300-\u036f]/g,"")
+   .replace(/ß/g,"ss")
+   .replace(/\s+/g," ")
+   .trim();
+}
+function v675LvTokens(){
+ return v675Norm(document.getElementById("lvFilter")?.value||"")
+   .split(" ")
+   .filter(Boolean);
+}
+function v675LvSearchText(p){
+ return v675Norm([
+   p.lg,p.pos,p.text,p.unit,
+   p.manualType,
+   p.manual?"manuell regie nachtrag sonderposition":"importiert"
+ ].filter(Boolean).join(" "));
+}
+function v675LvMatches(p,tokens){
+ if(!tokens.length)return true;
+ const hay=v675LvSearchText(p);
+ return tokens.every(t=>hay.includes(t));
+}
+function v675ClearLvSearch(){
+ const el=document.getElementById("lvFilter");
+ if(el){el.value="";el.focus()}
+ renderLV();
+}
+
+renderLV=function(){
+ const tokens=v675LvTokens();
+ const mode=document.getElementById("lvMode")?.value||"all";
+
+ let all=positions().map(p=>{
+   const done=projectTotal(p.pos);
+   const target=hasTargetQty(p);
+   const rest=target?Number(p.lv_qty)-done:null;
+   const pc=target&&Number(p.lv_qty)?done/Number(p.lv_qty)*100:null;
+   return{...p,done,rest,pc,target};
+ });
+
+ let list=all
+   .filter(p=>v675LvMatches(p,tokens))
+   .filter(p=>mode==="all"||
+     (mode==="used"&&p.done!==0)||
+     (mode==="open"&&p.target&&Math.abs(p.rest)>1e-9)||
+     (mode==="over"&&p.target&&p.rest<0));
+
+ const count=document.getElementById("v675LvResultCount");
+ const hint=document.getElementById("v675LvResultHint");
+ if(count)count.textContent=`${list.length} von ${all.length} Positionen`;
+ if(hint){
+   const q=document.getElementById("lvFilter")?.value.trim()||"";
+   hint.textContent=q?` · Suche: „${q}“`:"";
+ }
+
+ const b=document.getElementById("lvBody");
+ if(!b)return;
+
+ if(!list.length){
+   b.innerHTML='<tr><td colspan="14" class="empty">Keine passende LV-Unterposition gefunden. Suche oder Filter ändern.</td></tr>';
+   v627ApplyManualMasterUi();
+   return;
+ }
+
+ const allowed=v627CanManageManualPositions();
+
+ b.innerHTML=list.map(p=>{
+   const cls=!p.target?"manual":p.rest<0?"bad":Math.abs(p.rest)<1e-9?"ok":"warn";
+   const rowCls=!p.target?"v675RowManual":p.rest<0?"v675RowOver":Math.abs(p.rest)<1e-9?"v675RowDone":"v675RowOpen";
+   const bar=p.pc===null?0:Math.max(0,Math.min(100,p.pc));
+   const posLabel=p.manual
+     ? `<span class="badge manual">${esc(p.manualType||"manuell")}</span><br><b>${esc(p.pos)}</b>`
+     : `<b>${esc(p.pos)}</b>`;
+
+   let actions='<span class="small">–</span>';
+   if(p.manual && allowed){
+     actions=`<div class="v627LvActions">
+       <button class="secondary" onclick="openManualPosition('${esc(p.pos)}')">Bearbeiten</button>
+       <button class="danger" onclick="deleteManualPosition('${esc(p.pos)}')">Löschen</button>
+     </div>`;
+   }else if(p.manual && currentAccess?.().mode==="worker"){
+     actions='<span class="small">keine Berechtigung</span>';
+   }
+
+   return `<tr class="${rowCls}">
+    <td>${esc(p.lg||"")}</td>
+    <td>${posLabel}</td>
+    <td class="wide">${esc(p.text||"")}</td>
+    <td>${p.target?num(p.lv_qty):"–"}</td>
+    <td>${esc(p.unit||"")}</td>
+    <td><b>${num(p.done)}</b></td>
+    <td>${p.target?`<span class="badge ${cls}">${num(p.rest)}</span>`:"–"}</td>
+    <td>${p.pc===null?"–":pct(p.pc)}</td>
+    <td>${p.pc===null?'<span class="small">Regie</span>':`<div class="progress"><div style="width:${bar}%"></div></div>`}</td>
+    <td>${safeEuro(p.ep)}</td>
+    <td>${can("seePrices")?euro(p.done*Number(p.ep||0)):"–"}</td>
+    <td>${safeEuro(p.labor)}</td>
+    <td>${safeEuro(p.material)}</td>
+    <td class="noPrint">${actions}</td>
+   </tr>`;
+ }).join("");
+
+ v627ApplyManualMasterUi();
+};
 </script>
 
 </body>
