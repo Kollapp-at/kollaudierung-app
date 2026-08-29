@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.40</title>
+<title>Kollaudierung – V6.44</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1836,6 +1836,33 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   border-radius:.45mm;
 }
 
+
+/* ===== V6.44 SICHTBARE VERSION + AUFMASSBLATT NICHT ABGESCHNITTEN ===== */
+#view-sheet .tablewrap{
+  overflow:auto;
+  padding-right:14px;
+  padding-bottom:8px;
+  box-sizing:border-box;
+}
+#view-sheet .v641SheetTable{
+  min-width:1360px;
+}
+#view-sheet .v641SheetTable th:nth-child(2){width:27%}
+#view-sheet .v641SheetTable th:nth-child(4){width:24%}
+#view-sheet .v641SheetTable th:nth-child(10){width:11%}
+#view-sheet .v641SheetTable th:nth-child(11){width:132px}
+#view-sheet .v641ActionBox{min-width:112px}
+#view-sheet .v641ActionBox button{
+  width:100%;
+  white-space:nowrap;
+}
+#view-sheet .v641SheetTable td:last-child,
+#view-sheet .v641SheetTable th:last-child{
+  padding-right:10px;
+}
+#view-sheet .entryIdBadge{margin-right:2px}
+#view-sheet .v642AssetRow{margin-right:6px}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1848,12 +1875,6 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 </head>
 <body>
-
-<div class="notice noPrint" style="margin:8px 12px">
- <b>V6.40version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
-</div>
-
-
 <div id="pwaInstallBar" class="pwaInstallBar noPrint" style="display:none">
  <div>
   <b id="pwaInstallTitle">Kollaudierung installieren</b>
@@ -1866,7 +1887,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.40</h1>
+   <h1>Kollaudierung – V6.44</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
