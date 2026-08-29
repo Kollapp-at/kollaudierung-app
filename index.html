@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.27</title>
+<title>Kollaudierung – V6.28</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.27 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.28 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.27 alter Testhinweis entfernt ===== */
+/* ===== V6.28 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.27 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.28 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1163,7 +1163,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.27 HINWEISE / TEXTE ===== */
+/* ===== V6.28 HINWEISE / TEXTE ===== */
 #autoPlanLinkSummary{line-height:1.25}
 #autoPlanLinkMeta{line-height:1.35}
 #draftEntrySummary .fsCell .smallHint{
@@ -1174,13 +1174,13 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.27 EINHEITLICHE BEGRIFFE ===== */
+/* ===== V6.28 EINHEITLICHE BEGRIFFE ===== */
 .terminologyHint{
   line-height:1.4;
 }
 
 
-/* ===== V6.27 LETZTE ERFASSUNGEN ===== */
+/* ===== V6.28 LETZTE ERFASSUNGEN ===== */
 .v620RecentTable{
  table-layout:fixed!important;
  width:100%!important;
@@ -1288,7 +1288,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.27 ID-AUSWAHL IM AUFMASSBLATT ===== */
+/* ===== V6.28 ID-AUSWAHL IM AUFMASSBLATT ===== */
 .v621SheetIdToolbar{
  display:flex;
  align-items:flex-end;
@@ -1316,7 +1316,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.27 LV-ÜBERSICHT / NEUE POSITION ===== */
+/* ===== V6.28 LV-ÜBERSICHT / NEUE POSITION ===== */
 .v623AddLvCard{
  margin-bottom:12px;
  border:1px solid #b9cfda;
@@ -1343,7 +1343,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.27 MANUELLE LV-STAMMDATEN NUR IM MASTER ===== */
+/* ===== V6.28 MANUELLE LV-STAMMDATEN NUR IM MASTER ===== */
 .v627LvActions{
  display:flex;
  gap:6px;
@@ -1373,7 +1373,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.27version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.28version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1389,7 +1389,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.27</h1>
+   <h1>Kollaudierung – V6.28</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -1981,6 +1981,9 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    </div>
 
    <div id="workerSyncArea" style="display:none">
+  <div class="notice" style="margin-bottom:10px">
+   <b>Projektübergabe:</b> Hier kannst du deine Arbeitsdatei prüfen und eine Rückgabedatei für den Projektleiter erstellen.
+  </div>
     <div class="spacer"></div>
     <div class="syncPanel">
      <h3>Monteur-Arbeitsdatei</h3>
@@ -10090,7 +10093,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.27 MULTI-LV ================= */
+/* ================= V6.28 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10289,7 +10292,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.27 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.28 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10869,13 +10872,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.27 Gruppenmigration",e)}
+}catch(e){console.warn("V6.28 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.27 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.28 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -10981,7 +10984,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.27 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.28 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -11028,13 +11031,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.27 Migration",e)}
+}catch(e){console.warn("V6.28 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.27 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.28 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -11270,13 +11273,13 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.27 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.28 Gruppendarstellung",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.27 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   V6.28 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
    ============================================================ */
 
 function v615OrderedEntryGroups(){
@@ -11398,7 +11401,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.27 ID-Kompaktierung",e)}
+  }catch(e){console.warn("V6.28 ID-Kompaktierung",e)}
   return r;
 };
 
@@ -11452,13 +11455,13 @@ try{
   renderDraftEntrySummary?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.27 Startmigration",e)}
+}catch(e){console.warn("V6.28 Startmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.27 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
+   V6.28 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
    ============================================================ */
 
 function v616DraftLvItems(){
@@ -11624,7 +11627,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.27 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
+   V6.28 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
    ============================================================ */
 
 function v618GroupForId(id){
@@ -11784,7 +11787,7 @@ finalizeCurrentEntry=function(){
     }
     return result;
   }catch(err){
-    console.error("V6.27 Erfassung speichern",err);
+    console.error("V6.28 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -11809,7 +11812,7 @@ editEntry=function(id){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.27 Erfassung bearbeiten",err);
+    console.error("V6.28 Erfassung bearbeiten",err);
     alert("Erfassung konnte nicht zum Bearbeiten geöffnet werden: "+(err?.message||err));
   }
 };
@@ -11901,13 +11904,13 @@ try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.27 Datenkonsistenz",e)}
+}catch(e){console.warn("V6.28 Datenkonsistenz",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.27 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
+   V6.28 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
    ============================================================ */
 
 let v619IdMaintenanceRunning=false;
@@ -12218,7 +12221,7 @@ finalizeCurrentEntry=function(){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.27 Erfassung speichern",err);
+    console.error("V6.28 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -12228,18 +12231,18 @@ finalizeCurrentEntry=function(){
   }
 };
 
-/* Repair current project once after loading V6.27. */
+/* Repair current project once after loading V6.28. */
 try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.27 ID-Reparatur",e)}
+}catch(e){console.warn("V6.28 ID-Reparatur",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.27 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
+   V6.28 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
    ============================================================ */
 
 function v620RecentLvHtml(group){
@@ -12337,7 +12340,7 @@ try{renderRecent?.()}catch(e){}
 
 <script>
 /* ============================================================
-   V6.27 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
+   V6.28 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
    ============================================================ */
 
 function v621CurrentSheetViewIds(){
@@ -12470,7 +12473,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.27 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
+   V6.28 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
    ============================================================ */
 
 function v622PrepareCurrentDataForExport(){
@@ -12529,7 +12532,7 @@ printSheetsV52=async function(selected){
     if(progress)progress.classList.remove("show");
     v519PrintPrepared("sheetMultiPrintArea",pages,"sheetMultiPrintMode");
   }catch(err){
-    console.error("V6.27 PDF Export",err);
+    console.error("V6.28 PDF Export",err);
     const progress=document.getElementById("sheetExportProgress");
     if(progress)progress.classList.remove("show");
     alert("Export nicht möglich: "+(err?.message||err));
@@ -12678,7 +12681,7 @@ v519BuildSheetPages=async function(sh,includeBilling){
 
 <script>
 /* ============================================================
-   V6.27 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
+   V6.28 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
    ============================================================ */
 
 function v623OpenNewLvPosition(){
@@ -12694,17 +12697,13 @@ function v623OpenNewLvPosition(){
   }
 }
 
-/* Sync-/Benutzerbereich bleibt technisch erhalten, wird aber nicht mehr
-   als eigener Hauptreiter angezeigt. */
+/* Projektübergabe ist für Master UND Monteur erreichbar.
+   renderSyncView() trennt die Inhalte:
+   - Master: Benutzerverwaltung, Arbeitsdateien erstellen, Rückgaben importieren
+   - Monteur: eigene Arbeitsdatei-Informationen und Rückgabedatei erstellen
+*/
 const _v623ShowViewBase=showView;
 showView=function(name){
-  if(name==="sync"){
-    const access=typeof currentAccess==="function"?currentAccess():{mode:"master"};
-    if(access?.mode!=="master"){
-      alert("Benutzer- und Projektübergabe ist nur im Masterprojekt verfügbar.");
-      return;
-    }
-  }
   return _v623ShowViewBase(name);
 };
 </script>
@@ -12712,7 +12711,7 @@ showView=function(name){
 
 <script>
 /* ============================================================
-   V6.27 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
+   V6.28 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
    ============================================================ */
 
 /* A missing position can never have a target/LV quantity. */
@@ -12753,7 +12752,7 @@ renderSheet=function(){
   try{
     return _v625RenderSheetBase();
   }catch(err){
-    console.warn("V6.27 renderSheet fallback",err);
+    console.warn("V6.28 renderSheet fallback",err);
 
     const sh=activeSheet();
     const body=document.getElementById("sheetBody");
@@ -12843,7 +12842,7 @@ finalizeCurrentEntry=function(){
   try{
     return _v625FinalizeBase();
   }catch(err){
-    console.error("V6.27 finalize fallback",err);
+    console.error("V6.28 finalize fallback",err);
 
     const after=JSON.stringify((project()?.entries||[]).map(e=>[e.id,e.syncRevision,e.updated,e.qty,e.calc,e.pos,e.lineDesc]));
     const fm=document.getElementById("finalizeMessage");
@@ -12880,7 +12879,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.27 – MASTER-IDs KONSISTENT NEU AUFBAUEN
+   V6.28 – MASTER-IDs KONSISTENT NEU AUFBAUEN
    ============================================================ */
 let v626RebuildRunning=false;
 
@@ -13085,7 +13084,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.27 – MANUELLE LV-UNTERPOSITIONEN:
+   V6.28 – MANUELLE LV-UNTERPOSITIONEN:
    MASTER VERWALTET, MONTEUR VERWENDET
    ============================================================ */
 
