@@ -5322,6 +5322,353 @@ main > section.view,
   overflow-anchor:none;
 }
 
+
+/* ============================================================
+   V6.91 – UI-FEINSCHLIFF / MODERNER APP-CHARAKTER
+   ============================================================ */
+
+/* ---------- Gesamtbild ---------- */
+#view-entry{
+  --v691-blue:#2f739b;
+  --v691-blue-soft:#eef6fa;
+  --v691-green:#5f8c72;
+  --v691-green-soft:#f1f7f3;
+  --v691-sand:#9c8557;
+  --v691-sand-soft:#fcf8ef;
+  --v691-line:#dce5ea;
+  --v691-text:#21343e;
+  --v691-muted:#6b7a83;
+}
+
+/* Hauptkarten ruhiger, weniger "Box in Box" */
+#view-entry .v666ProjectSection,
+#view-entry .v666LvSection,
+#view-entry #entryCard,
+#view-entry .entryIntegratedPlan > .card{
+  border:1px solid var(--v691-line)!important;
+  box-shadow:0 2px 8px rgba(30,48,60,.045)!important;
+  border-radius:12px!important;
+}
+
+/* Projekt / Blatt kompakter */
+#view-entry .v666ProjectSection{
+  padding:13px 14px!important;
+}
+#view-entry .v666ProjectSection > h2{
+  margin-bottom:9px!important;
+  padding-bottom:8px;
+  border-bottom:1px solid #e5ecef;
+}
+#view-entry .projectMeta{
+  margin-top:6px!important;
+}
+#view-entry .metaCell{
+  background:#fafcfd!important;
+  border-color:#e0e8ec!important;
+  padding:8px 9px!important;
+}
+#view-entry .hr{
+  margin:10px 0!important;
+}
+
+/* ---------- Schritt-Kopf ---------- */
+#view-entry .v666LvSection > h2,
+#view-entry #entryCard > h2{
+  font-size:15px!important;
+  font-weight:800!important;
+  color:var(--v691-text)!important;
+  letter-spacing:-.01em;
+  padding-bottom:9px!important;
+  margin-bottom:12px!important;
+}
+#view-entry .v666LvSection > h2::before,
+#view-entry #entryCard > h2::before{
+  width:24px!important;
+  height:24px!important;
+  font-size:11px!important;
+  box-shadow:none!important;
+}
+#view-entry .v666LvSection > h2::before{
+  background:var(--v691-blue)!important;
+}
+#view-entry #entryCard > h2::before{
+  background:var(--v691-green)!important;
+}
+
+/* ---------- Labels / Inputs ---------- */
+#view-entry label{
+  color:#4d606b!important;
+  font-size:11.5px!important;
+  margin-top:8px!important;
+}
+#view-entry input,
+#view-entry select,
+#view-entry textarea{
+  border-color:#ccd9e0!important;
+  background:#fff!important;
+}
+#view-entry input:focus,
+#view-entry select:focus,
+#view-entry textarea:focus{
+  border-color:#78a7c2!important;
+  outline:2px solid rgba(47,115,155,.10)!important;
+}
+
+/* Beschreibung etwas kompakter als V6.90, aber hochwertiger */
+#lineDesc.v688DescField{
+  min-height:105px!important;
+  border-radius:9px!important;
+  font-size:13px!important;
+}
+
+/* ---------- LV-Suche ---------- */
+#view-entry .mobilePosPicker{
+  background:#f9fbfc!important;
+  border:1px solid #d9e4ea!important;
+  padding:8px!important;
+}
+#view-entry .mobilePosPickerHead{
+  padding:2px 2px 7px!important;
+  margin-bottom:6px!important;
+  border-bottom:1px solid #e4ebef!important;
+}
+#view-entry .mobilePosPickerHead span{
+  color:#526672!important;
+  font-size:11px!important;
+}
+#view-entry .mobilePosPickerHead button{
+  min-height:32px!important;
+  padding:5px 8px!important;
+  border-radius:7px!important;
+}
+
+/* Positionskarten kompakter und sauber */
+#view-entry .mobilePosResults{
+  gap:4px!important;
+}
+#view-entry .mobilePosResult{
+  border-radius:8px!important;
+  border-color:#dbe4e9!important;
+  background:#fff!important;
+}
+#view-entry .mobilePosResult:hover{
+  background:#f4f8fa!important;
+  border-color:#bfd2dd!important;
+}
+#view-entry .mobilePosResult.selected{
+  border:1.5px solid #3f83aa!important;
+  background:linear-gradient(180deg,#edf6fb 0%,#f7fbfd 100%)!important;
+  box-shadow:inset 3px 0 #2f739b!important;
+}
+#view-entry .mobilePosResult.selected::after{
+  top:7px!important;
+  right:8px!important;
+  background:#2f739b!important;
+  font-size:8.5px!important;
+  padding:3px 6px!important;
+}
+#view-entry .mobilePosResult .mprCode{
+  color:#294a5d;
+}
+#view-entry .mobilePosResult .mprText{
+  color:#52626b!important;
+}
+#view-entry .mobilePosResult .mprMeta{
+  color:#85929a!important;
+}
+
+/* Ausgewählte Position unten: eher Statuskarte */
+#view-entry #posInfo{
+  background:linear-gradient(180deg,#edf6fb,#f7fbfd)!important;
+  border:1px solid #cfdee7!important;
+  border-left:4px solid var(--v691-blue)!important;
+  padding:11px 12px!important;
+}
+
+/* ---------- Rechenansatz ---------- */
+#view-entry #entryCard{
+  background:#fff!important;
+}
+#view-entry #calc{
+  font-size:14px!important;
+  font-weight:650;
+}
+#view-entry .v682TemplateHint{
+  margin-top:7px!important;
+  padding:8px 10px!important;
+  font-size:11px!important;
+  border-left:3px solid #b18d3d!important;
+  background:#fffaf0!important;
+}
+#view-entry #calcPreview{
+  margin-top:8px!important;
+  padding:10px 11px!important;
+  background:#f8fafb!important;
+}
+#view-entry #calcPreview .calcResult{
+  font-size:18px!important;
+}
+
+/* ---------- Mehrfach-LV ---------- */
+#view-entry .multiLvBox{
+  padding:10px!important;
+  background:#f8fbfc!important;
+  border-color:#dbe6ec!important;
+}
+#view-entry .multiLvBox > .toolbar{
+  align-items:center!important;
+}
+#view-entry .multiLvBox > .toolbar b{
+  font-size:12.5px;
+  color:#2d414d;
+}
+#view-entry .multiLvBox button{
+  min-height:36px!important;
+}
+
+/* ---------- Status + Detail ---------- */
+#view-entry #entryCard > .grid2{
+  border:0!important;
+  padding:0!important;
+  background:transparent!important;
+  gap:8px!important;
+}
+#view-entry #entryCard > .grid2 > div{
+  background:#fafcfd!important;
+  border:1px solid #e0e8ec!important;
+  padding:9px!important;
+  border-radius:9px!important;
+}
+
+/* ---------- Hauptspeichern ---------- */
+#view-entry .v655QuickSave{
+  border:1px solid #cfdfd4!important;
+  border-left:4px solid var(--v691-green)!important;
+  background:linear-gradient(180deg,#f2f8f4 0%,#f8fbf9 100%)!important;
+}
+#view-entry .v655QuickSaveBtn{
+  min-height:46px!important;
+  font-size:13.5px!important;
+  box-shadow:0 2px 6px rgba(47,115,155,.10)!important;
+}
+
+/* ---------- Plan ---------- */
+#view-entry .entryPlanBox{
+  border:1px solid #d8e3ea!important;
+  border-left:4px solid #6d8fa4!important;
+  background:#f8fbfd!important;
+}
+#view-entry .entryPlanBox .toolbar{
+  gap:6px!important;
+}
+#view-entry .entryPlanBox button{
+  min-height:36px!important;
+}
+
+/* ---------- Notiz ---------- */
+#view-entry .v666NoteSection{
+  border:0!important;
+  border-top:1px solid #e4ebef!important;
+  border-radius:0!important;
+  padding:10px 0 0!important;
+  background:transparent!important;
+}
+#view-entry #note{
+  min-height:76px!important;
+}
+
+/* ---------- Fotos ---------- */
+#view-entry .v637PhotoBox{
+  border:1px solid #e4dbc8!important;
+  border-left:4px solid var(--v691-sand)!important;
+  background:var(--v691-sand-soft)!important;
+  padding:10px!important;
+}
+#view-entry .v637PhotoBox .filePickLabel{
+  min-height:36px!important;
+}
+
+/* ---------- Sekundäraktionen unten ---------- */
+#view-entry #entryCard > .toolbar:last-of-type{
+  margin-top:9px!important;
+  padding-top:8px!important;
+  border-top:1px solid #e5ecef!important;
+}
+#view-entry #entryCard > .toolbar:last-of-type button{
+  min-height:34px!important;
+  font-size:11.5px!important;
+}
+
+/* ---------- Plan-Schritt 3 ---------- */
+#view-entry .entryIntegratedPlan > .card{
+  overflow:hidden;
+}
+#view-entry .entryIntegratedPlan > .card > .toolbar:first-child{
+  margin:-14px -14px 0!important;
+  padding:12px 14px!important;
+  background:linear-gradient(180deg,#f5f9fb,#fafcfd)!important;
+  border-bottom:1px solid #dbe5eb!important;
+}
+#view-entry .entryIntegratedPlan h2{
+  font-size:15px!important;
+}
+#view-entry .entryIntegratedPlan h2::before{
+  content:"3";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;
+  height:24px;
+  margin-right:7px;
+  border-radius:999px;
+  color:#fff;
+  background:#6d8fa4;
+  font-size:11px;
+  font-weight:800;
+  vertical-align:middle;
+}
+
+/* ---------- Desktop ---------- */
+@media(min-width:1101px){
+  #view-entry .v666EntryGrid{
+    grid-template-columns:minmax(0,1.25fr) minmax(400px,.95fr)!important;
+    gap:15px!important;
+  }
+  #view-entry .v666LvSection,
+  #view-entry #entryCard{
+    padding:15px!important;
+  }
+  #view-entry .mobilePosResults{
+    max-height:340px!important;
+  }
+}
+
+/* ---------- Tablet ---------- */
+@media(min-width:601px) and (max-width:1100px){
+  #view-entry .v666LvSection,
+  #view-entry #entryCard{
+    padding:12px!important;
+  }
+  #lineDesc.v688DescField{
+    min-height:90px!important;
+  }
+}
+
+/* ---------- Handy ---------- */
+@media(max-width:600px){
+  #view-entry .v666LvSection,
+  #view-entry #entryCard{
+    padding:10px!important;
+  }
+  #view-entry .v666LvSection > h2,
+  #view-entry #entryCard > h2{
+    font-size:14px!important;
+  }
+  #view-entry #entryCard > .grid2 > div{
+    padding:8px!important;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -23002,7 +23349,7 @@ window.addEventListener("load",()=>{
    V6.72 – ERZWUNGENE VERSIONSAKTUALISIERUNG / CACHE-SYNC
    ============================================================ */
 
-const KOLLAPP_VERSION="6.89";
+const KOLLAPP_VERSION="6.91";
 const KOLLAPP_VERSION_KEY="kollapp_loaded_version";
 const KOLLAPP_RELOAD_KEY="kollapp_update_reload_guard";
 
