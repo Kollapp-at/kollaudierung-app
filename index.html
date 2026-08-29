@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.59</title>
+<title>Kollaudierung – V6.60</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2161,7 +2161,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.59</h1>
+     <h1>Kollaudierung – V6.60</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -18798,6 +18798,61 @@ window.addEventListener("load",()=>{
     document.getElementById("planScribbleHelp")?.classList.remove("show");
   },0);
 });
+</script>
+
+
+<script>
+/* ============================================================
+   V6.60 – KRITZELEIEN DAUERHAFT IM PLAN SICHTBAR
+   ============================================================ */
+
+/* V6.59 stored scribbles correctly, but the historic SVG renderer
+   had no branch for type="scribble". It therefore created an empty
+   annotation group. Fill that group with the actual polyline here. */
+const _v660RenderPlanAnnotationsBase=renderPlanAnnotations;
+renderPlanAnnotations=function(){
+  _v660RenderPlanAnnotationsBase.apply(this,arguments);
+
+  const svg=document.getElementById("planOverlay");
+  const pl=activePlan();
+  if(!svg || !pl)return;
+
+  const z=typeof v59MarkerScale==="function" ? v59MarkerScale() : 1;
+
+  /* Scribbles are already sorted before normal annotations by V6.59,
+     so their groups remain behind all official ID markings. */
+  for(const a of (pl.annotations||[])){
+    if(a.type!=="scribble" || !Array.isArray(a.points) || a.points.length<2)continue;
+
+    const g=[...svg.querySelectorAll('g.ann[data-id]')]
+      .find(el=>el.getAttribute("data-id")===a.id);
+    if(!g)continue;
+
+    /* Prevent duplicate drawing on repeated renders. */
+    g.querySelectorAll(".v660ScribbleStroke").forEach(el=>el.remove());
+
+    const pts=a.points
+      .map(pt=>`${planPxX(pt.x)},${planPxY(pt.y)}`)
+      .join(" ");
+
+    const stroke=svgEl("polyline",{
+      points:pts,
+      fill:"none",
+      stroke:a.color||"#666",
+      "stroke-width":Math.max(1,Number(a.width||7))*z,
+      "stroke-linejoin":"round",
+      "stroke-linecap":"round",
+      opacity:"0.65",
+      "class":"v660ScribbleStroke"
+    });
+
+    /* Keep the scribble behind anything else inside its annotation group. */
+    g.insertBefore(stroke,g.firstChild);
+
+    /* No visible ID/label for scribbles. */
+    g.querySelectorAll("text").forEach(el=>el.remove());
+  }
+};
 </script>
 
 </body>
