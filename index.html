@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.60</title>
+<title>Kollaudierung – V6.62</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2134,6 +2134,83 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   font-weight:800;
 }
 
+
+/* ===== V6.61 Zeichenstil direkt bei den Plan-Werkzeugen ===== */
+.v661ToolStyle{
+ display:flex;
+ align-items:center;
+ gap:6px;
+ padding:4px 7px;
+ border:1px solid #c9d4dc;
+ border-radius:8px;
+ background:#fff;
+ min-height:38px;
+ flex:0 0 auto;
+}
+.v661ToolStyle label,
+.v661ToolText label{
+ margin:0;
+ font-size:11px;
+ font-weight:700;
+ color:var(--muted);
+ white-space:nowrap;
+}
+.v661ToolStyle input[type="color"]{
+ width:38px;
+ min-width:38px;
+ height:32px;
+ padding:2px;
+ border-radius:6px;
+ cursor:pointer;
+}
+.v661ToolStyle select{
+ width:auto;
+ min-width:92px;
+ height:34px;
+ padding:5px 8px;
+ font-size:12px;
+}
+.v661ToolText{
+ display:flex;
+ align-items:center;
+ gap:6px;
+ padding:4px 7px;
+ border:1px solid #c9d4dc;
+ border-radius:8px;
+ background:#fff;
+ min-height:38px;
+ flex:0 1 250px;
+}
+.v661ToolText input{
+ width:190px;
+ min-width:130px;
+ height:34px;
+ padding:6px 8px;
+ font-size:12px;
+}
+@media(max-width:900px){
+ .v661ToolStyle{
+   min-height:44px;
+ }
+ .v661ToolStyle input[type="color"]{
+   width:42px;
+   min-width:42px;
+   height:36px;
+ }
+ .v661ToolStyle select{
+   min-width:100px;
+   height:38px;
+ }
+ .v661ToolText{
+   min-height:44px;
+   flex:0 0 auto;
+ }
+ .v661ToolText input{
+   width:180px;
+   height:38px;
+ }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -2161,7 +2238,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.60</h1>
+     <h1>Kollaudierung – V6.62</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -2425,6 +2502,21 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
        <button id="tool-freehand" class="secondary toolBtn" onclick="setPlanTool('freehand')">✎ Freihand</button>
        <button id="tool-scribble" class="secondary toolBtn" onclick="v659SelectScribble()">≈ Kritzeln</button>
        <button id="tool-text" class="secondary toolBtn" onclick="setPlanTool('text')">T Text</button>
+       <div id="planStyleBox" class="v661ToolStyle">
+        <label for="planStrokeColor">Farbe</label>
+        <input id="planStrokeColor" type="color" value="#b83232" title="Farbe der Markierung">
+        <label for="planStrokeWidth">Stärke</label>
+        <select id="planStrokeWidth" title="Linienstärke">
+         <option value="3">Fein</option>
+         <option value="5">Normal</option>
+         <option value="8" selected>Stark</option>
+         <option value="12">Sehr stark</option>
+        </select>
+       </div>
+       <div id="planTextWrap" class="v661ToolText" style="display:none">
+        <label for="planFreeText">Text</label>
+        <input id="planFreeText" placeholder="Text im Plan">
+       </div>
        <button class="secondary touchIconBtn" onclick="undoLastPlanAnnotation()" title="Letzte Markierung rückgängig">↶ Rückgängig</button>
        <button class="secondary touchIconBtn" onclick="changePlanZoom(-0.15)">− Zoom</button>
        <span id="planZoomLabel" class="small">100 %</span>
@@ -2481,22 +2573,6 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
        </select>
       </div>
 
-      <div id="planStyleBox" class="planStyleBox">
-       <label>Farbe</label>
-       <input id="planStrokeColor" type="color" value="#b83232" style="height:42px;padding:4px">
-       <label>Linienstärke</label>
-       <select id="planStrokeWidth">
-        <option value="3">Fein</option>
-        <option value="5">Normal</option>
-        <option value="8" selected>Stark</option>
-        <option value="12">Sehr stark</option>
-       </select>
-      </div>
-
-      <div id="planTextWrap" style="display:none">
-       <label>Text im Plan</label>
-       <input id="planFreeText" placeholder="Status / Zuordnung">
-      </div>
 
       <div class="planLinkBox">
        <div class="small"><b>Keine weitere Zuordnung nötig:</b> Die Markierung wird automatisch mit der aktuellen Aufmaßzeile und LV-Unterposition verbunden. Nur Werkzeug wählen, im Plan markieren und danach unten speichern.</div>
@@ -18853,6 +18929,159 @@ renderPlanAnnotations=function(){
     g.querySelectorAll("text").forEach(el=>el.remove());
   }
 };
+</script>
+
+
+<script>
+/* ============================================================
+   V6.61 – Stil- und Textsteuerung direkt in der Werkzeugleiste
+   ============================================================ */
+const _v661SetPlanToolBase=setPlanTool;
+setPlanTool=function(tool){
+  _v661SetPlanToolBase(tool);
+
+  const textWrap=document.getElementById("planTextWrap");
+  if(textWrap){
+    textWrap.style.display=tool==="text"?"flex":"none";
+  }
+
+  if(tool==="text"){
+    setTimeout(()=>document.getElementById("planFreeText")?.focus(),0);
+  }
+};
+
+/* When Kritzeln activates the freehand engine, keep style controls visible
+   just like for all other drawing tools. */
+const _v661ScribbleBase=v659SelectScribble;
+v659SelectScribble=function(){
+  _v661ScribbleBase();
+  document.getElementById("planTextWrap")?.style.setProperty("display","none");
+};
+</script>
+
+
+<script>
+/* ============================================================
+   V6.62 – TOUCH-FIX FÜR RECHTECK UND KREIS
+   Finger aufsetzen -> ziehen -> loslassen.
+   touchcancel verwirft die Form, statt eine Riesenform zu speichern.
+   ============================================================ */
+
+let v662ShapeTouchActive=false;
+let v662ShapeTouchId=null;
+
+function v662TouchCoords(t){
+  return planCoords({
+    clientX:t.clientX,
+    clientY:t.clientY
+  });
+}
+
+function v662SetupTouchShapes(){
+  const svg=document.getElementById("planOverlay");
+  if(!svg || svg.dataset.v662ShapeTouch==="1")return;
+  svg.dataset.v662ShapeTouch="1";
+
+  svg.addEventListener("touchstart",ev=>{
+    if(!["rect","circle"].includes(planTool) || !activePlan())return;
+    if(ev.touches.length!==1)return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    const t=ev.touches[0];
+    const pt=v662TouchCoords(t);
+
+    v662ShapeTouchActive=true;
+    v662ShapeTouchId=t.identifier;
+
+    planShapeDraft={
+      type:planTool,
+      start:pt,
+      current:pt,
+      pointerId:"v662-touch"
+    };
+
+    renderPlanAnnotations();
+  },{capture:true,passive:false});
+
+  svg.addEventListener("touchmove",ev=>{
+    if(!v662ShapeTouchActive || !planShapeDraft)return;
+
+    const t=[...ev.touches].find(x=>x.identifier===v662ShapeTouchId);
+    if(!t)return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    planShapeDraft.current=v662TouchCoords(t);
+    renderPlanAnnotations();
+  },{capture:true,passive:false});
+
+  svg.addEventListener("touchend",ev=>{
+    if(!v662ShapeTouchActive || !planShapeDraft)return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    const t=[...(ev.changedTouches||[])].find(x=>x.identifier===v662ShapeTouchId);
+    if(t){
+      planShapeDraft.current=v662TouchCoords(t);
+    }
+
+    v662ShapeTouchActive=false;
+    v662ShapeTouchId=null;
+
+    const draft=planShapeDraft;
+    const dx=Math.abs((draft.current?.x||0)-(draft.start?.x||0));
+    const dy=Math.abs((draft.current?.y||0)-(draft.start?.y||0));
+
+    /* Ignore taps / tiny accidental movements. */
+    if(dx<3 || dy<3){
+      planShapeDraft=null;
+      renderPlanAnnotations();
+      return;
+    }
+
+    finishShapeDraft();
+  },{capture:true,passive:false});
+
+  svg.addEventListener("touchcancel",ev=>{
+    if(!v662ShapeTouchActive)return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    /* Never save a shape on touchcancel.
+       iOS/Android can send this event when the browser takes over a gesture. */
+    v662ShapeTouchActive=false;
+    v662ShapeTouchId=null;
+    planShapeDraft=null;
+    renderPlanAnnotations();
+  },{capture:true,passive:false});
+}
+
+/* Re-install after every plan open because the SVG may have been rebuilt. */
+const _v662OpenPlanBase=openPlan;
+openPlan=async function(id){
+  await _v662OpenPlanBase(id);
+  v662SetupTouchShapes();
+};
+
+const _v662SetPlanToolBase=setPlanTool;
+setPlanTool=function(tool){
+  _v662SetPlanToolBase(tool);
+  v662SetupTouchShapes();
+
+  if(!["rect","circle"].includes(tool)){
+    v662ShapeTouchActive=false;
+    v662ShapeTouchId=null;
+  }
+};
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>{try{v662SetupTouchShapes()}catch(e){}},0);
+});
 </script>
 
 </body>
