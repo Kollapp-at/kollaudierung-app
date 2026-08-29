@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.36</title>
+<title>Kollaudierung – V6.39</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.36 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.39 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.36 alter Testhinweis entfernt ===== */
+/* ===== V6.39 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.36 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.39 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1163,7 +1163,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.36 HINWEISE / TEXTE ===== */
+/* ===== V6.39 HINWEISE / TEXTE ===== */
 #autoPlanLinkSummary{line-height:1.25}
 #autoPlanLinkMeta{line-height:1.35}
 #draftEntrySummary .fsCell .smallHint{
@@ -1174,13 +1174,13 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.36 EINHEITLICHE BEGRIFFE ===== */
+/* ===== V6.39 EINHEITLICHE BEGRIFFE ===== */
 .terminologyHint{
   line-height:1.4;
 }
 
 
-/* ===== V6.36 LETZTE ERFASSUNGEN ===== */
+/* ===== V6.39 LETZTE ERFASSUNGEN ===== */
 .v620RecentTable{
  table-layout:fixed!important;
  width:100%!important;
@@ -1288,7 +1288,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.36 ID-AUSWAHL IM AUFMASSBLATT ===== */
+/* ===== V6.39 ID-AUSWAHL IM AUFMASSBLATT ===== */
 .v621SheetIdToolbar{
  display:flex;
  align-items:flex-end;
@@ -1316,7 +1316,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.36 LV-ÜBERSICHT / NEUE POSITION ===== */
+/* ===== V6.39 LV-ÜBERSICHT / NEUE POSITION ===== */
 .v623AddLvCard{
  margin-bottom:12px;
  border:1px solid #b9cfda;
@@ -1343,7 +1343,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.36 MANUELLE LV-STAMMDATEN NUR IM MASTER ===== */
+/* ===== V6.39 MANUELLE LV-STAMMDATEN NUR IM MASTER ===== */
 .v627LvActions{
  display:flex;
  gap:6px;
@@ -1360,7 +1360,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.36 AUFTRAGGEBER IM EXPORT ===== */
+/* ===== V6.39 AUFTRAGGEBER IM EXPORT ===== */
 .v630ClientCard{
  margin-top:4px;
  border:1px solid #b9cfda;
@@ -1434,7 +1434,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.36 TITELBLOCK IM EXPORT SAUBER ZENTRIEREN ===== */
+/* ===== V6.39 TITELBLOCK IM EXPORT SAUBER ZENTRIEREN ===== */
 .v630DualHeader{
  align-items:center!important;
 }
@@ -1465,7 +1465,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.36 AUSFÜHRLICHERE LAGEPLAN-INFOS ===== */
+/* ===== V6.39 AUSFÜHRLICHERE LAGEPLAN-INFOS ===== */
 .v634EvidenceInfo{
  margin-top:7px;
  border:1px solid #d5dfe4;
@@ -1507,7 +1507,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.36 LANGE TEXTE / OVERFLOW ROBUST ===== */
+/* ===== V6.39 LANGE TEXTE / OVERFLOW ROBUST ===== */
 .v620RecentTable{
   width:100%!important;
   table-layout:fixed!important;
@@ -1578,6 +1578,161 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   .v620RecentTable th:nth-child(7){width:10%!important}
 }
 
+
+/* ===== V6.39 ZUSATZBILDER / FOTODOKUMENTATION ===== */
+.v637PhotoBox{margin-top:12px;padding:12px;border:1px solid #d7e1e8;border-radius:12px;background:#f8fbfd}
+.v637PhotoPickLabel{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;white-space:nowrap}
+.v637PhotoList{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
+.v637PhotoItem{border:1px solid #d7e1e8;border-radius:10px;background:#fff;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.v637PhotoThumbWrap{border:1px solid #d7e1e8;border-radius:8px;background:#fff;overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+.v637PhotoThumbWrap img{max-width:100%;max-height:100%;display:block;object-fit:contain}
+.v637PhotoMeta{font-size:12px;color:#425466;overflow-wrap:anywhere;word-break:break-word}
+.v637PhotoCaption{width:100%;box-sizing:border-box}
+.v637PhotoTools{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.v637PhotoBadge{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:2px 8px;border-radius:999px;background:#eef5fb;color:#234f7a;font-size:12px;font-weight:700}
+.v637PhotoEvidence{display:flex;flex-direction:column;gap:8px}
+.v637PhotoEvidenceHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.v637PhotoEvidenceInfo{border:1px solid #cdd9e1;border-radius:8px;padding:8px;background:#f9fbfd;font-size:10px;line-height:1.45}
+.v637PhotoEvidenceInfoGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 10px;margin-bottom:6px}
+.v637PhotoEvidenceInfoGrid > div{min-width:0}
+.v637PhotoEvidenceInfoGrid b{display:block;font-size:9px;color:#425466;margin-bottom:1px}
+.v637PhotoEvidencePosList{display:grid;grid-template-columns:1fr;gap:3px;margin-top:5px}
+.v637PhotoEvidencePosLine{border-top:1px solid #dde6ec;padding-top:3px;overflow-wrap:anywhere;word-break:break-word}
+.v637PhotoEvidenceGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.v637PhotoEvidenceFigure{margin:0;border:1px solid #cfd8df;border-radius:8px;background:#fff;overflow:hidden;display:flex;flex-direction:column;page-break-inside:avoid;break-inside:avoid}
+.v637PhotoEvidenceFigure img{display:block;width:100%;height:88mm;object-fit:contain;background:#fff}
+.v637PhotoEvidenceFigure figcaption{padding:5px 7px;font-size:9px;line-height:1.35;color:#334155;overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:800px){
+  .v637PhotoList{grid-template-columns:1fr}
+  .v637PhotoEvidenceInfoGrid{grid-template-columns:1fr}
+  .v637PhotoEvidenceGrid{grid-template-columns:1fr}
+}
+
+
+/* ===== V6.39 FOTO-ZUORDNUNG / REIHENFOLGE ===== */
+.v638PhotoTop{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.v638PhotoIndex{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;background:#eef5fb;border:1px solid #c7d7e6;color:#234f7a;font-weight:700;font-size:12px}
+.v638PhotoName{font-size:13px;color:#23313f;overflow-wrap:anywhere;word-break:break-word}
+.v638PhotoMeta b{display:block;margin-bottom:3px}
+.v638PhotoAssign{display:grid;grid-template-columns:1fr;gap:6px}
+.v638PhotoTools{justify-content:space-between}
+.v638PhotoMove{display:flex;gap:8px;flex-wrap:wrap}
+.v638PhotoEvidenceFigure figcaption b{display:block;font-size:10px;margin-bottom:3px;color:#0f172a}
+.v638PhotoEvidenceFigure .lbl{display:inline-block;min-width:92px;color:#425466;font-weight:700}
+.v638PhotoEvidenceFigure .line{margin-top:2px;overflow-wrap:anywhere;word-break:break-word}
+.v638PhotoEvidenceFigure .muted{color:#64748b}
+@media(max-width:800px){
+ .v638PhotoTop{align-items:flex-start}
+ .v638PhotoTools{justify-content:flex-end}
+}
+
+
+/* ===== V6.39 KAMERA + KOMPAKTER FOTOEXPORT + RUBRIK ===== */
+.v639PhotoAddActions{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+ justify-content:flex-end;
+ align-items:center;
+}
+.v639CameraBtn{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ min-height:40px;
+}
+.v639PhotoSectionTitle{
+ font-size:19pt;
+ font-weight:800;
+ margin:0 0 3mm;
+}
+.v639PhotoSectionSub{
+ font-size:8pt;
+ color:#5f6f78;
+ margin-bottom:5mm;
+}
+.v639PhotoIndexTable{
+ width:100%;
+ border-collapse:collapse;
+ font-size:7.5pt;
+}
+.v639PhotoIndexTable th,
+.v639PhotoIndexTable td{
+ padding:2.2mm 2mm;
+ border-bottom:0.25mm solid #d8e1e6;
+ vertical-align:top;
+ overflow-wrap:anywhere;
+ word-break:break-word;
+}
+.v639PhotoIndexTable th{
+ text-align:left;
+ font-size:7pt;
+ background:#f2f6f8;
+}
+.v639PhotoIndexId{
+ font-weight:800;
+ text-align:center;
+}
+.v639PhotoEvidenceGrid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:5mm;
+ align-items:start;
+}
+.v639PhotoEvidenceFigure{
+ margin:0;
+ border:0.25mm solid #ccd7dd;
+ border-radius:2mm;
+ overflow:hidden;
+ background:white;
+ break-inside:avoid;
+ page-break-inside:avoid;
+}
+.v639PhotoEvidenceFigure img{
+ display:block;
+ width:100%;
+ height:52mm;
+ object-fit:contain;
+ background:#fff;
+}
+.v639PhotoEvidenceFigure figcaption{
+ padding:2mm 2.3mm;
+ font-size:6.7pt;
+ line-height:1.28;
+ min-height:15mm;
+}
+.v639PhotoEvidenceFigure figcaption b{
+ font-size:7.2pt;
+}
+.v639PhotoEvidenceFigure .lbl{
+ display:inline-block;
+ min-width:22mm;
+ font-weight:700;
+ color:#425466;
+}
+.v639PhotoCompactInfo{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:1.8mm 3mm;
+ margin-bottom:3mm;
+ padding:2.5mm;
+ border:0.25mm solid #d5dfe4;
+ border-radius:2mm;
+ background:#f9fbfc;
+ font-size:6.8pt;
+}
+.v639PhotoCompactInfo b{
+ display:block;
+ font-size:6.2pt;
+ color:#53636c;
+ margin-bottom:0.6mm;
+}
+@media(max-width:700px){
+ .v639PhotoAddActions{justify-content:stretch}
+ .v639PhotoAddActions label{flex:1}
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1592,7 +1747,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.36version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.39version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1608,7 +1763,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.36</h1>
+   <h1>Kollaudierung – V6.39</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -1782,6 +1937,24 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
     <label>Anmerkung zur Position</label>
     <textarea id="note" placeholder="optional"></textarea>
+
+    <div class="v637PhotoBox">
+     <div class="toolbar" style="justify-content:space-between;align-items:flex-start">
+      <div>
+       <label style="margin:0">Zusatzbilder / Fotodokumentation</label>
+       <div class="small" style="margin-top:4px">Hier können zusätzliche Bilder zur aktuellen Erfassungs-ID hinterlegt werden. Diese werden im Export zusätzlich zum Lageplan ausgegeben.</div>
+      </div>
+      <div class="v639PhotoAddActions">
+       <label class="secondary filePickLabel v637PhotoPickLabel" for="entryPhotoFiles">+ Bilder auswählen</label>
+       <input id="entryPhotoFiles" type="file" accept="image/*" multiple style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="v637EntryPhotoFilesChanged(event)">
+       <label class="primary filePickLabel v639CameraBtn" for="entryCameraFile">📷 Foto aufnehmen</label>
+       <input id="entryCameraFile" type="file" accept="image/*" capture="environment" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="v639CameraPhotoChanged(event)">
+      </div>
+     </div>
+     <div id="entryPhotoList" class="v637PhotoList">
+      <div class="small">Noch keine Zusatzbilder gewählt.</div>
+     </div>
+    </div>
     <div class="toolbar">
      <button class="secondary" onclick="clearCurrentEntryDraft()">Eingabe leeren</button>
      <button class="danger" id="cancelEditBtn" style="display:none" onclick="cancelEdit()">Bearbeitung abbrechen</button>
@@ -10371,7 +10544,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.36 MULTI-LV ================= */
+/* ================= V6.39 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10570,7 +10743,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.36 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.39 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -11150,13 +11323,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.36 Gruppenmigration",e)}
+}catch(e){console.warn("V6.39 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.36 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.39 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -11262,7 +11435,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.36 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.39 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -11309,13 +11482,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.36 Migration",e)}
+}catch(e){console.warn("V6.39 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.36 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.39 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -11551,13 +11724,13 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.36 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.39 Gruppendarstellung",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.36 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   V6.39 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
    ============================================================ */
 
 function v615OrderedEntryGroups(){
@@ -11679,7 +11852,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.36 ID-Kompaktierung",e)}
+  }catch(e){console.warn("V6.39 ID-Kompaktierung",e)}
   return r;
 };
 
@@ -11733,13 +11906,13 @@ try{
   renderDraftEntrySummary?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.36 Startmigration",e)}
+}catch(e){console.warn("V6.39 Startmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.36 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
+   V6.39 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
    ============================================================ */
 
 function v616DraftLvItems(){
@@ -11905,7 +12078,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.36 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
+   V6.39 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
    ============================================================ */
 
 function v618GroupForId(id){
@@ -12065,7 +12238,7 @@ finalizeCurrentEntry=function(){
     }
     return result;
   }catch(err){
-    console.error("V6.36 Erfassung speichern",err);
+    console.error("V6.39 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -12090,7 +12263,7 @@ editEntry=function(id){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.36 Erfassung bearbeiten",err);
+    console.error("V6.39 Erfassung bearbeiten",err);
     alert("Erfassung konnte nicht zum Bearbeiten geöffnet werden: "+(err?.message||err));
   }
 };
@@ -12182,13 +12355,13 @@ try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.36 Datenkonsistenz",e)}
+}catch(e){console.warn("V6.39 Datenkonsistenz",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.36 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
+   V6.39 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
    ============================================================ */
 
 let v619IdMaintenanceRunning=false;
@@ -12499,7 +12672,7 @@ finalizeCurrentEntry=function(){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.36 Erfassung speichern",err);
+    console.error("V6.39 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -12509,18 +12682,18 @@ finalizeCurrentEntry=function(){
   }
 };
 
-/* Repair current project once after loading V6.36. */
+/* Repair current project once after loading V6.39. */
 try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.36 ID-Reparatur",e)}
+}catch(e){console.warn("V6.39 ID-Reparatur",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.36 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
+   V6.39 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
    ============================================================ */
 
 function v620RecentLvHtml(group){
@@ -12618,7 +12791,7 @@ try{renderRecent?.()}catch(e){}
 
 <script>
 /* ============================================================
-   V6.36 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
+   V6.39 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
    ============================================================ */
 
 function v621CurrentSheetViewIds(){
@@ -12751,7 +12924,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.36 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
+   V6.39 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
    ============================================================ */
 
 function v622PrepareCurrentDataForExport(){
@@ -12810,7 +12983,7 @@ printSheetsV52=async function(selected){
     if(progress)progress.classList.remove("show");
     v519PrintPrepared("sheetMultiPrintArea",pages,"sheetMultiPrintMode");
   }catch(err){
-    console.error("V6.36 PDF Export",err);
+    console.error("V6.39 PDF Export",err);
     const progress=document.getElementById("sheetExportProgress");
     if(progress)progress.classList.remove("show");
     alert("Export nicht möglich: "+(err?.message||err));
@@ -12959,7 +13132,7 @@ v519BuildSheetPages=async function(sh,includeBilling){
 
 <script>
 /* ============================================================
-   V6.36 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
+   V6.39 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
    ============================================================ */
 
 function v623OpenNewLvPosition(){
@@ -12989,7 +13162,7 @@ showView=function(name){
 
 <script>
 /* ============================================================
-   V6.36 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
+   V6.39 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
    ============================================================ */
 
 /* A missing position can never have a target/LV quantity. */
@@ -13030,7 +13203,7 @@ renderSheet=function(){
   try{
     return _v625RenderSheetBase();
   }catch(err){
-    console.warn("V6.36 renderSheet fallback",err);
+    console.warn("V6.39 renderSheet fallback",err);
 
     const sh=activeSheet();
     const body=document.getElementById("sheetBody");
@@ -13120,7 +13293,7 @@ finalizeCurrentEntry=function(){
   try{
     return _v625FinalizeBase();
   }catch(err){
-    console.error("V6.36 finalize fallback",err);
+    console.error("V6.39 finalize fallback",err);
 
     const after=JSON.stringify((project()?.entries||[]).map(e=>[e.id,e.syncRevision,e.updated,e.qty,e.calc,e.pos,e.lineDesc]));
     const fm=document.getElementById("finalizeMessage");
@@ -13157,7 +13330,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.36 – MASTER-IDs KONSISTENT NEU AUFBAUEN
+   V6.39 – MASTER-IDs KONSISTENT NEU AUFBAUEN
    ============================================================ */
 let v626RebuildRunning=false;
 
@@ -13362,7 +13535,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.36 – MANUELLE LV-UNTERPOSITIONEN:
+   V6.39 – MANUELLE LV-UNTERPOSITIONEN:
    MASTER VERWALTET, MONTEUR VERWENDET
    ============================================================ */
 
@@ -13511,7 +13684,7 @@ try{v627ApplyManualMasterUi();renderLV();}catch(e){}
 
 <script>
 /* ============================================================
-   V6.36 – BERECHTIGUNG "REGIEPOSITIONEN" STEUERT
+   V6.39 – BERECHTIGUNG "REGIEPOSITIONEN" STEUERT
    ANLEGEN + BEARBEITEN + LÖSCHEN
    ============================================================ */
 
@@ -13668,7 +13841,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.36 – ZWEITES LOGO / AUFTRAGGEBERDATEN IM EXPORT
+   V6.39 – ZWEITES LOGO / AUFTRAGGEBERDATEN IM EXPORT
    ============================================================ */
 
 const _v630EnsureExportSettingsBase=ensureExportSettings;
@@ -13908,7 +14081,7 @@ try{renderExportSettings();}catch(e){}
 
 <script>
 /* ============================================================
-   V6.36 – LAGEPLÄNE / PLAN-NACHWEISE NACH ERFASSUNGS-ID
+   V6.39 – LAGEPLÄNE / PLAN-NACHWEISE NACH ERFASSUNGS-ID
    ============================================================ */
 
 annotationsForSheet=function(sh){
@@ -13958,7 +14131,7 @@ v516GroupLinksByEntryAndPlan=function(links){
 
 <script>
 /* ============================================================
-   V6.36 – PLANMARKIERUNG DIREKT MIT LV-UNTERPOSITION VERKNÜPFT
+   V6.39 – PLANMARKIERUNG DIREKT MIT LV-UNTERPOSITION VERKNÜPFT
    ============================================================ */
 
 function v633EntryForAnnotation(a){
@@ -14261,13 +14434,13 @@ try{
   v633MigrateAnnotationLvLinks();
   v633RepairAnnotationLinks();
   persist();
-}catch(e){console.warn("V6.36 Plan/LV-Migration",e)}
+}catch(e){console.warn("V6.39 Plan/LV-Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.36 – MEHR INFORMATIONEN IM LAGEPLAN-NACHWEIS
+   V6.39 – MEHR INFORMATIONEN IM LAGEPLAN-NACHWEIS
    ============================================================ */
 
 function v634SheetForEntry(e){
@@ -14397,7 +14570,7 @@ makePlanEvidenceHtml=async function(sh){
 
 <script>
 /* ============================================================
-   V6.36 – STATUS / GRUND VEREINHEITLICHT
+   V6.39 – STATUS / GRUND VEREINHEITLICHT
    ============================================================ */
 function v635NormalizeReason(v){
   const map={
@@ -14429,6 +14602,729 @@ try{
     renderSheet?.();
   }
 }catch(e){}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.39 – ZUSATZBILDER / FOTODOKUMENTATION PRO ERFASSUNGS-ID
+   ============================================================ */
+let v637DraftPhotos=[];
+
+function v637EnsurePhotoStore(){
+  const p=project?.();
+  if(!p)return {};
+  if(!p.entryPhotoStore || typeof p.entryPhotoStore!=="object")p.entryPhotoStore={};
+  return p.entryPhotoStore;
+}
+function v637ClonePhotos(arr){
+  return (arr||[]).map(x=>({
+    id:String(x?.id||("ph_"+(typeof cryptoSafeId==="function"?cryptoSafeId():Math.random().toString(36).slice(2)))) ,
+    name:String(x?.name||"Bild"),
+    caption:String(x?.caption||""),
+    dataUrl:String(x?.dataUrl||"")
+  })).filter(x=>x.dataUrl);
+}
+function v637MediaKeyForEntry(entry){
+  if(!entry)return "";
+  return entry.multiLvGroup || (entry.id?`single:${entry.id}`:"");
+}
+function v637PhotosForEntry(entry){
+  const store=v637EnsurePhotoStore();
+  if(!entry)return [];
+  const keys=[];
+  if(entry.multiLvGroup)keys.push(entry.multiLvGroup);
+  if(entry.id)keys.push(`single:${entry.id}`);
+  for(const k of keys){
+    if(k && Array.isArray(store[k]) && store[k].length)return v637ClonePhotos(store[k]);
+  }
+  return [];
+}
+function v637SetPhotosForKey(key,photos){
+  const store=v637EnsurePhotoStore();
+  if(!key)return;
+  const clean=v637ClonePhotos(photos);
+  if(clean.length)store[key]=clean;
+  else delete store[key];
+}
+function v637CleanupPhotoStore(){
+  const p=project?.();
+  if(!p?.entryPhotoStore)return;
+  const valid=new Set();
+  (p.entries||[]).forEach(e=>{
+    const k=v637MediaKeyForEntry(e);
+    if(k)valid.add(k);
+  });
+  Object.keys(p.entryPhotoStore).forEach(k=>{
+    if(!valid.has(k) || !Array.isArray(p.entryPhotoStore[k]) || !p.entryPhotoStore[k].length)delete p.entryPhotoStore[k];
+  });
+}
+function v637PhotoCountBadgeHtml(entry){
+  const n=v637PhotosForEntry(entry).length;
+  return n?`<div class="v637PhotoBadge">📷 ${n} Bild${n===1?"":"er"}</div>`:"";
+}
+async function v637ImageFileToData(file){
+  if(!file || !file.type || !file.type.startsWith("image/"))throw new Error("Bitte nur Bilddateien auswählen.");
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((resolve,reject)=>{
+      const i=new Image();
+      i.onload=()=>resolve(i);
+      i.onerror=()=>reject(new Error("Bild konnte nicht geladen werden."));
+      i.src=url;
+    });
+    const maxW=1800,maxH=1800;
+    const scale=Math.min(1,maxW/img.naturalWidth,maxH/img.naturalHeight);
+    const w=Math.max(1,Math.round(img.naturalWidth*scale));
+    const h=Math.max(1,Math.round(img.naturalHeight*scale));
+    const c=document.createElement("canvas");
+    c.width=w;c.height=h;
+    const ctx=c.getContext("2d");
+    ctx.fillStyle="#ffffff";
+    ctx.fillRect(0,0,w,h);
+    ctx.drawImage(img,0,0,w,h);
+    return c.toDataURL("image/jpeg",0.88);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+function v637RenderPhotoList(){
+  const box=document.getElementById("entryPhotoList");
+  if(!box)return;
+  if(!v637DraftPhotos.length){
+    box.innerHTML='<div class="small">Noch keine Zusatzbilder gewählt.</div>';
+    return;
+  }
+  box.innerHTML=v637DraftPhotos.map((ph,idx)=>`
+    <div class="v637PhotoItem">
+      <div class="v637PhotoThumbWrap"><img src="${ph.dataUrl}" alt="${esc(ph.name||("Bild "+(idx+1)))}"></div>
+      <div class="v637PhotoMeta"><b>${esc(ph.name||("Bild "+(idx+1)))}</b></div>
+      <input class="v637PhotoCaption" type="text" placeholder="Bildbeschreibung / Bemerkung (optional)" value="${esc(ph.caption||"")}" oninput="v637PhotoCaptionChanged('${ph.id}', this.value)">
+      <div class="v637PhotoTools">
+        <button type="button" class="danger" onclick="v637RemovePhoto('${ph.id}')">Bild entfernen</button>
+      </div>
+    </div>`).join("");
+}
+async function v637EntryPhotoFilesChanged(ev){
+  const files=[...(ev.target.files||[])];
+  if(!files.length)return;
+  const msgBox=document.getElementById("message");
+  try{
+    if(msgBox){msgBox.style.color="#425466";msgBox.textContent="Bilder werden verarbeitet …";}
+    for(const file of files){
+      const dataUrl=await v637ImageFileToData(file);
+      v637DraftPhotos.push({
+        id:"ph_"+(typeof cryptoSafeId==="function"?cryptoSafeId():Math.random().toString(36).slice(2)),
+        name:file.name||`Bild ${v637DraftPhotos.length+1}`,
+        caption:"",
+        dataUrl
+      });
+    }
+    v637RenderPhotoList();
+    if(msgBox){msgBox.style.color="#1f7a4d";msgBox.textContent=`${files.length} Bild(er) hinzugefügt.`;}
+  }catch(err){
+    alert(err?.message||"Bilder konnten nicht verarbeitet werden.");
+  }finally{
+    ev.target.value="";
+  }
+}
+function v637RemovePhoto(id){
+  v637DraftPhotos=v637DraftPhotos.filter(x=>x.id!==id);
+  v637RenderPhotoList();
+}
+function v637PhotoCaptionChanged(id,val){
+  const ph=v637DraftPhotos.find(x=>x.id===id);
+  if(ph)ph.caption=String(val||"");
+}
+function v637LoadPhotosForEntry(id){
+  const e=typeof id==="string"?project?.().entries?.find(x=>x.id===id):id;
+  const anchor=(typeof v612AnchorEntry==="function"?v612AnchorEntry(e):e)||e;
+  v637DraftPhotos=v637PhotosForEntry(anchor);
+  v637RenderPhotoList();
+}
+function v637ClearDraftPhotos(){
+  v637DraftPhotos=[];
+  v637RenderPhotoList();
+}
+function v637PosListHtml(anchor){
+  const items=(typeof v612GroupEntries==="function"?v612GroupEntries(anchor):[anchor]).slice().sort((a,b)=>(a.pos||"").localeCompare(b.pos||"","de",{numeric:true,sensitivity:"base"}));
+  return `<div class="v637PhotoEvidencePosList">${items.map(x=>{
+    const pos=getPos?.(x.pos);
+    return `<div class="v637PhotoEvidencePosLine"><b>${esc(x.pos||"–")}</b> · ${esc(pos?.text||"–")}<br>${num?.(x.qty||0)} ${esc(x.unit||pos?.unit||"")} · ${esc(x.calc||"–")}</div>`;
+  }).join("")}</div>`;
+}
+async function v637PhotoEvidencePagesForSheet(sh){
+  const groups=(typeof v614SheetGroups==="function"?v614SheetGroups(sh):[])
+    .slice().sort((a,b)=>{
+      const ad=Number(entryDisplayId?.(a.entries?.[0])||999999999);
+      const bd=Number(entryDisplayId?.(b.entries?.[0])||999999999);
+      return ad-bd;
+    });
+  const pages=[];
+  for(const group of groups){
+    const anchor=group.entries?.[0];
+    if(!anchor)continue;
+    const photos=v637PhotosForEntry(anchor);
+    if(!photos.length)continue;
+    const chunks=[];
+    for(let i=0;i<photos.length;i+=4)chunks.push(photos.slice(i,i+4));
+    const area=[sh?.topArea,sh?.area].filter(Boolean).join(" – ")||"–";
+    for(let i=0;i<chunks.length;i++){
+      const chunk=chunks[i];
+      const body=`<div class="v637PhotoEvidence">
+        <div class="v637PhotoEvidenceHead">
+          <div>
+            <b>ID ${entryDisplayId?.(anchor)||""} · ${esc(anchor.lineDesc||"–")}</b>
+            <div class="desc">Zusätzliche Bilddokumentation${chunks.length>1?` · Teil ${i+1}/${chunks.length}`:""}</div>
+          </div>
+          <div class="desc">${chunk.length} Bild${chunk.length===1?"":"er"} · Aufmaßblatt ${esc(sh.code||"–")}</div>
+        </div>
+        <div class="v637PhotoEvidenceInfo">
+          <div class="v637PhotoEvidenceInfoGrid">
+            <div><b>Erfassungs-ID</b>${entryDisplayId?.(anchor)||"–"}</div>
+            <div><b>Aufmaßblatt</b>${esc(sh.code||"–")}</div>
+            <div><b>Bereich</b>${esc(area)}</div>
+            <div><b>Status</b>${esc(anchor.reason||"–")}</div>
+            <div><b>Detail</b>${esc(anchor.detail||"–")}</div>
+            <div><b>Anmerkung</b>${esc(anchor.note||"–")}</div>
+          </div>
+          <div><b>LV-Unterposition(en)</b>${v637PosListHtml(anchor)}</div>
+        </div>
+        <div class="v637PhotoEvidenceGrid">${chunk.map((ph,ix)=>`
+          <figure class="v637PhotoEvidenceFigure">
+            <img src="${ph.dataUrl}" alt="${esc(ph.name||`Bild ${ix+1}`)}">
+            <figcaption><b>${esc(ph.name||`Bild ${ix+1}`)}</b>${ph.caption?`<br>${esc(ph.caption)}`:""}</figcaption>
+          </figure>`).join("")}</div>
+      </div>`;
+      pages.push(v519Page(body,`Fotodokumentation · ${esc(sh.code||"–")}`,`ID ${entryDisplayId?.(anchor)||"–"} · ${esc(anchor.lineDesc||"–")}`,'v519EvidencePage'));
+    }
+  }
+  return pages;
+}
+
+const _v637RecentBase=renderRecent;
+renderRecent=function(){
+  _v637RecentBase.apply(this,arguments);
+  try{
+    const body=document.getElementById("recentBody");
+    if(!body)return;
+    [...body.querySelectorAll("tr")].forEach((tr,idx)=>{
+      const all=sortedSheetEntries?.()||[];
+      const groups=[]; const seen=new Set();
+      for(const e of all.slice().reverse()){
+        const key=v612GroupKey?.(e)||e.id;
+        if(seen.has(key))continue;
+        seen.add(key);
+        const g=v612GroupEntries?.(e)||[e];
+        if(g.length)groups.push(g);
+        if(groups.length>=12)break;
+      }
+      const group=groups[idx];
+      const anchor=group?.[0];
+      const cell=tr.children?.[1];
+      if(anchor && cell && !cell.querySelector('.v637PhotoBadge'))cell.insertAdjacentHTML('beforeend',v637PhotoCountBadgeHtml(anchor));
+    });
+  }catch(err){}
+};
+const _v637SheetBase=renderSheet;
+renderSheet=function(){
+  _v637SheetBase.apply(this,arguments);
+  try{
+    const body=document.getElementById('sheetBody');
+    if(!body)return;
+    const rows=[...body.querySelectorAll('tr')];
+    const groups=typeof v614SheetGroups==='function' && activeSheet()?v614SheetGroups(activeSheet()):[];
+    let rowIndex=0;
+    groups.forEach(group=>{
+      const anchor=group.entries?.[0];
+      const badge=v637PhotoCountBadgeHtml(anchor);
+      if(!badge)return;
+      const firstRow=rows[rowIndex];
+      const descCell=firstRow?.children?.[1];
+      if(descCell && !descCell.querySelector('.v637PhotoBadge'))descCell.insertAdjacentHTML('beforeend',badge);
+      rowIndex += (group.entries?.length||1);
+    });
+  }catch(err){}
+};
+
+const _v637EditBase=editEntry;
+editEntry=function(id){
+  const r=_v637EditBase.apply(this,arguments);
+  try{ v637LoadPhotosForEntry(id); }catch(err){ v637ClearDraftPhotos(); }
+  return r;
+};
+const _v637CancelBase=cancelEdit;
+cancelEdit=function(){
+  const r=_v637CancelBase.apply(this,arguments);
+  v637ClearDraftPhotos();
+  return r;
+};
+const _v637ClearBase=clearCurrentEntryDraft;
+clearCurrentEntryDraft=function(){
+  const before=JSON.stringify(v637DraftPhotos);
+  const r=_v637ClearBase.apply(this,arguments);
+  if(!editingEntryId){
+    v637ClearDraftPhotos();
+  }else if(before!==JSON.stringify(v637DraftPhotos)){
+    v637RenderPhotoList();
+  }
+  return r;
+};
+
+const _v637FinalizeBase=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const beforeIds=new Set((project?.()?.entries||[]).map(e=>e.id));
+  const beforeEntryCount=(project?.()?.entries||[]).length;
+  const beforeEditGroup=v612EditingGroupId||"";
+  const draftCopy=v637ClonePhotos(v637DraftPhotos);
+  const result=_v637FinalizeBase.apply(this,arguments);
+  try{
+    const fm=document.getElementById('finalizeMessage');
+    const failed=/konnte nicht gespeichert/i.test(fm?.textContent||"");
+    const afterEntries=project?.()?.entries||[];
+    const changed=afterEntries.length!==beforeEntryCount || [...afterEntries].some(e=>!beforeIds.has(e.id));
+    if(!failed && (changed || beforeEditGroup)){
+      if(beforeEditGroup){
+        v637SetPhotosForKey(beforeEditGroup,draftCopy);
+      }else if(draftCopy.length){
+        const created=afterEntries.find(e=>!beforeIds.has(e.id));
+        if(created){
+          v637SetPhotosForKey(v637MediaKeyForEntry(created),draftCopy);
+        }
+      }
+      v637CleanupPhotoStore();
+      persist?.();
+      v637ClearDraftPhotos();
+      try{renderRecent?.()}catch(err){}
+      try{renderSheet?.()}catch(err){}
+    }
+  }catch(err){ console.warn('V6.39 Foto-Speicher',err); }
+  return result;
+};
+
+const _v637DeleteBase=deleteEntry;
+deleteEntry=function(id){
+  const e=project?.().entries?.find(x=>x.id===id);
+  const key=e?v637MediaKeyForEntry((typeof v612AnchorEntry==='function'?v612AnchorEntry(e):e)||e):"";
+  const beforeCount=(project?.()?.entries||[]).length;
+  const result=_v637DeleteBase.apply(this,arguments);
+  try{
+    const afterCount=(project?.()?.entries||[]).length;
+    if(key && afterCount<beforeCount){
+      const store=v637EnsurePhotoStore();
+      delete store[key];
+      v637CleanupPhotoStore();
+      persist?.();
+      v637ClearDraftPhotos();
+      try{renderRecent?.()}catch(err){}
+      try{renderSheet?.()}catch(err){}
+    }
+  }catch(err){}
+  return result;
+};
+
+const _v637EvidenceBase=v519EvidencePagesForSheet;
+v519EvidencePagesForSheet=async function(sh){
+  const base=await _v637EvidenceBase(sh);
+  const photoPages=await v637PhotoEvidencePagesForSheet(sh);
+  return [...base,...photoPages];
+};
+
+window.addEventListener('load',()=>{
+  try{v637CleanupPhotoStore();persist?.();}catch(err){}
+  setTimeout(()=>{ try{v637RenderPhotoList()}catch(err){} },0);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.39 – FOTO-ZUORDNUNG JE LV-UNTERPOSITION + REIHENFOLGE
+   ============================================================ */
+function v638EntriesForKey(key){
+  const list=project?.()?.entries||[];
+  if(!key)return [];
+  if(String(key).startsWith('single:')){
+    const id=String(key).slice(7);
+    return list.filter(e=>e.id===id);
+  }
+  return list.filter(e=>(e.multiLvGroup||'')===String(key));
+}
+function v638AnchorForCurrentContext(){
+  if(editingEntryId){
+    const e=project?.()?.entries?.find(x=>x.id===editingEntryId);
+    return (typeof v612AnchorEntry==='function'?v612AnchorEntry(e):e)||e||null;
+  }
+  if(v612EditingGroupId){
+    const e=v638EntriesForKey(v612EditingGroupId)?.[0];
+    return (typeof v612AnchorEntry==='function'?v612AnchorEntry(e):e)||e||null;
+  }
+  return null;
+}
+function v638CurrentAssignablePosOptions(){
+  const arr=[];
+  const push=(entry)=>{
+    if(!entry || !entry.pos)return;
+    if(arr.some(x=>x.pos===entry.pos))return;
+    const p=getPos?.(entry.pos);
+    arr.push({pos:entry.pos, text:p?.text||entry.text||''});
+  };
+  const anchor=v638AnchorForCurrentContext();
+  if(anchor){
+    const entries=(typeof v612GroupEntries==='function'?v612GroupEntries(anchor):[anchor]);
+    entries.forEach(push);
+  }else{
+    (multiLvDraft||[]).forEach(push);
+    const cand=typeof v610CurrentLvCandidate==='function'?v610CurrentLvCandidate():null;
+    if(cand?.valid)push(cand);
+  }
+  return arr.sort((a,b)=>(a.pos||'').localeCompare(b.pos||'','de',{numeric:true,sensitivity:'base'}));
+}
+function v638PhotoTargetLabel(targetPos,anchor){
+  if(!targetPos)return 'gesamte Erfassungs-ID';
+  const group=(anchor && typeof v612GroupEntries==='function')?v612GroupEntries(anchor):[];
+  const entry=group.find(x=>x.pos===targetPos) || (project?.()?.entries||[]).find(x=>x.pos===targetPos);
+  const pos=getPos?.(targetPos);
+  return `${targetPos} · ${pos?.text||entry?.text||'LV-Unterposition'}`;
+}
+function v638PhotoOptionsHtml(currentValue){
+  const opts=v638CurrentAssignablePosOptions();
+  const known=opts.some(o=>o.pos===currentValue);
+  const extra=(currentValue && !known)?`<option value="${esc(currentValue)}">${esc(currentValue)} · frühere Zuordnung</option>`:'';
+  return `<option value="">gesamte Erfassungs-ID</option>${opts.map(o=>`<option value="${esc(o.pos)}" ${o.pos===currentValue?'selected':''}>${esc(o.pos)} · ${esc(o.text||'LV-Unterposition')}</option>`).join('')}${extra}`;
+}
+
+v637ClonePhotos=function(arr){
+  return (arr||[]).map((x,idx)=>({
+    id:String(x?.id||('ph_'+(typeof cryptoSafeId==='function'?cryptoSafeId():Math.random().toString(36).slice(2)))) ,
+    name:String(x?.name||('Bild '+(idx+1))),
+    caption:String(x?.caption||''),
+    targetPos:String(x?.targetPos||''),
+    dataUrl:String(x?.dataUrl||'')
+  })).filter(x=>x.dataUrl);
+};
+
+v637SetPhotosForKey=function(key,photos){
+  const clean=v637ClonePhotos(photos);
+  const valid=new Set(v638EntriesForKey(key).map(e=>e.pos).filter(Boolean));
+  clean.forEach(ph=>{ if(ph.targetPos && !valid.has(ph.targetPos)) ph.targetPos=''; });
+  const store=v637EnsurePhotoStore();
+  if(!key)return;
+  if(clean.length)store[key]=clean;
+  else delete store[key];
+};
+
+function v638MovePhoto(id,dir){
+  const idx=v637DraftPhotos.findIndex(x=>x.id===id);
+  if(idx<0)return;
+  const next=idx+dir;
+  if(next<0 || next>=v637DraftPhotos.length)return;
+  const item=v637DraftPhotos[idx];
+  v637DraftPhotos.splice(idx,1);
+  v637DraftPhotos.splice(next,0,item);
+  v637RenderPhotoList();
+}
+function v638PhotoTargetChanged(id,val){
+  const ph=v637DraftPhotos.find(x=>x.id===id);
+  if(ph)ph.targetPos=String(val||'');
+}
+function v638BuildPhotoCaption(ph,idx){
+  return `${esc(ph.name||('Bild '+(idx+1)))}`;
+}
+
+v637RenderPhotoList=function(){
+  const box=document.getElementById('entryPhotoList');
+  if(!box)return;
+  if(!v637DraftPhotos.length){
+    box.innerHTML='<div class="small">Noch keine Zusatzbilder gewählt.</div>';
+    return;
+  }
+  box.innerHTML=v637DraftPhotos.map((ph,idx)=>`
+    <div class="v637PhotoItem">
+      <div class="v638PhotoTop">
+        <div class="v637PhotoMeta">
+          <span class="v638PhotoIndex">${idx+1}</span>
+          <div class="v638PhotoName"><b>${v638BuildPhotoCaption(ph,idx)}</b></div>
+        </div>
+        <div class="v638PhotoMove">
+          <button type="button" class="secondary" ${idx===0?'disabled':''} onclick="v638MovePhoto('${ph.id}',-1)">↑ weiter nach oben</button>
+          <button type="button" class="secondary" ${idx===v637DraftPhotos.length-1?'disabled':''} onclick="v638MovePhoto('${ph.id}',1)">↓ weiter nach unten</button>
+        </div>
+      </div>
+      <div class="v637PhotoThumbWrap"><img src="${ph.dataUrl}" alt="${esc(ph.name||('Bild '+(idx+1)))}"></div>
+      <div class="v638PhotoAssign">
+        <div>
+          <label style="margin-top:0">Zuordnung im Export</label>
+          <select onchange="v638PhotoTargetChanged('${ph.id}', this.value)">${v638PhotoOptionsHtml(ph.targetPos||'')}</select>
+        </div>
+        <div>
+          <label style="margin-top:0">Bildbeschreibung / Bemerkung</label>
+          <input class="v637PhotoCaption" type="text" placeholder="z. B. Situation vor Ort, Detail, Besonderheit" value="${esc(ph.caption||'')}" oninput="v637PhotoCaptionChanged('${ph.id}', this.value)">
+        </div>
+      </div>
+      <div class="v637PhotoTools">
+        <div class="small">Reihenfolge ${idx+1} von ${v637DraftPhotos.length}</div>
+        <button type="button" class="danger" onclick="v637RemovePhoto('${ph.id}')">Bild entfernen</button>
+      </div>
+    </div>`).join('');
+};
+
+const _v638PhotoFilesChanged=v637EntryPhotoFilesChanged;
+v637EntryPhotoFilesChanged=async function(ev){
+  const before=v637DraftPhotos.length;
+  await _v638PhotoFilesChanged(ev);
+  const opts=v638CurrentAssignablePosOptions();
+  const defaultPos=opts.length===1?opts[0].pos:'';
+  for(let i=before;i<v637DraftPhotos.length;i++){
+    if(typeof v637DraftPhotos[i].targetPos!=='string')v637DraftPhotos[i].targetPos=defaultPos;
+  }
+  v637RenderPhotoList();
+};
+
+function v638PhotoCaptionHtml(ph,idx,anchor){
+  const assign=v638PhotoTargetLabel(ph.targetPos||'',anchor);
+  return `<b>${esc(ph.name||('Bild '+(idx+1)))}</b>
+    <div class="line"><span class="lbl">Zuordnung:</span> ${esc(assign)}</div>
+    <div class="line"><span class="lbl">Beschreibung:</span> ${ph.caption?esc(ph.caption):'<span class="muted">keine zusätzliche Bildbeschreibung</span>'}</div>`;
+}
+
+v637PhotoEvidencePagesForSheet=async function(sh){
+  const groups=(typeof v614SheetGroups==='function'?v614SheetGroups(sh):[])
+    .slice().sort((a,b)=>{
+      const ad=Number(entryDisplayId?.(a.entries?.[0])||999999999);
+      const bd=Number(entryDisplayId?.(b.entries?.[0])||999999999);
+      return ad-bd;
+    });
+  const pages=[];
+  for(const group of groups){
+    const anchor=group.entries?.[0];
+    if(!anchor)continue;
+    const photos=v637PhotosForEntry(anchor);
+    if(!photos.length)continue;
+    const chunks=[];
+    for(let i=0;i<photos.length;i+=4)chunks.push(photos.slice(i,i+4));
+    const area=[sh?.topArea,sh?.area].filter(Boolean).join(' – ')||'–';
+    for(let i=0;i<chunks.length;i++){
+      const chunk=chunks[i];
+      const body=`<div class="v637PhotoEvidence">
+        <div class="v637PhotoEvidenceHead">
+          <div>
+            <b>ID ${entryDisplayId?.(anchor)||''} · ${esc(anchor.lineDesc||'–')}</b>
+            <div class="desc">Zusätzliche Bilddokumentation${chunks.length>1?` · Teil ${i+1}/${chunks.length}`:''}</div>
+          </div>
+          <div class="desc">${chunk.length} Bild${chunk.length===1?'':'er'} · Aufmaßblatt ${esc(sh.code||'–')}</div>
+        </div>
+        <div class="v637PhotoEvidenceInfo">
+          <div class="v637PhotoEvidenceInfoGrid">
+            <div><b>Erfassungs-ID</b>${entryDisplayId?.(anchor)||'–'}</div>
+            <div><b>Aufmaßblatt</b>${esc(sh.code||'–')}</div>
+            <div><b>Bereich</b>${esc(area)}</div>
+            <div><b>Status</b>${esc(anchor.reason||'–')}</div>
+            <div><b>Detail</b>${esc(anchor.detail||'–')}</div>
+            <div><b>Anmerkung</b>${esc(anchor.note||'–')}</div>
+          </div>
+          <div><b>LV-Unterposition(en)</b>${v637PosListHtml(anchor)}</div>
+        </div>
+        <div class="v637PhotoEvidenceGrid">${chunk.map((ph,ix)=>`
+          <figure class="v637PhotoEvidenceFigure">
+            <img src="${ph.dataUrl}" alt="${esc(ph.name||`Bild ${ix+1}`)}">
+            <figcaption>${v638PhotoCaptionHtml(ph,ix,anchor)}</figcaption>
+          </figure>`).join('')}</div>
+      </div>`;
+      pages.push(v519Page(body,`Fotodokumentation · ${esc(sh.code||'–')}`,`ID ${entryDisplayId?.(anchor)||'–'} · ${esc(anchor.lineDesc||'–')}`,'v519EvidencePage'));
+    }
+  }
+  return pages;
+};
+
+const _v638LoadPhotos=v637LoadPhotosForEntry;
+v637LoadPhotosForEntry=function(id){
+  _v638LoadPhotos.apply(this,arguments);
+  v637DraftPhotos.forEach(ph=>{ if(typeof ph.targetPos!=='string') ph.targetPos=''; });
+  v637RenderPhotoList();
+};
+
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    try{
+      v637DraftPhotos=v637ClonePhotos(v637DraftPhotos);
+      v637RenderPhotoList();
+    }catch(err){}
+  },0);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.39 – KAMERA + KOMPAKTER FOTOEXPORT + FOTO-RUBRIK
+   ============================================================ */
+
+async function v639CameraPhotoChanged(ev){
+  /* Same processing as selected gallery images, but camera input opens the
+     rear camera directly on supported iPhone/iPad/Android browsers. */
+  return await v637EntryPhotoFilesChanged(ev);
+}
+
+function v639PhotoGroupsForSheet(sh){
+  return (typeof v614SheetGroups==="function"?v614SheetGroups(sh):[])
+    .map(g=>({group:g,anchor:g.entries?.[0]}))
+    .filter(x=>x.anchor && v637PhotosForEntry(x.anchor).length)
+    .sort((a,b)=>{
+      const aid=Number(entryDisplayId(a.anchor))||999999999;
+      const bid=Number(entryDisplayId(b.anchor))||999999999;
+      return aid-bid;
+    });
+}
+
+function v639PhotoAssignmentSummary(anchor,photos){
+  const labels=[];
+  const seen=new Set();
+  for(const ph of photos){
+    const label=v638PhotoTargetLabel(ph.targetPos||"",anchor);
+    if(!seen.has(label)){
+      seen.add(label);
+      labels.push(label);
+    }
+  }
+  return labels.join(" · ");
+}
+
+function v639PhotoIndexPageForSheet(sh){
+  const groups=v639PhotoGroupsForSheet(sh);
+  if(!groups.length)return null;
+
+  const rows=groups.map(({anchor})=>{
+    const photos=v637PhotosForEntry(anchor);
+    return `<tr>
+      <td class="v639PhotoIndexId">${entryDisplayId(anchor)}</td>
+      <td><b>${esc(anchor.lineDesc||"–")}</b>${anchor.detail?`<br><span class="small">${esc(anchor.detail)}</span>`:""}</td>
+      <td>${photos.length}</td>
+      <td>${esc(v639PhotoAssignmentSummary(anchor,photos)||"gesamte Erfassungs-ID")}</td>
+    </tr>`;
+  }).join("");
+
+  const body=`<div class="v639PhotoSectionTitle">Fotodokumentation</div>
+    <div class="v639PhotoSectionSub">
+      Aufmaßblatt ${esc(sh.code||"–")} · ${esc([sh.topArea,sh.area].filter(Boolean).join(" – ")||"–")} ·
+      ${groups.reduce((n,x)=>n+v637PhotosForEntry(x.anchor).length,0)} Bild(er)
+    </div>
+    <table class="v639PhotoIndexTable">
+      <thead><tr><th>ID</th><th>Erfassung / Beschreibung</th><th>Bilder</th><th>Zuordnung</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  return v519Page(
+    body,
+    `Fotodokumentation · ${esc(sh.code||"–")}`,
+    "Übersicht",
+    "v519EvidencePage"
+  );
+}
+
+/* Compact photo layout:
+   6 photos per export page (2 columns × up to 3 rows). */
+v637PhotoEvidencePagesForSheet=async function(sh){
+  const groups=v639PhotoGroupsForSheet(sh);
+  const pages=[];
+
+  for(const {anchor} of groups){
+    const photos=v637PhotosForEntry(anchor);
+    if(!photos.length)continue;
+
+    const chunks=[];
+    for(let i=0;i<photos.length;i+=6)chunks.push(photos.slice(i,i+6));
+
+    const area=[sh?.topArea,sh?.area].filter(Boolean).join(" – ")||"–";
+    const posItems=(typeof v612GroupEntries==="function"?v612GroupEntries(anchor):[anchor]);
+
+    for(let i=0;i<chunks.length;i++){
+      const chunk=chunks[i];
+
+      const body=`<div class="v637PhotoEvidence">
+        <div class="v637PhotoEvidenceHead">
+          <div>
+            <b>ID ${entryDisplayId(anchor)} · ${esc(anchor.lineDesc||"–")}</b>
+            <div class="desc">Fotodokumentation${chunks.length>1?` · Teil ${i+1}/${chunks.length}`:""}</div>
+          </div>
+          <div class="desc">${chunk.length} Bild${chunk.length===1?"":"er"} · Aufmaßblatt ${esc(sh.code||"–")}</div>
+        </div>
+
+        <div class="v639PhotoCompactInfo">
+          <div><b>Erfassungs-ID</b>${entryDisplayId(anchor)}</div>
+          <div><b>Aufmaßblatt</b>${esc(sh.code||"–")}</div>
+          <div><b>Bereich</b>${esc(area)}</div>
+          <div><b>Status</b>${esc(anchor.reason||"–")}</div>
+          <div><b>Detail</b>${esc(anchor.detail||"–")}</div>
+          <div><b>Anmerkung</b>${esc(anchor.note||"–")}</div>
+        </div>
+
+        <div class="v639PhotoEvidenceGrid">${chunk.map((ph,ix)=>{
+          const assigned=ph.targetPos
+            ? posItems.find(x=>x.pos===ph.targetPos)
+            : null;
+          const pos=getPos(ph.targetPos);
+          const assignment=ph.targetPos
+            ? `${ph.targetPos} · ${pos?.text||"LV-Unterposition"}${assigned?` · ${num(assigned.qty)} ${esc(assigned.unit||pos?.unit||"")}`:""}`
+            : "gesamte Erfassungs-ID";
+
+          return `<figure class="v639PhotoEvidenceFigure">
+            <img src="${ph.dataUrl}" alt="${esc(ph.name||`Bild ${ix+1}`)}">
+            <figcaption>
+              <b>Bild ${photos.indexOf(ph)+1} · ${esc(ph.name||`Foto ${photos.indexOf(ph)+1}`)}</b>
+              <div><span class="lbl">Zuordnung:</span>${esc(assignment)}</div>
+              ${ph.caption
+                ? `<div><span class="lbl">Beschreibung:</span>${esc(ph.caption)}</div>`
+                : `<div><span class="lbl">Beschreibung:</span><span style="color:#6b7a84">–</span></div>`}
+            </figcaption>
+          </figure>`;
+        }).join("")}</div>
+      </div>`;
+
+      pages.push(v519Page(
+        body,
+        `Fotodokumentation · ${esc(sh.code||"–")}`,
+        `ID ${entryDisplayId(anchor)} · ${esc(anchor.lineDesc||"–")}`,
+        "v519EvidencePage"
+      ));
+    }
+  }
+  return pages;
+};
+
+/* Export structure:
+   Lageplan pages first, then own Fotodokumentation section + photo pages. */
+const _v639EvidenceBase=v519EvidencePagesForSheet;
+v519EvidencePagesForSheet=async function(sh){
+  const pages=await _v639EvidenceBase(sh);
+
+  /* V6.37/38 wrapper already appended photo pages. Remove those by identifying
+     their Fotodokumentation page title, then rebuild the section in V6.39. */
+  const planPages=(pages||[]).filter(pg=>{
+    const html=String(pg?.html||pg||"");
+    return !/Fotodokumentation/i.test(html);
+  });
+
+  const photoPages=await v637PhotoEvidencePagesForSheet(sh);
+  if(!photoPages.length)return planPages;
+
+  const indexPage=v639PhotoIndexPageForSheet(sh);
+  return [...planPages, ...(indexPage?[indexPage]:[]), ...photoPages];
+};
+
+/* Update assignment selectors whenever LV-underpositions change while editing. */
+const _v639RenderMultiBase=renderMultiLvDraft;
+renderMultiLvDraft=function(){
+  const r=_v639RenderMultiBase.apply(this,arguments);
+  try{v637RenderPhotoList()}catch(err){}
+  return r;
+};
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    try{v637RenderPhotoList()}catch(err){}
+  },0);
+});
 </script>
 
 </body>
