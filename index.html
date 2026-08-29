@@ -5669,6 +5669,155 @@ main > section.view,
   }
 }
 
+
+/* ============================================================
+   V6.92 – SICHTBARES REDESIGN ERFASSUNG
+   ============================================================ */
+#view-entry #entryCard{
+  padding:16px!important;
+  background:#fff!important;
+}
+#view-entry #entryCard > h2{
+  margin-bottom:16px!important;
+}
+.v692SectionTitle{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:16px 0 7px;
+  padding-top:12px;
+  border-top:1px solid #e5ecef;
+}
+.v692SectionTitle:first-of-type{
+  margin-top:0;
+  padding-top:0;
+  border-top:0;
+}
+.v692SectionTitle > span{
+  width:24px;
+  height:24px;
+  flex:0 0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:7px;
+  background:#eaf3f8;
+  color:#2f739b;
+  font-size:11px;
+  font-weight:900;
+}
+.v692SectionTitle > div{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+}
+.v692SectionTitle b{
+  font-size:12.5px;
+  color:#263b47;
+  line-height:1.2;
+}
+.v692SectionTitle small{
+  font-size:10.5px;
+  color:#74838c;
+  line-height:1.2;
+}
+.v692SaveTitle > span{
+  background:#e9f4ed;
+  color:#4f7d60;
+}
+
+/* Unterbereiche deutlich, aber ohne Kachel-in-Kachel-Wirkung */
+#view-entry #entryCard .v682TemplateHint,
+#view-entry #entryCard .calcPreview,
+#view-entry #entryCard .multiLvBox,
+#view-entry #entryCard .v692StatusGrid,
+#view-entry #entryCard .v655QuickSave,
+#view-entry #entryCard .entryPlanBox,
+#view-entry #entryCard .v666NoteSection,
+#view-entry #entryCard .v637PhotoBox{
+  margin-top:0!important;
+}
+#view-entry #entryCard .calcPreview{
+  border:0!important;
+  background:#f7f9fa!important;
+  padding:10px 11px!important;
+}
+#view-entry #entryCard .multiLvBox{
+  border:0!important;
+  background:#f7f9fa!important;
+  padding:10px!important;
+}
+#view-entry #entryCard .v692StatusGrid{
+  border:0!important;
+  background:transparent!important;
+  padding:0!important;
+  gap:8px!important;
+}
+#view-entry #entryCard .v692StatusGrid > div{
+  border:0!important;
+  background:#f7f9fa!important;
+  padding:9px 10px!important;
+}
+#view-entry #entryCard .v655QuickSave{
+  border:0!important;
+  background:#edf6f0!important;
+  padding:10px!important;
+}
+#view-entry #entryCard .entryPlanBox{
+  border:0!important;
+  background:#f1f6f9!important;
+  padding:10px!important;
+}
+#view-entry #entryCard .v666NoteSection{
+  border:0!important;
+  padding:0!important;
+  background:transparent!important;
+}
+#view-entry #entryCard .v637PhotoBox{
+  border:0!important;
+  background:#fbf8f1!important;
+  padding:10px!important;
+}
+
+/* Linke Spalte ebenfalls sichtbar ruhiger */
+#view-entry .v666LvSection{
+  padding:16px!important;
+}
+#view-entry .v666LvSection > h2{
+  margin-bottom:14px!important;
+}
+#view-entry .mobilePosPicker{
+  background:#f7f9fa!important;
+  border:0!important;
+  padding:8px!important;
+}
+#view-entry .mobilePosPickerHead{
+  background:transparent!important;
+}
+#view-entry #posInfo{
+  border:0!important;
+  border-left:4px solid #2f739b!important;
+  background:#edf6fb!important;
+}
+#lineDesc.v688DescField{
+  min-height:120px!important;
+}
+
+/* PC: rechter Bereich bekommt genug Breite */
+@media(min-width:1101px){
+  #view-entry .v666EntryGrid{
+    grid-template-columns:minmax(0,1.18fr) minmax(430px,1fr)!important;
+    gap:16px!important;
+  }
+}
+
+@media(max-width:1100px){
+  .v692SectionTitle{
+    margin-top:14px;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -5811,6 +5960,7 @@ main > section.view,
 
    <div class="card v666Section v666MeasureSection" id="entryCard">
     <h2>2. Menge / Rechenansatz</h2>
+    <div class="v692SectionTitle"><span>1</span><div><b>Menge erfassen</b><small>Rechenansatz oder Vorlage</small></div></div>
     <label>Rechenansatz</label>
     <input id="calc" placeholder="z. B. 2,50 + 1,20 oder 0 für Vorlage" oninput="previewCalc()">
     <div class="v682TemplateHint">
@@ -5821,6 +5971,7 @@ main > section.view,
      <div class="calcResult" id="calcResult">–</div>
      <div class="small" id="calcHint">+, −, ×, ÷ und Klammern sind möglich.</div>
     </div>
+    <div class="v692SectionTitle"><span>2</span><div><b>LV-Unterpositionen</b><small>Positionen derselben Erfassungs-ID</small></div></div>
     <div class="multiLvBox" id="multiLvBox">
      <div class="toolbar" style="justify-content:space-between;align-items:center">
       <div>
@@ -5834,7 +5985,8 @@ main > section.view,
      </div>
     </div>
 
-    <div class="grid2">
+    <div class="v692SectionTitle"><span>3</span><div><b>Status & Zuordnung</b><small>Ausführungsstatus und Detailbereich</small></div></div>
+    <div class="grid2 v692StatusGrid">
      <div>
       <label>Status / Grund</label>
       <select id="reason">
@@ -5867,11 +6019,13 @@ main > section.view,
      </div>
     </div>
 
+    <div class="v692SectionTitle v692SaveTitle"><span>4</span><div><b>Erfassung abschließen</b><small>Aufmaß speichern, Plan/Fotos können später ergänzt werden</small></div></div>
     <div class="v655QuickSave v666SaveSection noPrint">
      <button type="button" class="primary v655QuickSaveBtn" onclick="finalizeCurrentEntry()">Erfassung speichern</button>
      <div class="small">Kein Plan oder Foto erforderlich? Die Erfassung kann hier direkt gespeichert werden. Planmarkierungen und Bilder können später jederzeit ergänzt werden.</div>
     </div>
 
+    <div class="v692SectionTitle"><span>5</span><div><b>Plan zuordnen</b><small>Optionaler Lageplan zur Erfassungs-ID</small></div></div>
     <div class="entryPlanBox v666PlanSection">
      <div class="grid2">
       <div>
@@ -5891,11 +6045,13 @@ main > section.view,
      <div class="small" style="margin-top:6px">Der ausgewählte Plan wird mit der Aufmaßerfassung gespeichert und beim Plan-Nachweis verwendet.</div>
     </div>
 
+    <div class="v692SectionTitle"><span>6</span><div><b>Anmerkung</b><small>Zusätzliche Information zur Position</small></div></div>
     <div class="v666NoteSection">
      <label>Anmerkung zur Position</label>
      <textarea id="note" placeholder="optional"></textarea>
     </div>
 
+    <div class="v692SectionTitle"><span>7</span><div><b>Fotodokumentation</b><small>Optionaler Bildnachweis zur Erfassungs-ID</small></div></div>
     <div class="v637PhotoBox v666PhotoSection">
      <div class="toolbar" style="justify-content:space-between;align-items:flex-start">
       <div>
@@ -23349,7 +23505,7 @@ window.addEventListener("load",()=>{
    V6.72 – ERZWUNGENE VERSIONSAKTUALISIERUNG / CACHE-SYNC
    ============================================================ */
 
-const KOLLAPP_VERSION="6.91";
+const KOLLAPP_VERSION="6.92";
 const KOLLAPP_VERSION_KEY="kollapp_loaded_version";
 const KOLLAPP_RELOAD_KEY="kollapp_update_reload_guard";
 
