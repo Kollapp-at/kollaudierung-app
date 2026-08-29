@@ -1788,6 +1788,54 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   margin-bottom:0.8mm;
 }
 
+
+/* ===== V6.43 MEDIENHINWEISE / OPTISCHE FEINABSTIMMUNG ===== */
+.v642AssetRow{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.v642AssetBadge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid transparent;line-height:1.2}
+.v642AssetBadge.plan{background:#eef6ff;border-color:#cfe0f3;color:#1e4f7a}
+.v642AssetBadge.photo{background:#f2f8f2;border-color:#cfe6cf;color:#27603a}
+.v642AssetBadge.neutral{background:#f4f7f9;border-color:#d9e3e8;color:#4e6575}
+.v642DescMain{font-weight:800;line-height:1.25;overflow-wrap:anywhere;word-break:break-word}
+.v642SheetNote{color:var(--muted);font-size:11px;line-height:1.35;overflow-wrap:anywhere;word-break:break-word}
+.v642SheetNote div+div{margin-top:2px}
+#view-sheet .v641SheetTable td{padding-top:8px;padding-bottom:8px}
+#view-sheet .v641SheetTable td:nth-child(2){min-width:220px}
+#view-sheet .v641SheetTable td:nth-child(4){min-width:260px}
+#view-sheet .v641SheetTable td:nth-child(10){min-width:160px}
+#view-sheet .v641ActionBox button{min-height:34px}
+#recentBody td:nth-child(2) .v642DescMain{margin-bottom:2px}
+#recentBody td:nth-child(2){min-width:240px}
+#recentBody td:nth-child(3),#recentBody td:nth-child(4){overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:900px){
+ .v642AssetBadge{font-size:10px;padding:3px 7px}
+}
+
+
+/* ===== V6.43 DEZENTE KOLLAPP-SIGNATUR IN DER PDF-FUSSZEILE ===== */
+.v643FooterLeft{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:0.7mm;
+  min-width:0;
+}
+.v643AppCredit{
+  display:inline-flex;
+  align-items:center;
+  gap:1.1mm;
+  font-size:4.8pt;
+  line-height:1;
+  color:#6f7c83;
+  opacity:.72;
+  white-space:nowrap;
+}
+.v643AppCredit img{
+  width:3.2mm;
+  height:3.2mm;
+  object-fit:contain;
+  border-radius:.45mm;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -15586,6 +15634,123 @@ async function exportSelectedPhotoDocPDF(){
     : [];
   await printPhotoDocsForSheets(selected);
 }
+</script>
+
+
+<script>
+/* ===== V6.43 BADGES FÜR PLANMARKIERUNGEN UND BILDER ===== */
+(function(){
+  function v642GroupEntries(entry){
+    if(!entry)return [];
+    try{
+      if(typeof v612GroupEntries==='function'){
+        const arr=v612GroupEntries(entry);
+        if(Array.isArray(arr) && arr.length)return arr;
+      }
+    }catch(err){}
+    return [entry];
+  }
+  function v642AnnotationLinksForEntry(entry){
+    const ids=new Set(v642GroupEntries(entry).map(x=>String(x.id||'')).filter(Boolean));
+    const out=[];
+    (plans?.()||[]).forEach(pl=>{
+      (pl.annotations||[]).forEach(a=>{
+        if(a && a.entryId && ids.has(String(a.entryId||''))) out.push({plan:pl,annotation:a});
+      });
+    });
+    return out;
+  }
+  function v642PhotoCount(entry){
+    try{return typeof v637PhotosForEntry==='function' ? (v637PhotosForEntry(entry).length||0) : 0;}catch(err){return 0;}
+  }
+  function v642AssetBadgesHtml(entry){
+    if(!entry)return '';
+    const annCount=v642AnnotationLinksForEntry(entry).length;
+    const photoCount=v642PhotoCount(entry);
+    const parts=[];
+    if(annCount)parts.push(`<span class="v642AssetBadge plan">🗺 ${annCount} Planmarkierung${annCount===1?'':'en'}</span>`);
+    if(photoCount)parts.push(`<span class="v642AssetBadge photo">📷 ${photoCount} Bild${photoCount===1?'':'er'}</span>`);
+    return parts.length?`<div class="v642AssetRow">${parts.join('')}</div>`:'';
+  }
+  window.v642AssetBadgesHtml=v642AssetBadgesHtml;
+
+  const _baseRenderRecent=renderRecent;
+  renderRecent=function(){
+    _baseRenderRecent.apply(this,arguments);
+    try{
+      const body=document.getElementById('recentBody');
+      if(!body)return;
+      const all=typeof sortedSheetEntries==='function' ? (sortedSheetEntries()||[]) : [];
+      const groups=[]; const seen=new Set();
+      for(const e of all.slice().reverse()){
+        const key=(typeof v612GroupKey==='function' ? v612GroupKey(e) : (e.id||''));
+        if(seen.has(key))continue;
+        seen.add(key);
+        const g=v642GroupEntries(e);
+        if(g.length)groups.push(g);
+        if(groups.length>=200)break;
+      }
+      [...body.querySelectorAll('tr')].forEach((tr,idx)=>{
+        const group=groups[idx]; const anchor=group?.[0];
+        const descCell=tr.children?.[1];
+        if(!anchor || !descCell)return;
+        const text=descCell.textContent||'';
+        descCell.innerHTML=`<div class="v642DescMain">${esc(anchor.lineDesc||text.trim()||'')}</div>${v642AssetBadgesHtml(anchor)}`;
+      });
+    }catch(err){}
+  };
+
+  const _baseRenderSheet=renderSheet;
+  renderSheet=function(){
+    _baseRenderSheet.apply(this,arguments);
+    try{
+      const body=document.getElementById('sheetBody');
+      if(!body)return;
+      const table=body.closest('table');
+      if(table)table.classList.add('v641SheetTable');
+      [...body.querySelectorAll('tr')].forEach(tr=>{
+        const tds=tr.children; if(!tds || tds.length<11)return;
+        const idText=(tds[0].textContent||'').trim();
+        const idNum=parseInt(idText,10);
+        let anchor=null;
+        if(Number.isFinite(idNum) && idNum>0){
+          anchor=(project()?.entries||[]).find(e=>Number(e.displayId||0)===idNum) || null;
+        }
+        if(!anchor)return;
+        const descCell=tds[1];
+        const detailText=(tds[7]?.textContent||'').trim();
+        const noteText=(tds[9]?.textContent||'').trim();
+        descCell.innerHTML=`<div class="v642DescMain">${esc(anchor.lineDesc||'')}</div>${v642AssetBadgesHtml(anchor)}`;
+        tds[7].innerHTML = detailText ? `<div class="v642SheetNote">${esc(detailText)}</div>` : '';
+        tds[9].innerHTML = noteText ? `<div class="v642SheetNote">${esc(noteText)}</div>` : '';
+      });
+    }catch(err){}
+  };
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V6.43 – DEZENTE APP-SIGNATUR IN DER PDF-FUSSZEILE
+   ============================================================ */
+const v643AppIconData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAECElEQVR4nO3cQVLbMBiGYdHpvgdg3zUz3XJ8DsAluEcXZiiF/I6cSLKt/3kO0GTsl09JGnj49ftPgUt+7P0EOC5xEBIHIXEQEgchcRASByFxEBIHIXEQEgchcRASByFxEBIHIXEQEgchcRASByFxEBIHIXEQ+rnXA7+9vuz10Gf0+PQ8/kEfBv/eiibuNLKScXHIoqExiYyIQxad9E6k+wtSZfTT+9p2XA5ZDNNpQnothzJG6nS1u8ShjPF6XHMfghFqH4fZ2EvzK984DmXsq+31d6wQahmH2TiChnfBchBqFofZOI5W98JyEBIHoTZxOFOOpskdsRyExEFIHITEQUgchMRBSByD7PKLJ3cSxwhLGafrY7ffeEvidEF8dvo4Vq7+7p/bfn9uj0/Puz+reo6VXqJqT7Qlp1+OAzrR7V9nORqrKeMs9Yijpcq7fpaXHY6VNibLYmE5GpiyjCKO+81aRnGs3GPiLBaW40bTl1Esxw3q34ieuowijq0yDMYHx8oGqcoolqNStiwWluO6nGUUcVyVtoziWFmROYuF5bhMGUUcFylj4Vj5jyw+sxz/KOMLcbxTxneOFVmEsi+HMlakjkMZ65IeK7KokXE5lFEpXRzKqJfoWJHFVlmWQxk3mH858nzls7nJ4zAY95j5WFHGnSZfjnWyWDfzcqxTxlVJ41BGjXTHiizq5VoOZWySKA5lbJXiWJHFbeZfDmXcbP44Hp+ez/LX+45m/jgW+rhBljiKCdkuURwLfdRLF0fRR7WMcRRHTJ2kcSz0sS51HMWErJo5jrfXl8pPwPRx0cxxLOr7kMgX88dRtnyCro/PUsRRNh4xEllkiWNhQjbJFUfxKnWLdHEsHDE1ksZRTEiFvHEsTMiK7HEUExITxzsT8p04/vFG9wtx/McR85k4LnDELMRxmQkp4liXfELEcUXmCRFHlZwTIo5aCd/oimODbF8KEcdmeSZEHLdI8ipVHLeb/ogRx13mnhBxNDDrhIijjSknRBwtTTYh4mhspje64miv8og5/l+yE0cvx7/3V4mjo5UJOUU6p/8jtce/ym+vL19eXhz/OS8sxwj1b3QPRRzjLH2cqBJxDHWiMoo4WCEOQuIgJA5C4iAkDkLiINQmjuP/73M2Te6I5SAkDkLN4nCyHEere2E5CLWMw3gcQcO7YDkINY7DeOyr7fVvvxz62EvzK+9YIdQlDuMxXo9r3ms59DFSp6v98Ov3nx7/7odzfWvydLr+EHZ/zWFC+ul9bbsvxwcT0tCYH7lxcSwkcqeRSzw6jg8q2WSX03m3ODg+H4IREgchcRASByFxEBIHIXEQEgchcRASByFxEBIHIXEQEgchcRASByFxEBIHIXEQEgchcRD6C3cfaqYStFXDAAAAAElFTkSuQmCC';
+
+v519FooterHtml=function(pageNo,totalPages){
+  const ex=v519Settings();
+  const fs=Math.max(6,Math.min(8,Number(ex.metaFontSize||7)));
+  return `<div class="v519PageFooter" style="font-size:${fs}pt">
+    <div class="v643FooterLeft">
+      <div>${ex.showTimestamp?`Stand: ${esc(v519Timestamp())}`:""}</div>
+      <div class="v643AppCredit">
+        <img src="${v643AppIconData}" alt="Kollapp">
+        <span>Kollapp © Mst. Dominic Höfler</span>
+      </div>
+    </div>
+    <div class="center">${esc(ex.footerText||"")}${totalPages?` · Seite ${pageNo}/${totalPages}`:""}</div>
+    <div class="right">${ex.showFileRef?`Dokument: ${esc(v519FileRef())}`:""}</div>
+  </div>`;
+};
 </script>
 
 </body>
