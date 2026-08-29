@@ -3,9 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.51</title>
+<title>Kollaudierung – V6.52</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
  --bg:#f4f6f8; --card:#fff; --text:#17222c; --muted:#66727f; --line:#d7dee5;
@@ -2038,6 +2040,22 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 .v651PdfReadyActions button{flex:1;min-width:130px}
 
+
+/* ===== V6.52 iOS-PDF DOM-RENDERER ===== */
+.v652CaptureHost{
+  position:fixed;
+  left:-20000px;
+  top:0;
+  z-index:-9999;
+  background:#fff;
+  pointer-events:none;
+  overflow:hidden;
+}
+.v652CaptureHost .v519PrintPage{
+  margin:0!important;
+  box-shadow:none!important;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -2065,7 +2083,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.51</h1>
+     <h1>Kollaudierung – V6.52</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -16866,6 +16884,160 @@ v519PrintPrepared=function(areaId,pages,modeClass){
     return v651CreateIosPdf(pages);
   }
   return _v651PrintPreparedBase(areaId,pages,modeClass);
+};
+</script>
+
+
+<script>
+/* ============================================================
+   V6.52 – iOS PDF MIT html2canvas + jsPDF
+   Ersetzt den in Safari gesperrten foreignObject-Renderer.
+   ============================================================ */
+
+function v652WaitForImages(root){
+  const imgs=[...root.querySelectorAll("img")];
+  return Promise.all(imgs.map(img=>{
+    if(img.complete && img.naturalWidth>0)return Promise.resolve();
+    return new Promise(resolve=>{
+      const done=()=>resolve();
+      img.addEventListener("load",done,{once:true});
+      img.addEventListener("error",done,{once:true});
+      setTimeout(done,4000);
+    });
+  }));
+}
+
+function v652MountPage(page,index,total){
+  const landscape=String(page.extraClass||"").includes("v520LandscapePage");
+  const host=document.createElement("div");
+  host.className="v652CaptureHost";
+  host.style.width=(landscape?1123:794)+"px";
+  host.style.height=(landscape?794:1123)+"px";
+
+  const wrapper=document.createElement("div");
+  wrapper.className="v651CaptureRoot";
+  wrapper.style.width="100%";
+  wrapper.style.height="100%";
+  wrapper.innerHTML=v651PageHtml(page,index,total);
+  host.appendChild(wrapper);
+  document.body.appendChild(host);
+
+  const pageEl=wrapper.querySelector(".v519PrintPage");
+  if(pageEl){
+    pageEl.style.width="100%";
+    pageEl.style.height="100%";
+    pageEl.style.margin="0";
+  }
+  return {host,pageEl,landscape};
+}
+
+async function v652RenderCanvas(page,index,total){
+  if(typeof html2canvas!=="function"){
+    throw new Error("PDF-Grafikmodul konnte nicht geladen werden. Bitte Internetverbindung prüfen und die App neu öffnen.");
+  }
+
+  const mounted=v652MountPage(page,index,total);
+  try{
+    await v652WaitForImages(mounted.host);
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+    const canvas=await html2canvas(mounted.pageEl,{
+      backgroundColor:"#ffffff",
+      scale:1.35,
+      useCORS:true,
+      allowTaint:false,
+      logging:false,
+      imageTimeout:5000,
+      removeContainer:true,
+      width:mounted.pageEl.scrollWidth,
+      height:mounted.pageEl.scrollHeight,
+      windowWidth:mounted.pageEl.scrollWidth,
+      windowHeight:mounted.pageEl.scrollHeight
+    });
+
+    return {
+      dataUrl:canvas.toDataURL("image/jpeg",0.9),
+      landscape:mounted.landscape
+    };
+  } finally {
+    mounted.host.remove();
+  }
+}
+
+async function v652BuildPdfBlob(pages){
+  const jsPDFCtor=window.jspdf?.jsPDF;
+  if(!jsPDFCtor){
+    throw new Error("PDF-Modul konnte nicht geladen werden. Bitte Internetverbindung prüfen und die App neu öffnen.");
+  }
+  if(!pages?.length)throw new Error("Keine PDF-Seiten vorhanden.");
+
+  let doc=null;
+
+  for(let i=0;i<pages.length;i++){
+    v651PdfProgress(i+1,pages.length,"PDF-Seiten werden auf dem iPhone aufgebaut …");
+    await new Promise(r=>setTimeout(r,25));
+
+    const rendered=await v652RenderCanvas(pages[i],i,pages.length);
+    const orientation=rendered.landscape?"landscape":"portrait";
+
+    if(!doc){
+      doc=new jsPDFCtor({
+        orientation,
+        unit:"mm",
+        format:"a4",
+        compress:true,
+        putOnlyUsedFonts:true
+      });
+    }else{
+      doc.addPage("a4",orientation);
+    }
+
+    const pw=rendered.landscape?297:210;
+    const ph=rendered.landscape?210:297;
+    doc.addImage(rendered.dataUrl,"JPEG",0,0,pw,ph,undefined,"FAST");
+  }
+
+  return doc.output("blob");
+}
+
+/* Override only the iOS PDF generator from V6.51. */
+v651CreateIosPdf=async function(pages){
+  v651PdfOverlay("PDF wird direkt in Kollapp erstellt …");
+  try{
+    const blob=await v652BuildPdfBlob(pages);
+    v651ShowReady(blob);
+  }catch(err){
+    console.error("V6.52 iOS PDF",err);
+    const txt=document.getElementById("v651PdfText");
+    const sub=document.getElementById("v651PdfSub");
+    const acts=document.getElementById("v651PdfActions");
+    if(txt)txt.textContent="PDF konnte auf diesem Gerät nicht erstellt werden.";
+    if(sub)sub.textContent=err?.message||String(err);
+    if(acts){
+      acts.style.display="flex";
+      acts.innerHTML=`
+        <button class="secondary" onclick="v652FallbackPrint()">Mit Safari drucken</button>
+        <button class="secondary" onclick="v651CloseOverlay()">Schließen</button>`;
+    }
+  }
+};
+
+/* Emergency fallback remains available instead of leaving the user stuck. */
+function v652FallbackPrint(){
+  v651CloseOverlay();
+  try{
+    if(typeof _v651PrintPreparedBase==="function" && window.v652LastPrintArgs){
+      return _v651PrintPreparedBase(...window.v652LastPrintArgs);
+    }
+  }catch(e){}
+  window.print();
+}
+
+/* Remember the original print request for the fallback button. */
+const _v652PrintPrepared=v519PrintPrepared;
+v519PrintPrepared=function(areaId,pages,modeClass){
+  window.v652LastPrintArgs=[areaId,pages,modeClass];
+  return _v652PrintPrepared.apply(this,arguments);
 };
 </script>
 
