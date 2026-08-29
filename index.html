@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.85</title>
+<title>Kollaudierung – V6.86</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -4894,6 +4894,167 @@ main{
   line-height:1.35;
 }
 
+
+/* ============================================================
+   V6.86 – TABLET LV-POSITIONSAUSWAHL / KLARER AUSWAHLZUSTAND
+   ============================================================ */
+
+/* Tablet + phone use the touch-friendly position picker. */
+@media(max-width:1100px){
+  .desktopPosLabel,
+  #posSelect{
+    display:none!important;
+  }
+
+  .mobilePosPicker{
+    display:block!important;
+    margin-top:8px;
+    border:1px solid #d9e3e9;
+    border-radius:11px;
+    background:#f8fafb;
+    padding:8px;
+  }
+
+  .mobilePosPickerHead{
+    position:sticky;
+    top:0;
+    z-index:3;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin:0 0 7px;
+    padding:4px 3px 8px;
+    background:#f8fafb;
+    border-bottom:1px solid #e2e8ec;
+  }
+
+  .mobilePosPickerHead span{
+    min-width:0;
+    font-size:11.5px!important;
+    color:#526570!important;
+    font-weight:750!important;
+    line-height:1.3;
+  }
+
+  .mobilePosPickerHead button{
+    flex:0 0 auto;
+    width:auto!important;
+    min-height:36px!important;
+    padding:6px 9px!important;
+    font-size:11px!important;
+  }
+
+  .mobilePosResults{
+    display:flex!important;
+    flex-direction:column;
+    gap:7px;
+    max-height:360px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+    touch-action:pan-y!important;
+    scroll-behavior:auto!important;
+    padding:1px 2px 3px;
+  }
+
+  .mobilePosResult{
+    position:relative;
+    width:100%;
+    min-height:60px!important;
+    padding:10px 11px!important;
+    border:1px solid #d7e0e5!important;
+    border-radius:9px!important;
+    background:#fff!important;
+    text-align:left!important;
+    color:#22343e!important;
+    display:block!important;
+    box-shadow:none!important;
+  }
+
+  .mobilePosResult:active{
+    background:#edf5f9!important;
+  }
+
+  .mobilePosResult.selected{
+    border:2px solid #2f739b!important;
+    background:#eaf4f9!important;
+    padding:9px 10px!important;
+    box-shadow:0 0 0 2px rgba(47,115,155,.08)!important;
+  }
+
+  .mobilePosResult.selected::after{
+    content:"✓ AUSGEWÄHLT";
+    position:absolute;
+    right:9px;
+    top:9px;
+    padding:3px 6px;
+    border-radius:999px;
+    background:#2f739b;
+    color:#fff;
+    font-size:9px;
+    font-weight:850;
+    letter-spacing:.02em;
+  }
+
+  .mobilePosResult.selected .mprCode{
+    padding-right:92px;
+    color:#1f6389;
+  }
+
+  .mobilePosResult .mprCode{
+    display:block;
+    font-weight:850!important;
+    font-size:13.5px!important;
+    line-height:1.25;
+  }
+
+  .mobilePosResult .mprText{
+    display:block;
+    margin-top:4px;
+    font-size:12px!important;
+    line-height:1.32;
+    color:#455761!important;
+    white-space:normal;
+  }
+
+  .mobilePosResult .mprMeta{
+    display:block;
+    margin-top:5px;
+    font-size:10.5px!important;
+    color:#74838c!important;
+  }
+
+  #posSearch{
+    position:static!important;
+  }
+
+  #posInfo{
+    border-left:3px solid #2f739b!important;
+  }
+}
+
+/* Tablet gets a little more list height than phone. */
+@media(min-width:601px) and (max-width:1100px){
+  .mobilePosResults{
+    max-height:390px!important;
+  }
+  .mobilePosResult{
+    min-height:64px!important;
+  }
+}
+
+/* Phone remains slightly more compact. */
+@media(max-width:600px){
+  .mobilePosResults{
+    max-height:330px!important;
+  }
+  .mobilePosResult{
+    min-height:58px!important;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -4924,7 +5085,7 @@ main{
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V6.85</h1>
+     <h1>Kollaudierung – V6.86</h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -22574,7 +22735,7 @@ window.addEventListener("load",()=>{
    V6.72 – ERZWUNGENE VERSIONSAKTUALISIERUNG / CACHE-SYNC
    ============================================================ */
 
-const KOLLAPP_VERSION="6.85";
+const KOLLAPP_VERSION="6.86";
 const KOLLAPP_VERSION_KEY="kollapp_loaded_version";
 const KOLLAPP_RELOAD_KEY="kollapp_update_reload_guard";
 
@@ -23426,6 +23587,118 @@ window.addEventListener("load",()=>{
       persist?.();
       v671RenderTemplates?.();
     }catch(e){}
+  },120);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.86 – TABLET POSITION PICKER
+   ============================================================ */
+
+/* The card picker is now used on tablets as well as phones. */
+v523IsPhone=function(){
+  return window.matchMedia("(max-width: 1100px)").matches;
+};
+
+function v686IsTablet(){
+  return window.matchMedia("(min-width: 601px) and (max-width: 1100px)").matches;
+}
+
+/* Re-render with a stronger selected state and useful header text. */
+renderMobilePositionResults=function(){
+  const box=document.getElementById("mobilePosResults");
+  const count=document.getElementById("mobilePosResultCount");
+  if(!box||!count)return;
+
+  const list=v523MatchingPositions();
+  const selected=document.getElementById("posSelect")?.value||"";
+  const q=(document.getElementById("posSearch")?.value||"").trim();
+
+  if(selected){
+    const p=getPos(selected);
+    count.innerHTML=`Ausgewählt: <b>${esc(selected)}</b>${p?.text?` · ${esc(p.text)}`:""} · ${list.length} Treffer`;
+  }else{
+    count.textContent=q
+      ? `${list.length} Treffer · Position antippen`
+      : `${positions().length} Positionen · suchen oder scrollen`;
+  }
+
+  if(!list.length){
+    box.innerHTML='<div class="mobilePosEmpty">Keine passende LV-Unterposition gefunden.</div>';
+    return;
+  }
+
+  box.innerHTML=list.map(p=>{
+    const meta=[
+      p.unit ? `EH ${p.unit}` : "",
+      Number.isFinite(Number(p.lv_qty)) ? `LV-Menge ${num(p.lv_qty)}` : ""
+    ].filter(Boolean).join(" · ");
+
+    return `<button type="button"
+      class="mobilePosResult ${p.pos===selected?"selected":""}"
+      data-pos="${esc(p.pos)}"
+      onclick="selectMobilePosition('${String(p.pos).replace(/'/g,"\\'")}')">
+      <span class="mprCode">${esc(p.pos)}</span>
+      <span class="mprText">${esc(p.text)}</span>
+      ${meta?`<span class="mprMeta">${esc(meta)}</span>`:""}
+    </button>`;
+  }).join("");
+};
+
+/* Tablet: keep current search/list open after selecting.
+   Phone: preserve the quicker compact workflow. */
+selectMobilePosition=function(code){
+  const sel=document.getElementById("posSelect");
+  if(!sel)return;
+
+  if(![...sel.options].some(o=>o.value===code)){
+    const p=getPos(code);
+    if(p){
+      const opt=document.createElement("option");
+      opt.value=code;
+      opt.textContent=`${p.pos} · ${p.text}`;
+      sel.appendChild(opt);
+    }
+  }
+
+  sel.value=code;
+
+  if(!v686IsTablet()){
+    const search=document.getElementById("posSearch");
+    if(search)search.value=code;
+  }
+
+  showPosInfo();
+  renderMobilePositionResults();
+
+  /* On tablet keep the selected row in view without jumping the whole page. */
+  if(v686IsTablet()){
+    requestAnimationFrame(()=>{
+      const selectedRow=document.querySelector('.mobilePosResult.selected');
+      selectedRow?.scrollIntoView({behavior:"auto",block:"nearest"});
+    });
+  }else{
+    const box=document.getElementById("mobilePosResults");
+    if(box)box.scrollTop=0;
+    document.getElementById("posInfo")?.scrollIntoView({behavior:"auto",block:"nearest"});
+  }
+};
+
+/* Programmatic selection/editing must immediately refresh the visible cards. */
+const _v686ShowPosInfoBase=showPosInfo;
+showPosInfo=function(){
+  const r=_v686ShowPosInfoBase.apply(this,arguments);
+  if(window.matchMedia("(max-width: 1100px)").matches){
+    try{renderMobilePositionResults()}catch(e){}
+  }
+  return r;
+};
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    try{renderMobilePositionResults()}catch(e){}
   },120);
 });
 </script>
