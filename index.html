@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.48</title>
+<title>Kollaudierung – V6.50</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1906,37 +1906,94 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.48 dezente Kollapp-Kennung im Kopfbereich ===== */
+/* ===== V6.49 Header-Logo + Copyright-Hinweis ===== */
 .headerBrand{
   display:flex;
   flex-direction:column;
   gap:4px;
+  min-width:320px;
 }
-.headerCredit{
+.headerTitleRow{
   display:flex;
   align-items:center;
-  gap:7px;
-  font-size:11px;
-  line-height:1.2;
-  color:rgba(255,255,255,.78);
+  gap:10px;
+  flex-wrap:wrap;
 }
-.headerCredit img{
-  width:16px;
-  height:16px;
-  border-radius:4px;
-  opacity:.9;
+.headerMiniCredit{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10.5px;
+  line-height:1;
+  color:rgba(255,255,255,.78);
+  margin-top:1px;
+}
+.headerMiniCredit img{
+  width:14px;
+  height:14px;
+  border-radius:3px;
+  opacity:.92;
   flex:0 0 auto;
 }
-.headerCredit span{
+.headerMiniCredit span{
   white-space:nowrap;
 }
+@media (max-width: 900px){
+  .headerBrand{min-width:0}
+  .headerTitleRow{align-items:flex-start}
+}
 @media (max-width: 700px){
-  .headerCredit{
-    font-size:10px;
+  .headerMiniCredit{
+    font-size:9.5px;
   }
-  .headerCredit img{
-    width:14px;
-    height:14px;
+  .headerMiniCredit img{
+    width:12px;
+    height:12px;
+  }
+}
+
+
+/* ===== V6.50 LOGO DIREKT VOR DER APP-ÜBERSCHRIFT ===== */
+.headerTitleRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.headerAppLogo{
+  width:28px;
+  height:28px;
+  border-radius:6px;
+  object-fit:contain;
+  flex:0 0 auto;
+}
+.headerTitleText{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  flex-wrap:wrap;
+  min-width:0;
+}
+.headerMiniCredit{
+  margin-top:0!important;
+  font-size:10px!important;
+  opacity:.76;
+}
+.headerMiniCredit img{
+  display:none!important;
+}
+@media(max-width:700px){
+  .headerAppLogo{
+    width:24px;
+    height:24px;
+  }
+  .headerTitleText{
+    gap:6px;
+  }
+  .headerMiniCredit{
+    width:100%;
+    margin-left:32px!important;
+    font-size:9px!important;
   }
 }
 
@@ -1963,8 +2020,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 <header>
  <div class="headerRow">
-  <div>
-   <h1>Kollaudierung – V6.48</h1>
+  <div class="headerBrand">
+   <div class="headerTitleRow">
+    <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
+    <div class="headerTitleText">
+     <h1>Kollaudierung – V6.50</h1>
+     <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
+    </div>
+   </div>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
