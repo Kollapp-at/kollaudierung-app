@@ -1,9 +1,10 @@
-const CACHE = "kollaudierung-v6.92-shell-1";
-const RUNTIME = "kollaudierung-v6.92-runtime-1";
+const CACHE = "kollaudierung-v6.94-shell-1";
+const RUNTIME = "kollaudierung-v6.94-runtime-1";
 
 const SHELL = [
   "./",
   "./index.html",
+  "./version.json",
   "./manifest.webmanifest",
   "./icon-180.png",
   "./icon-192.png",
@@ -48,14 +49,17 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  /* App shell: cache-first. */
+  /* App shell: network-first so GitHub updates become visible immediately.
+     Offline fallback remains available from the cache. */
   if(url.origin === self.location.origin){
     event.respondWith(
-      caches.match(req).then(hit => hit || fetch(req).then(res => {
-        const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put(req,copy)).catch(()=>{});
-        return res;
-      }))
+      fetch(new Request(req,{cache:"no-store"}))
+        .then(res => {
+          const copy=res.clone();
+          caches.open(CACHE).then(c=>c.put(req,copy)).catch(()=>{});
+          return res;
+        })
+        .catch(()=>caches.match(req))
     );
     return;
   }

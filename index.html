@@ -5818,6 +5818,28 @@ main > section.view,
   }
 }
 
+
+/* ============================================================
+   V6.93 – UPDATE-SICHERHEIT
+   ============================================================ */
+.v693UpdateBtn{
+  border-color:#cddbe3!important;
+}
+.v693BuildStamp{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-left:6px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.82);
+  font-size:9.5px;
+  font-weight:700;
+  vertical-align:middle;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -14773,7 +14795,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js",{scope:"./"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=6.94",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -23502,137 +23524,6 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.72 – ERZWUNGENE VERSIONSAKTUALISIERUNG / CACHE-SYNC
-   ============================================================ */
-
-const KOLLAPP_VERSION="6.92";
-const KOLLAPP_VERSION_KEY="kollapp_loaded_version";
-const KOLLAPP_RELOAD_KEY="kollapp_update_reload_guard";
-
-function v672CurrentVersion(){
-  return KOLLAPP_VERSION;
-}
-
-function v672SetVersionStamp(){
-  try{
-    localStorage.setItem(KOLLAPP_VERSION_KEY,KOLLAPP_VERSION);
-  }catch(e){}
-}
-
-async function v672ClearOldCaches(){
-  if(!("caches" in window))return;
-  try{
-    const keys=await caches.keys();
-    const keep=[
-      `kollaudierung-v${KOLLAPP_VERSION}-shell-1`,
-      `kollaudierung-v${KOLLAPP_VERSION}-runtime-1`
-    ];
-    await Promise.all(
-      keys.filter(k=>!keep.includes(k)).map(k=>caches.delete(k))
-    );
-  }catch(e){
-    console.warn("V6.72 Cache löschen",e);
-  }
-}
-
-async function v672ForceServiceWorkerUpdate(){
-  if(!("serviceWorker" in navigator))return false;
-
-  try{
-    const regs=await navigator.serviceWorker.getRegistrations();
-    let changed=false;
-
-    for(const reg of regs){
-      try{
-        await reg.update();
-
-        if(reg.waiting){
-          reg.waiting.postMessage({type:"SKIP_WAITING"});
-          changed=true;
-        }
-
-        if(reg.installing){
-          await new Promise(resolve=>{
-            const sw=reg.installing;
-            const done=()=>{
-              if(sw.state==="installed" || sw.state==="activated" || sw.state==="redundant"){
-                resolve();
-              }
-            };
-            sw.addEventListener("statechange",done);
-            setTimeout(resolve,2500);
-          });
-
-          if(reg.waiting){
-            reg.waiting.postMessage({type:"SKIP_WAITING"});
-            changed=true;
-          }
-        }
-      }catch(e){}
-    }
-
-    return changed;
-  }catch(e){
-    console.warn("V6.72 SW Update",e);
-    return false;
-  }
-}
-
-async function v672CheckVersionAndReload(){
-  let previous="";
-  try{
-    previous=localStorage.getItem(KOLLAPP_VERSION_KEY)||"";
-  }catch(e){}
-
-  const firstTimeForThisVersion=previous!==KOLLAPP_VERSION;
-
-  await v672ClearOldCaches();
-  const swChanged=await v672ForceServiceWorkerUpdate();
-
-  v672SetVersionStamp();
-
-  /* Reload once when:
-     - app version changed OR
-     - a waiting service worker was activated.
-     Guard prevents reload loops. */
-  if(firstTimeForThisVersion || swChanged){
-    let guard="";
-    try{guard=sessionStorage.getItem(KOLLAPP_RELOAD_KEY)||""}catch(e){}
-
-    if(guard!==KOLLAPP_VERSION){
-      try{sessionStorage.setItem(KOLLAPP_RELOAD_KEY,KOLLAPP_VERSION)}catch(e){}
-      setTimeout(()=>{
-        const url=new URL(location.href);
-        url.searchParams.set("_v",KOLLAPP_VERSION);
-        location.replace(url.toString());
-      },120);
-      return;
-    }
-  }
-
-  try{sessionStorage.removeItem(KOLLAPP_RELOAD_KEY)}catch(e){}
-}
-
-/* If a new SW takes control, refresh exactly once. */
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.addEventListener("controllerchange",()=>{
-    let guard="";
-    try{guard=sessionStorage.getItem("kollapp_controller_reload")||""}catch(e){}
-    if(guard===KOLLAPP_VERSION)return;
-
-    try{sessionStorage.setItem("kollapp_controller_reload",KOLLAPP_VERSION)}catch(e){}
-    location.reload();
-  });
-}
-
-window.addEventListener("load",()=>{
-  setTimeout(v672CheckVersionAndReload,350);
-});
-</script>
-
-
-<script>
-/* ============================================================
    V6.73 – FINALE DIREKTE REITERSTEUERUNG
    Keine historischen showView-Wrapper mehr im Ausfuehrungspfad.
    ============================================================ */
@@ -24677,6 +24568,80 @@ function scrollToEntryTop(){
   const y=Math.max(0,Math.round(tabs.getBoundingClientRect().top+window.scrollY-headerHeight-8));
   window.scrollTo(0,y);
 }
+</script>
+
+
+
+<script>
+/* ============================================================
+   V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
+   ============================================================ */
+const KOLLAPP_VERSION="6.94";
+let v694UpdateInProgress=false;
+
+async function v694CheckForUpdate(){
+  if(v694UpdateInProgress || !navigator.onLine)return;
+
+  try{
+    const url=new URL("./version.json",location.href);
+    url.searchParams.set("_",Date.now().toString());
+
+    const res=await fetch(url.toString(),{
+      cache:"no-store",
+      headers:{"Cache-Control":"no-cache"}
+    });
+    if(!res.ok)return;
+
+    const data=await res.json();
+    const remote=String(data?.version||"").trim();
+    if(!remote || remote===KOLLAPP_VERSION)return;
+
+    v694UpdateInProgress=true;
+
+    /* Update only app assets. localStorage / IndexedDB are intentionally untouched. */
+    try{
+      if("serviceWorker" in navigator){
+        const regs=await navigator.serviceWorker.getRegistrations();
+        for(const reg of regs){
+          try{await reg.update()}catch(e){}
+          if(reg.waiting){
+            try{reg.waiting.postMessage({type:"SKIP_WAITING"})}catch(e){}
+          }
+        }
+      }
+    }catch(e){}
+
+    try{
+      if("caches" in window){
+        const keys=await caches.keys();
+        await Promise.all(
+          keys.filter(k=>String(k).startsWith("kollaudierung-"))
+              .map(k=>caches.delete(k))
+        );
+      }
+    }catch(e){}
+
+    const fresh=new URL("./index.html",location.href);
+    fresh.searchParams.set("_v",remote);
+    fresh.searchParams.set("_fresh",Date.now().toString());
+    location.replace(fresh.toString());
+  }catch(e){
+    /* Offline / GitHub temporarily unavailable: simply keep working. */
+  }
+}
+
+/* Check after opening, and whenever the user comes back to the app. */
+window.addEventListener("load",()=>{
+  setTimeout(v694CheckForUpdate,1200);
+});
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible"){
+    setTimeout(v694CheckForUpdate,250);
+  }
+});
+window.addEventListener("focus",()=>{
+  setTimeout(v694CheckForUpdate,250);
+});
 </script>
 
 </body>
