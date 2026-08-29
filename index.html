@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.28</title>
+<title>Kollaudierung – V6.29</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.28 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.29 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.28 alter Testhinweis entfernt ===== */
+/* ===== V6.29 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.28 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.29 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1163,7 +1163,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.28 HINWEISE / TEXTE ===== */
+/* ===== V6.29 HINWEISE / TEXTE ===== */
 #autoPlanLinkSummary{line-height:1.25}
 #autoPlanLinkMeta{line-height:1.35}
 #draftEntrySummary .fsCell .smallHint{
@@ -1174,13 +1174,13 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.28 EINHEITLICHE BEGRIFFE ===== */
+/* ===== V6.29 EINHEITLICHE BEGRIFFE ===== */
 .terminologyHint{
   line-height:1.4;
 }
 
 
-/* ===== V6.28 LETZTE ERFASSUNGEN ===== */
+/* ===== V6.29 LETZTE ERFASSUNGEN ===== */
 .v620RecentTable{
  table-layout:fixed!important;
  width:100%!important;
@@ -1288,7 +1288,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.28 ID-AUSWAHL IM AUFMASSBLATT ===== */
+/* ===== V6.29 ID-AUSWAHL IM AUFMASSBLATT ===== */
 .v621SheetIdToolbar{
  display:flex;
  align-items:flex-end;
@@ -1316,7 +1316,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.28 LV-ÜBERSICHT / NEUE POSITION ===== */
+/* ===== V6.29 LV-ÜBERSICHT / NEUE POSITION ===== */
 .v623AddLvCard{
  margin-bottom:12px;
  border:1px solid #b9cfda;
@@ -1343,7 +1343,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.28 MANUELLE LV-STAMMDATEN NUR IM MASTER ===== */
+/* ===== V6.29 MANUELLE LV-STAMMDATEN NUR IM MASTER ===== */
 .v627LvActions{
  display:flex;
  gap:6px;
@@ -1373,7 +1373,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.28version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.29version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1389,7 +1389,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.28</h1>
+   <h1>Kollaudierung – V6.29</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -1811,7 +1811,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div class="toolbar v623AddLvToolbar">
     <div>
      <h2 style="margin:0">LV-Unterposition hinzufügen</h2>
-     <div class="small" style="margin-top:4px">Neue manuelle Position, Regieposition, Nachtragsposition oder Sonderposition direkt zur LV-Übersicht hinzufügen.<div class="v627MasterOnlyNote">LV-Stammdaten können ausschließlich im Masterprojekt angelegt, bearbeitet oder gelöscht werden.</div></div>
+     <div class="small" style="margin-top:4px">Neue manuelle Position, Regieposition, Nachtragsposition oder Sonderposition direkt zur LV-Übersicht hinzufügen.<div class="v627MasterOnlyNote">Master dürfen diese Stammdaten immer verwalten. Monteure nur, wenn im Benutzerprofil „Regie-/manuelle LV-Unterpositionen verwalten“ freigegeben ist.</div></div>
     </div>
     <button class="primary v623AddLvBtn" type="button" onclick="v623OpenNewLvPosition()">+ Neue LV-Unterposition</button>
    </div>
@@ -8840,7 +8840,7 @@ try{renderMobilePositionResults()}catch(e){}
    <h3>Berechtigungen</h3>
    <div class="permissionGrid">
     <label class="permissionCheck"><input id="ueSeePrices" type="checkbox"> Preise sehen</label>
-    <label class="permissionCheck"><input id="ueManualPos" type="checkbox"> LV-Unterposition / Regiepositionen anlegen</label>
+    <label class="permissionCheck"><input id="ueManualPos" type="checkbox"> Regie-/manuelle LV-Unterpositionen verwalten</label>
     <label class="permissionCheck"><input id="ueBilling" type="checkbox"> Abrechnung sehen / exportieren</label>
     <label class="permissionCheck"><input id="ueProjectEdit" type="checkbox"> Projektdaten verändern</label>
    </div>
@@ -10093,7 +10093,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.28 MULTI-LV ================= */
+/* ================= V6.29 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10292,7 +10292,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.28 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.29 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10872,13 +10872,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.28 Gruppenmigration",e)}
+}catch(e){console.warn("V6.29 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.28 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.29 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -10984,7 +10984,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.28 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.29 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -11031,13 +11031,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.28 Migration",e)}
+}catch(e){console.warn("V6.29 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.28 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.29 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -11273,13 +11273,13 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.28 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.29 Gruppendarstellung",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.28 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   V6.29 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
    ============================================================ */
 
 function v615OrderedEntryGroups(){
@@ -11401,7 +11401,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.28 ID-Kompaktierung",e)}
+  }catch(e){console.warn("V6.29 ID-Kompaktierung",e)}
   return r;
 };
 
@@ -11455,13 +11455,13 @@ try{
   renderDraftEntrySummary?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.28 Startmigration",e)}
+}catch(e){console.warn("V6.29 Startmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.28 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
+   V6.29 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
    ============================================================ */
 
 function v616DraftLvItems(){
@@ -11627,7 +11627,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.28 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
+   V6.29 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
    ============================================================ */
 
 function v618GroupForId(id){
@@ -11787,7 +11787,7 @@ finalizeCurrentEntry=function(){
     }
     return result;
   }catch(err){
-    console.error("V6.28 Erfassung speichern",err);
+    console.error("V6.29 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -11812,7 +11812,7 @@ editEntry=function(id){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.28 Erfassung bearbeiten",err);
+    console.error("V6.29 Erfassung bearbeiten",err);
     alert("Erfassung konnte nicht zum Bearbeiten geöffnet werden: "+(err?.message||err));
   }
 };
@@ -11904,13 +11904,13 @@ try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.28 Datenkonsistenz",e)}
+}catch(e){console.warn("V6.29 Datenkonsistenz",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.28 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
+   V6.29 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
    ============================================================ */
 
 let v619IdMaintenanceRunning=false;
@@ -12221,7 +12221,7 @@ finalizeCurrentEntry=function(){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.28 Erfassung speichern",err);
+    console.error("V6.29 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -12231,18 +12231,18 @@ finalizeCurrentEntry=function(){
   }
 };
 
-/* Repair current project once after loading V6.28. */
+/* Repair current project once after loading V6.29. */
 try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.28 ID-Reparatur",e)}
+}catch(e){console.warn("V6.29 ID-Reparatur",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.28 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
+   V6.29 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
    ============================================================ */
 
 function v620RecentLvHtml(group){
@@ -12340,7 +12340,7 @@ try{renderRecent?.()}catch(e){}
 
 <script>
 /* ============================================================
-   V6.28 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
+   V6.29 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
    ============================================================ */
 
 function v621CurrentSheetViewIds(){
@@ -12473,7 +12473,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.28 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
+   V6.29 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
    ============================================================ */
 
 function v622PrepareCurrentDataForExport(){
@@ -12532,7 +12532,7 @@ printSheetsV52=async function(selected){
     if(progress)progress.classList.remove("show");
     v519PrintPrepared("sheetMultiPrintArea",pages,"sheetMultiPrintMode");
   }catch(err){
-    console.error("V6.28 PDF Export",err);
+    console.error("V6.29 PDF Export",err);
     const progress=document.getElementById("sheetExportProgress");
     if(progress)progress.classList.remove("show");
     alert("Export nicht möglich: "+(err?.message||err));
@@ -12681,7 +12681,7 @@ v519BuildSheetPages=async function(sh,includeBilling){
 
 <script>
 /* ============================================================
-   V6.28 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
+   V6.29 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
    ============================================================ */
 
 function v623OpenNewLvPosition(){
@@ -12711,7 +12711,7 @@ showView=function(name){
 
 <script>
 /* ============================================================
-   V6.28 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
+   V6.29 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
    ============================================================ */
 
 /* A missing position can never have a target/LV quantity. */
@@ -12752,7 +12752,7 @@ renderSheet=function(){
   try{
     return _v625RenderSheetBase();
   }catch(err){
-    console.warn("V6.28 renderSheet fallback",err);
+    console.warn("V6.29 renderSheet fallback",err);
 
     const sh=activeSheet();
     const body=document.getElementById("sheetBody");
@@ -12842,7 +12842,7 @@ finalizeCurrentEntry=function(){
   try{
     return _v625FinalizeBase();
   }catch(err){
-    console.error("V6.28 finalize fallback",err);
+    console.error("V6.29 finalize fallback",err);
 
     const after=JSON.stringify((project()?.entries||[]).map(e=>[e.id,e.syncRevision,e.updated,e.qty,e.calc,e.pos,e.lineDesc]));
     const fm=document.getElementById("finalizeMessage");
@@ -12879,7 +12879,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.28 – MASTER-IDs KONSISTENT NEU AUFBAUEN
+   V6.29 – MASTER-IDs KONSISTENT NEU AUFBAUEN
    ============================================================ */
 let v626RebuildRunning=false;
 
@@ -13084,7 +13084,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.28 – MANUELLE LV-UNTERPOSITIONEN:
+   V6.29 – MANUELLE LV-UNTERPOSITIONEN:
    MASTER VERWALTET, MONTEUR VERWENDET
    ============================================================ */
 
@@ -13228,6 +13228,163 @@ const _v627CreateWorkerBase=typeof createWorkerPackage==="function"?createWorker
 
 /* Immediate refresh */
 try{v627ApplyManualMasterUi();renderLV();}catch(e){}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.29 – BERECHTIGUNG "REGIEPOSITIONEN" STEUERT
+   ANLEGEN + BEARBEITEN + LÖSCHEN
+   ============================================================ */
+
+/* In this narrow V6.27 UI context, "master" means:
+   master OR a worker explicitly allowed to manage manual positions. */
+v627IsMaster=function(){
+  const access=typeof currentAccess==="function" ? currentAccess() : {mode:"master"};
+  return access?.mode==="master" || !!access?.permissions?.manualPositions;
+};
+
+v627CanManageManualPositions=function(){
+  const access=typeof currentAccess==="function" ? currentAccess() : {mode:"master"};
+  return access?.mode==="master" || !!access?.permissions?.manualPositions;
+};
+
+/* Bypass the V6.27 master-only wrapper, but retain the older permission guard
+   and the real manual-position implementation. */
+openManualPosition=function(code=null){
+  if(!v627CanManageManualPositions()){
+    alert("Dieses Benutzerprofil darf keine Regie-/manuellen LV-Unterpositionen verwalten.");
+    return;
+  }
+  return _v627OpenManualBase(code);
+};
+
+saveManualPosition=function(){
+  if(!v627CanManageManualPositions()){
+    alert("Dieses Benutzerprofil darf keine Regie-/manuellen LV-Unterpositionen speichern.");
+    return;
+  }
+
+  const result=_v627SaveManualBase();
+
+  try{
+    showView("lv");
+    renderLV();
+    filterPositions?.();
+  }catch(e){}
+  return result;
+};
+
+deleteManualPosition=function(code){
+  if(!v627CanManageManualPositions()){
+    alert("Dieses Benutzerprofil darf keine Regie-/manuellen LV-Unterpositionen löschen.");
+    return;
+  }
+  const result=_v627DeleteManualBase(code);
+  try{
+    renderLV();
+    filterPositions?.();
+  }catch(e){}
+  return result;
+};
+
+/* Show create/edit/delete UI according to the permission. */
+v627ApplyManualMasterUi=function(){
+  const allowed=v627CanManageManualPositions();
+
+  const addCard=document.querySelector(".v623AddLvCard");
+  if(addCard)addCard.style.display=allowed?"":"none";
+
+  [...document.querySelectorAll("button")].forEach(btn=>{
+    const t=(btn.textContent||"").trim();
+    if(t.includes("Neue LV-Unterposition") || t.includes("Regieposition")){
+      if(btn.closest("#view-lv")){
+        btn.style.display=allowed?"":"none";
+      }
+    }
+  });
+};
+
+/* Final LV overview: actions on MANUAL positions are available when permitted.
+   Imported LV positions remain read-only for workers. */
+renderLV=function(){
+ const q=(document.getElementById("lvFilter")?.value||"").trim().toLowerCase();
+ const mode=document.getElementById("lvMode")?.value||"all";
+
+ let list=positions().map(p=>{
+   const done=projectTotal(p.pos);
+   const target=hasTargetQty(p);
+   const rest=target?Number(p.lv_qty)-done:null;
+   const pc=target&&Number(p.lv_qty)?done/Number(p.lv_qty)*100:null;
+   return{...p,done,rest,pc,target};
+ }).filter(p=>!q||String(p.pos||"").toLowerCase().includes(q)||String(p.text||"").toLowerCase().includes(q))
+ .filter(p=>mode==="all"||(mode==="used"&&p.done!==0)||(mode==="open"&&p.target&&Math.abs(p.rest)>1e-9)||(mode==="over"&&p.target&&p.rest<0));
+
+ const b=document.getElementById("lvBody");
+ if(!b)return;
+
+ if(!list.length){
+   b.innerHTML='<tr><td colspan="14" class="empty">Keine Positionen für diesen Filter.</td></tr>';
+   v627ApplyManualMasterUi();
+   return;
+ }
+
+ const allowed=v627CanManageManualPositions();
+
+ b.innerHTML=list.map(p=>{
+   const cls=!p.target?"manual":p.rest<0?"bad":Math.abs(p.rest)<1e-9?"ok":"warn";
+   const bar=p.pc===null?0:Math.max(0,Math.min(100,p.pc));
+   const posLabel=p.manual
+     ? `<span class="badge manual">${esc(p.manualType||"manuell")}</span><br><b>${esc(p.pos)}</b>`
+     : `<b>${esc(p.pos)}</b>`;
+
+   let actions='<span class="small">–</span>';
+
+   if(p.manual && allowed){
+     actions=`<div class="v627LvActions">
+       <button class="secondary" onclick="openManualPosition('${esc(p.pos)}')">Bearbeiten</button>
+       <button class="danger" onclick="deleteManualPosition('${esc(p.pos)}')">Löschen</button>
+     </div>`;
+   }else if(p.manual && currentAccess?.().mode==="worker"){
+     actions='<span class="small">keine Berechtigung</span>';
+   }
+
+   return `<tr>
+    <td>${esc(p.lg||"")}</td>
+    <td>${posLabel}</td>
+    <td class="wide">${esc(p.text||"")}</td>
+    <td>${p.target?num(p.lv_qty):"–"}</td>
+    <td>${esc(p.unit||"")}</td>
+    <td><b>${num(p.done)}</b></td>
+    <td>${p.target?`<span class="badge ${cls}">${num(p.rest)}</span>`:"–"}</td>
+    <td>${p.pc===null?"–":pct(p.pc)}</td>
+    <td>${p.pc===null?'<span class="small">Regie</span>':`<div class="progress"><div style="width:${bar}%"></div></div>`}</td>
+    <td>${safeEuro(p.ep)}</td>
+    <td>${can("seePrices")?euro(p.done*Number(p.ep||0)):"–"}</td>
+    <td>${safeEuro(p.labor)}</td>
+    <td>${safeEuro(p.material)}</td>
+    <td class="noPrint">${actions}</td>
+   </tr>`;
+ }).join("");
+
+ v627ApplyManualMasterUi();
+};
+
+/* Permission text should describe the real ability. */
+permissionText=function(p){
+ const x=[];
+ if(p?.seePrices)x.push("Preise");
+ if(p?.manualPositions)x.push("Regiepositionen verwalten");
+ if(p?.billing)x.push("Abrechnung");
+ if(p?.projectEdit)x.push("Projektdaten ändern");
+ return x.length?x.join(" · "):"Nur Aufmaß erfassen";
+};
+
+/* Refresh after loading a worker package / switching user mode. */
+try{
+  v627ApplyManualMasterUi();
+  renderLV();
+}catch(e){}
 </script>
 
 </body>
