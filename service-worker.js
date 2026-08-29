@@ -1,5 +1,5 @@
-const CACHE = "kollaudierung-v6.94-shell-1";
-const RUNTIME = "kollaudierung-v6.94-runtime-1";
+const CACHE = "kollaudierung-v6.95-shell-1";
+const RUNTIME = "kollaudierung-v6.95-runtime-1";
 
 const SHELL = [
   "./",
