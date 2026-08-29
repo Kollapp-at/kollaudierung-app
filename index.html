@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.95</title>
+<title>Kollaudierung – V6.96</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -5840,6 +5840,69 @@ main > section.view,
   vertical-align:middle;
 }
 
+
+/* ============================================================
+   V6.96 – STABILE LV-POSITIONSAUSWAHL
+   ============================================================ */
+
+/* Auswahl darf die Kartengröße nicht mehr verändern. */
+#view-entry .mobilePosResult,
+#view-entry .mobilePosResult.selected{
+  box-sizing:border-box!important;
+  border:1px solid #dbe4e9!important;
+  padding:8px 10px!important;
+  transform:none!important;
+}
+#view-entry .mobilePosResult.selected{
+  border-color:#4c8db2!important;
+  background:#edf6fb!important;
+  box-shadow:inset 4px 0 0 #2f739b, 0 0 0 1px rgba(47,115,155,.08)!important;
+}
+
+/* Rechts ist IMMER Platz reserviert. Dadurch springt Text beim Auswählen nicht. */
+#view-entry .mobilePosResult .mprCode,
+#view-entry .mobilePosResult .mprText,
+#view-entry .mobilePosResult .mprMeta{
+  padding-right:98px!important;
+  overflow-wrap:anywhere!important;
+}
+#view-entry .mobilePosResult.selected::after{
+  right:8px!important;
+  top:8px!important;
+  white-space:nowrap;
+}
+
+/* Liste hat eine stabile Größe; Scrollbar verändert die Breite nicht. */
+#view-entry .mobilePosResults{
+  scrollbar-gutter:stable!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  contain:layout paint;
+}
+@media(min-width:1101px){
+  #view-entry .mobilePosResults{
+    height:340px!important;
+    max-height:340px!important;
+  }
+}
+@media(min-width:601px) and (max-width:1100px){
+  #view-entry .mobilePosResults{
+    height:390px!important;
+    max-height:390px!important;
+  }
+}
+@media(max-width:600px){
+  #view-entry .mobilePosResults{
+    height:330px!important;
+    max-height:330px!important;
+  }
+}
+
+/* Auch Buttons selbst dürfen beim Tippen nicht versetzt werden. */
+#view-entry .mobilePosResult:active{
+  transform:none!important;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -5870,7 +5933,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V6.95 <span class="v693BuildStamp">Build 6.95</span></h1>
+     <h1>Kollaudierung – V6.96 <span class="v693BuildStamp">Build 6.96</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -14795,7 +14858,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=6.95",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=6.96",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -24576,7 +24639,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="6.95";
+const KOLLAPP_VERSION="6.96";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -24641,6 +24704,210 @@ document.addEventListener("visibilitychange",()=>{
 });
 window.addEventListener("focus",()=>{
   setTimeout(v694CheckForUpdate,250);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.96 – EINE FINALE POSITIONSLOGIK
+   Keine Wrapper-Kette, kein mehrfaches Rendern, kein Seitensprung.
+   ============================================================ */
+
+function v696EnsurePositionSelect(){
+  const sel=document.getElementById("posSelect");
+  if(!sel)return;
+
+  const current=sel.value;
+  const all=positions();
+
+  /* Das versteckte Select dient nur noch als stabiler interner Werteträger. */
+  if(sel.options.length!==all.length ||
+     [...sel.options].some((o,i)=>String(o.value)!==String(all[i]?.pos||""))){
+    sel.innerHTML=all.map(p=>
+      `<option value="${esc(p.pos)}">${esc(p.pos)} · ${esc(p.text)}</option>`
+    ).join("");
+
+    if(current && [...sel.options].some(o=>o.value===current)){
+      sel.value=current;
+    }else{
+      sel.selectedIndex=-1;
+    }
+  }
+}
+
+function v696PositionInfoHtml(p){
+  if(!p){
+    return positions().length
+      ? '<span class="small">LV-Unterposition auswählen.</span>'
+      : '<span class="small">Dieses Projekt hat noch kein importiertes LV. Öffne „Excel / PDF importieren“ oder füge eine manuelle Position hinzu.</span>';
+  }
+
+  const done=projectTotal(p.pos);
+  const typeText=p.manual
+    ? `<span class="badge manual">${esc(p.manualType||"manuell")}</span> `
+    : "";
+
+  if(!hasTargetQty(p)){
+    return `<div class="strong">${typeText}${esc(p.pos)} · ${esc(p.text)}</div>
+      <div class="small" style="margin-top:5px">
+       Keine LV-/Soll-Menge hinterlegt · kollaudiert: <b>${num(done)} ${esc(p.unit)}</b><br>
+       EH-Preis: <b>${euro(p.ep)}</b> · Lohn/EH: ${euro(p.labor)} · Sonstiges/EH: ${euro(p.material)}
+      </div>`;
+  }
+
+  const rest=Number(p.lv_qty)-done;
+  return `<div class="strong">${typeText}${esc(p.pos)} · ${esc(p.text)}</div>
+    <div class="small" style="margin-top:5px">
+     LV-/Soll-Menge: <b>${num(p.lv_qty)} ${esc(p.unit)}</b> · Projekt kollaudiert:
+     <b>${num(done)} ${esc(p.unit)}</b> · Rest: <b>${num(rest)} ${esc(p.unit)}</b><br>
+     EH-Preis: <b>${euro(p.ep)}</b> · Lohn/EH: ${euro(p.labor)} · Sonstiges/EH: ${euro(p.material)}
+    </div>`;
+}
+
+/* Final: Info aktualisieren – OHNE die Positionsliste erneut zu rendern. */
+showPosInfo=function(){
+  v696EnsurePositionSelect();
+
+  const code=document.getElementById("posSelect")?.value||"";
+  const p=code ? getPos(code) : null;
+  const box=document.getElementById("posInfo");
+
+  if(box)box.innerHTML=v696PositionInfoHtml(p);
+
+  /* Rechenvorschau hängt von der Einheit der gewählten Position ab. */
+  try{previewCalc()}catch(e){}
+};
+
+/* Final: genau ein Renderdurchlauf. */
+renderMobilePositionResults=function(options={}){
+  const preserveScroll=options.preserveScroll!==false;
+  const box=document.getElementById("mobilePosResults");
+  const count=document.getElementById("mobilePosResultCount");
+  if(!box||!count)return;
+
+  v696EnsurePositionSelect();
+
+  const oldScroll=box.scrollTop;
+  const list=v523MatchingPositions();
+  const selected=document.getElementById("posSelect")?.value||"";
+  const q=(document.getElementById("posSearch")?.value||"").trim();
+
+  if(selected){
+    const p=getPos(selected);
+    count.innerHTML=`Ausgewählt: <b>${esc(selected)}</b>${p?.text?` · ${esc(p.text)}`:""} · ${list.length} Treffer`;
+  }else{
+    count.textContent=q
+      ? `${list.length} Treffer · Position auswählen`
+      : `${positions().length} Positionen · suchen oder scrollen`;
+  }
+
+  if(!list.length){
+    box.innerHTML='<div class="mobilePosEmpty">Keine passende LV-Unterposition gefunden.</div>';
+    box.scrollTop=0;
+    return;
+  }
+
+  box.innerHTML=list.map(p=>{
+    const meta=[
+      p.unit ? `EH ${p.unit}` : "",
+      Number.isFinite(Number(p.lv_qty)) ? `LV-Menge ${num(p.lv_qty)}` : ""
+    ].filter(Boolean).join(" · ");
+
+    return `<button type="button"
+      class="mobilePosResult ${String(p.pos)===String(selected)?"selected":""}"
+      data-pos="${esc(p.pos)}"
+      onclick="selectMobilePosition('${String(p.pos).replace(/'/g,"\\'")}')">
+      <span class="mprCode">${esc(p.pos)}</span>
+      <span class="mprText">${esc(p.text)}</span>
+      ${meta?`<span class="mprMeta">${esc(meta)}</span>`:""}
+    </button>`;
+  }).join("");
+
+  if(preserveScroll){
+    box.scrollTop=oldScroll;
+  }else{
+    box.scrollTop=0;
+  }
+};
+
+/* Nur der innere Listencontainer wird bei Bedarf minimal verschoben. */
+function v696KeepSelectedVisible(){
+  const box=document.getElementById("mobilePosResults");
+  const row=box?.querySelector(".mobilePosResult.selected");
+  if(!box||!row)return;
+
+  const boxRect=box.getBoundingClientRect();
+  const rowRect=row.getBoundingClientRect();
+
+  if(rowRect.top<boxRect.top){
+    box.scrollTop-=Math.ceil(boxRect.top-rowRect.top)+6;
+  }else if(rowRect.bottom>boxRect.bottom){
+    box.scrollTop+=Math.ceil(rowRect.bottom-boxRect.bottom)+6;
+  }
+}
+
+/* Final: Auswahl verändert weder Suchbegriff noch Seitenposition. */
+selectMobilePosition=function(code){
+  const sel=document.getElementById("posSelect");
+  if(!sel)return;
+
+  v696EnsurePositionSelect();
+
+  if(![...sel.options].some(o=>String(o.value)===String(code))){
+    const p=getPos(code);
+    if(!p)return;
+    const opt=document.createElement("option");
+    opt.value=code;
+    opt.textContent=`${p.pos} · ${p.text}`;
+    sel.appendChild(opt);
+  }
+
+  /* Scrollwerte VOR jeder DOM-Änderung merken. */
+  const pageX=window.scrollX;
+  const pageY=window.scrollY;
+  const list=document.getElementById("mobilePosResults");
+  const listScroll=list?.scrollTop||0;
+
+  sel.value=code;
+
+  /* Einmal Info + einmal Liste aktualisieren. */
+  showPosInfo();
+  if(list)list.scrollTop=listScroll;
+  renderMobilePositionResults({preserveScroll:true});
+  v696KeepSelectedVisible();
+
+  /* Browser darf durch Fokus/DOM-Änderung die Seite nicht verschieben. */
+  if(Math.abs(window.scrollY-pageY)>1 || Math.abs(window.scrollX-pageX)>1){
+    window.scrollTo(pageX,pageY);
+  }
+};
+
+/* Suche filtert nur Karten. Keine automatische Positionsänderung mehr. */
+filterPositions=function(){
+  renderMobilePositionResults({preserveScroll:false});
+};
+
+clearMobilePositionSearch=function(){
+  const input=document.getElementById("posSearch");
+  if(input){
+    input.value="";
+    /* bewusst kein focus(): verhindert mobilen/Tablet-Seitensprung */
+  }
+  renderMobilePositionResults({preserveScroll:false});
+};
+
+/* Initialisierung */
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    try{
+      v696EnsurePositionSelect();
+      showPosInfo();
+      renderMobilePositionResults({preserveScroll:false});
+    }catch(e){
+      console.warn("V6.96 Positionspicker",e);
+    }
+  },140);
 });
 </script>
 
