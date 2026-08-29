@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.80</title>
+<title>Kollaudierung – V6.81</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -4704,6 +4704,35 @@ main{
   }
 }
 
+
+/* ============================================================
+   V6.81 – TABLET-NAVIGATION OHNE ICONS + SAUBERER REITERSTART
+   ============================================================ */
+
+/* Tablet/phone: text-only tabs are clearer and need less width. */
+@media(max-width:1100px){
+  .tabs.noPrint .v667TabIcon{
+    display:none!important;
+  }
+  .tabs.noPrint .tab{
+    gap:0!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
+  }
+}
+
+/* Slightly calmer tablet navigation bar. */
+@media(min-width:601px) and (max-width:1100px){
+  .tabs.noPrint{
+    padding:6px!important;
+    gap:5px!important;
+  }
+  .tabs.noPrint .tab{
+    min-height:42px!important;
+    font-size:12px!important;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -4734,7 +4763,7 @@ main{
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V6.80</h1>
+     <h1>Kollaudierung – V6.81</h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -22375,7 +22404,7 @@ window.addEventListener("load",()=>{
    V6.72 – ERZWUNGENE VERSIONSAKTUALISIERUNG / CACHE-SYNC
    ============================================================ */
 
-const KOLLAPP_VERSION="6.72";
+const KOLLAPP_VERSION="6.81";
 const KOLLAPP_VERSION_KEY="kollapp_loaded_version";
 const KOLLAPP_RELOAD_KEY="kollapp_update_reload_guard";
 
@@ -22804,6 +22833,45 @@ showView = function(name){
       }
     });
   });
+  return r;
+};
+</script>
+
+
+<script>
+/* ============================================================
+   V6.81 – REITERWECHSEL: NEUER INHALT DIREKT UNTER DIE REITER
+   ============================================================ */
+const _v681ShowViewBase = showView;
+
+function v681ScrollActiveViewToStart(name){
+  const header = document.querySelector("header.appHeader");
+  const tabs = document.querySelector(".tabs.noPrint");
+  const view = document.getElementById("view-"+name);
+  if(!view)return;
+
+  const headerH = header ? header.getBoundingClientRect().height : 0;
+  const tabsH = tabs ? tabs.getBoundingClientRect().height : 0;
+
+  /* View should start just below the permanently visible header + tab bar. */
+  const absoluteTop = view.getBoundingClientRect().top + window.scrollY;
+  const target = Math.max(0, Math.round(absoluteTop - headerH - tabsH - 14));
+
+  /* "auto" intentionally cancels historical smooth-scroll wrappers. */
+  window.scrollTo({top:target, behavior:"auto"});
+}
+
+showView = function(name){
+  const r = _v681ShowViewBase.apply(this, arguments);
+
+  /* Old versions contain several delayed/smooth scroll helpers.
+     Re-apply the correct position after them, without animation. */
+  requestAnimationFrame(()=>{
+    v681ScrollActiveViewToStart(name);
+    setTimeout(()=>v681ScrollActiveViewToStart(name),60);
+    setTimeout(()=>v681ScrollActiveViewToStart(name),180);
+  });
+
   return r;
 };
 </script>
