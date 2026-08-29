@@ -1,5 +1,5 @@
-const CACHE = "kollaudierung-v6.71-shell-1";
-const RUNTIME = "kollaudierung-v6.71-runtime-1";
+const CACHE = "kollaudierung-v6.72-shell-1";
+const RUNTIME = "kollaudierung-v6.72-runtime-1";
 
 const SHELL = [
   "./",
@@ -37,7 +37,7 @@ self.addEventListener("fetch", event => {
   /* Navigation: prefer fresh GitHub version, fall back to cached app. */
   if(req.mode === "navigate"){
     event.respondWith(
-      fetch(req)
+      fetch(new Request(req,{cache:"no-store"}))
         .then(res => {
           const copy = res.clone();
           caches.open(CACHE).then(c => c.put("./index.html", copy)).catch(()=>{});
@@ -74,4 +74,11 @@ self.addEventListener("fetch", event => {
       return hit || network;
     })
   );
+});
+
+
+self.addEventListener("message", event => {
+  if(event.data && event.data.type === "SKIP_WAITING"){
+    self.skipWaiting();
+  }
 });

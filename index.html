@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.71</title>
+<title>Kollaudierung – V6.72</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -3146,7 +3146,7 @@ main > section.view.active{
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.71</h1>
+     <h1>Kollaudierung – V6.72</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -20702,6 +20702,137 @@ deleteEntry=function(){
 
 window.addEventListener("load",()=>{
   setTimeout(()=>{try{v671RenderTemplates()}catch(e){}},100);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.72 – ERZWUNGENE VERSIONSAKTUALISIERUNG / CACHE-SYNC
+   ============================================================ */
+
+const KOLLAPP_VERSION="6.72";
+const KOLLAPP_VERSION_KEY="kollapp_loaded_version";
+const KOLLAPP_RELOAD_KEY="kollapp_update_reload_guard";
+
+function v672CurrentVersion(){
+  return KOLLAPP_VERSION;
+}
+
+function v672SetVersionStamp(){
+  try{
+    localStorage.setItem(KOLLAPP_VERSION_KEY,KOLLAPP_VERSION);
+  }catch(e){}
+}
+
+async function v672ClearOldCaches(){
+  if(!("caches" in window))return;
+  try{
+    const keys=await caches.keys();
+    const keep=[
+      `kollaudierung-v${KOLLAPP_VERSION}-shell-1`,
+      `kollaudierung-v${KOLLAPP_VERSION}-runtime-1`
+    ];
+    await Promise.all(
+      keys.filter(k=>!keep.includes(k)).map(k=>caches.delete(k))
+    );
+  }catch(e){
+    console.warn("V6.72 Cache löschen",e);
+  }
+}
+
+async function v672ForceServiceWorkerUpdate(){
+  if(!("serviceWorker" in navigator))return false;
+
+  try{
+    const regs=await navigator.serviceWorker.getRegistrations();
+    let changed=false;
+
+    for(const reg of regs){
+      try{
+        await reg.update();
+
+        if(reg.waiting){
+          reg.waiting.postMessage({type:"SKIP_WAITING"});
+          changed=true;
+        }
+
+        if(reg.installing){
+          await new Promise(resolve=>{
+            const sw=reg.installing;
+            const done=()=>{
+              if(sw.state==="installed" || sw.state==="activated" || sw.state==="redundant"){
+                resolve();
+              }
+            };
+            sw.addEventListener("statechange",done);
+            setTimeout(resolve,2500);
+          });
+
+          if(reg.waiting){
+            reg.waiting.postMessage({type:"SKIP_WAITING"});
+            changed=true;
+          }
+        }
+      }catch(e){}
+    }
+
+    return changed;
+  }catch(e){
+    console.warn("V6.72 SW Update",e);
+    return false;
+  }
+}
+
+async function v672CheckVersionAndReload(){
+  let previous="";
+  try{
+    previous=localStorage.getItem(KOLLAPP_VERSION_KEY)||"";
+  }catch(e){}
+
+  const firstTimeForThisVersion=previous!==KOLLAPP_VERSION;
+
+  await v672ClearOldCaches();
+  const swChanged=await v672ForceServiceWorkerUpdate();
+
+  v672SetVersionStamp();
+
+  /* Reload once when:
+     - app version changed OR
+     - a waiting service worker was activated.
+     Guard prevents reload loops. */
+  if(firstTimeForThisVersion || swChanged){
+    let guard="";
+    try{guard=sessionStorage.getItem(KOLLAPP_RELOAD_KEY)||""}catch(e){}
+
+    if(guard!==KOLLAPP_VERSION){
+      try{sessionStorage.setItem(KOLLAPP_RELOAD_KEY,KOLLAPP_VERSION)}catch(e){}
+      setTimeout(()=>{
+        const url=new URL(location.href);
+        url.searchParams.set("_v",KOLLAPP_VERSION);
+        location.replace(url.toString());
+      },120);
+      return;
+    }
+  }
+
+  try{sessionStorage.removeItem(KOLLAPP_RELOAD_KEY)}catch(e){}
+}
+
+/* If a new SW takes control, refresh exactly once. */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    let guard="";
+    try{guard=sessionStorage.getItem("kollapp_controller_reload")||""}catch(e){}
+    if(guard===KOLLAPP_VERSION)return;
+
+    try{sessionStorage.setItem("kollapp_controller_reload",KOLLAPP_VERSION)}catch(e){}
+    location.reload();
+  });
+}
+
+window.addEventListener("load",()=>{
+  setTimeout(v672CheckVersionAndReload,350);
 });
 </script>
 
