@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.30</title>
+<title>Kollaudierung – V6.33</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.30 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.33 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.30 alter Testhinweis entfernt ===== */
+/* ===== V6.33 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.30 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.33 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1163,7 +1163,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.30 HINWEISE / TEXTE ===== */
+/* ===== V6.33 HINWEISE / TEXTE ===== */
 #autoPlanLinkSummary{line-height:1.25}
 #autoPlanLinkMeta{line-height:1.35}
 #draftEntrySummary .fsCell .smallHint{
@@ -1174,13 +1174,13 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.30 EINHEITLICHE BEGRIFFE ===== */
+/* ===== V6.33 EINHEITLICHE BEGRIFFE ===== */
 .terminologyHint{
   line-height:1.4;
 }
 
 
-/* ===== V6.30 LETZTE ERFASSUNGEN ===== */
+/* ===== V6.33 LETZTE ERFASSUNGEN ===== */
 .v620RecentTable{
  table-layout:fixed!important;
  width:100%!important;
@@ -1288,7 +1288,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.30 ID-AUSWAHL IM AUFMASSBLATT ===== */
+/* ===== V6.33 ID-AUSWAHL IM AUFMASSBLATT ===== */
 .v621SheetIdToolbar{
  display:flex;
  align-items:flex-end;
@@ -1316,7 +1316,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.30 LV-ÜBERSICHT / NEUE POSITION ===== */
+/* ===== V6.33 LV-ÜBERSICHT / NEUE POSITION ===== */
 .v623AddLvCard{
  margin-bottom:12px;
  border:1px solid #b9cfda;
@@ -1343,7 +1343,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.30 MANUELLE LV-STAMMDATEN NUR IM MASTER ===== */
+/* ===== V6.33 MANUELLE LV-STAMMDATEN NUR IM MASTER ===== */
 .v627LvActions{
  display:flex;
  gap:6px;
@@ -1360,7 +1360,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.30 AUFTRAGGEBER IM EXPORT ===== */
+/* ===== V6.33 AUFTRAGGEBER IM EXPORT ===== */
 .v630ClientCard{
  margin-top:4px;
  border:1px solid #b9cfda;
@@ -1433,6 +1433,37 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
  #v630ClientFields{grid-template-columns:1fr!important}
 }
 
+
+/* ===== V6.33 TITELBLOCK IM EXPORT SAUBER ZENTRIEREN ===== */
+.v630DualHeader{
+ align-items:center!important;
+}
+.v630DocCenter{
+ text-align:center;
+ min-width:0;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ align-self:center;
+}
+.v630DocCenter .docTitle,
+.v630DocCenter .docSub,
+.v630DocCenter .v519PageTitle,
+.v630DocCenter .v519PageSub{
+ text-align:center!important;
+ width:100%;
+ margin-left:auto;
+ margin-right:auto;
+}
+.v630DocCenter .docSub,
+.v630DocCenter .v519PageSub{
+ margin-top:4px!important;
+}
+.v519PageHeader.v630DualHeader{
+ align-items:center!important;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1447,7 +1478,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.30version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.33version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1463,7 +1494,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.30</h1>
+   <h1>Kollaudierung – V6.33</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -10209,7 +10240,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.30 MULTI-LV ================= */
+/* ================= V6.33 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10408,7 +10439,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.30 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.33 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10988,13 +11019,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.30 Gruppenmigration",e)}
+}catch(e){console.warn("V6.33 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.30 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.33 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -11100,7 +11131,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.30 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.33 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -11147,13 +11178,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.30 Migration",e)}
+}catch(e){console.warn("V6.33 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.30 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.33 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -11389,13 +11420,13 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.30 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.33 Gruppendarstellung",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.30 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   V6.33 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
    ============================================================ */
 
 function v615OrderedEntryGroups(){
@@ -11517,7 +11548,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.30 ID-Kompaktierung",e)}
+  }catch(e){console.warn("V6.33 ID-Kompaktierung",e)}
   return r;
 };
 
@@ -11571,13 +11602,13 @@ try{
   renderDraftEntrySummary?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.30 Startmigration",e)}
+}catch(e){console.warn("V6.33 Startmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.30 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
+   V6.33 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
    ============================================================ */
 
 function v616DraftLvItems(){
@@ -11743,7 +11774,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.30 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
+   V6.33 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
    ============================================================ */
 
 function v618GroupForId(id){
@@ -11903,7 +11934,7 @@ finalizeCurrentEntry=function(){
     }
     return result;
   }catch(err){
-    console.error("V6.30 Erfassung speichern",err);
+    console.error("V6.33 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -11928,7 +11959,7 @@ editEntry=function(id){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.30 Erfassung bearbeiten",err);
+    console.error("V6.33 Erfassung bearbeiten",err);
     alert("Erfassung konnte nicht zum Bearbeiten geöffnet werden: "+(err?.message||err));
   }
 };
@@ -12020,13 +12051,13 @@ try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.30 Datenkonsistenz",e)}
+}catch(e){console.warn("V6.33 Datenkonsistenz",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.30 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
+   V6.33 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
    ============================================================ */
 
 let v619IdMaintenanceRunning=false;
@@ -12337,7 +12368,7 @@ finalizeCurrentEntry=function(){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.30 Erfassung speichern",err);
+    console.error("V6.33 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -12347,18 +12378,18 @@ finalizeCurrentEntry=function(){
   }
 };
 
-/* Repair current project once after loading V6.30. */
+/* Repair current project once after loading V6.33. */
 try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.30 ID-Reparatur",e)}
+}catch(e){console.warn("V6.33 ID-Reparatur",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.30 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
+   V6.33 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
    ============================================================ */
 
 function v620RecentLvHtml(group){
@@ -12456,7 +12487,7 @@ try{renderRecent?.()}catch(e){}
 
 <script>
 /* ============================================================
-   V6.30 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
+   V6.33 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
    ============================================================ */
 
 function v621CurrentSheetViewIds(){
@@ -12589,7 +12620,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.30 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
+   V6.33 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
    ============================================================ */
 
 function v622PrepareCurrentDataForExport(){
@@ -12648,7 +12679,7 @@ printSheetsV52=async function(selected){
     if(progress)progress.classList.remove("show");
     v519PrintPrepared("sheetMultiPrintArea",pages,"sheetMultiPrintMode");
   }catch(err){
-    console.error("V6.30 PDF Export",err);
+    console.error("V6.33 PDF Export",err);
     const progress=document.getElementById("sheetExportProgress");
     if(progress)progress.classList.remove("show");
     alert("Export nicht möglich: "+(err?.message||err));
@@ -12797,7 +12828,7 @@ v519BuildSheetPages=async function(sh,includeBilling){
 
 <script>
 /* ============================================================
-   V6.30 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
+   V6.33 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
    ============================================================ */
 
 function v623OpenNewLvPosition(){
@@ -12827,7 +12858,7 @@ showView=function(name){
 
 <script>
 /* ============================================================
-   V6.30 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
+   V6.33 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
    ============================================================ */
 
 /* A missing position can never have a target/LV quantity. */
@@ -12868,7 +12899,7 @@ renderSheet=function(){
   try{
     return _v625RenderSheetBase();
   }catch(err){
-    console.warn("V6.30 renderSheet fallback",err);
+    console.warn("V6.33 renderSheet fallback",err);
 
     const sh=activeSheet();
     const body=document.getElementById("sheetBody");
@@ -12958,7 +12989,7 @@ finalizeCurrentEntry=function(){
   try{
     return _v625FinalizeBase();
   }catch(err){
-    console.error("V6.30 finalize fallback",err);
+    console.error("V6.33 finalize fallback",err);
 
     const after=JSON.stringify((project()?.entries||[]).map(e=>[e.id,e.syncRevision,e.updated,e.qty,e.calc,e.pos,e.lineDesc]));
     const fm=document.getElementById("finalizeMessage");
@@ -12995,7 +13026,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.30 – MASTER-IDs KONSISTENT NEU AUFBAUEN
+   V6.33 – MASTER-IDs KONSISTENT NEU AUFBAUEN
    ============================================================ */
 let v626RebuildRunning=false;
 
@@ -13200,7 +13231,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.30 – MANUELLE LV-UNTERPOSITIONEN:
+   V6.33 – MANUELLE LV-UNTERPOSITIONEN:
    MASTER VERWALTET, MONTEUR VERWENDET
    ============================================================ */
 
@@ -13349,7 +13380,7 @@ try{v627ApplyManualMasterUi();renderLV();}catch(e){}
 
 <script>
 /* ============================================================
-   V6.30 – BERECHTIGUNG "REGIEPOSITIONEN" STEUERT
+   V6.33 – BERECHTIGUNG "REGIEPOSITIONEN" STEUERT
    ANLEGEN + BEARBEITEN + LÖSCHEN
    ============================================================ */
 
@@ -13506,7 +13537,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.30 – ZWEITES LOGO / AUFTRAGGEBERDATEN IM EXPORT
+   V6.33 – ZWEITES LOGO / AUFTRAGGEBERDATEN IM EXPORT
    ============================================================ */
 
 const _v630EnsureExportSettingsBase=ensureExportSettings;
@@ -13741,6 +13772,365 @@ v519HeaderHtml=function(title,subtitle=""){
 
 /* initialize */
 try{renderExportSettings();}catch(e){}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.33 – LAGEPLÄNE / PLAN-NACHWEISE NACH ERFASSUNGS-ID
+   ============================================================ */
+
+annotationsForSheet=function(sh){
+  const ids=new Set(entriesForSheet(sh).map(e=>e.id));
+  const out=[];
+
+  plans().forEach((pl,planIndex)=>{
+    (pl.annotations||[]).forEach((a,annIndex)=>{
+      if(!a.entryId || !ids.has(a.entryId))return;
+      const entry=project().entries.find(e=>e.id===a.entryId);
+      if(entry)out.push({plan:pl,ann:a,entry,planIndex,annIndex});
+    });
+  });
+
+  out.sort((a,b)=>{
+    const aid=Number(entryDisplayId(a.entry))||999999999;
+    const bid=Number(entryDisplayId(b.entry))||999999999;
+    if(aid!==bid)return aid-bid;
+
+    const ap=String(a.plan?.name||"");
+    const bp=String(b.plan?.name||"");
+    const pc=ap.localeCompare(bp,"de",{numeric:true,sensitivity:"base"});
+    if(pc!==0)return pc;
+
+    if(a.planIndex!==b.planIndex)return a.planIndex-b.planIndex;
+    return a.annIndex-b.annIndex;
+  });
+
+  return out;
+};
+
+const _v632GroupLinksBase=v516GroupLinksByEntryAndPlan;
+v516GroupLinksByEntryAndPlan=function(links){
+  const groups=_v632GroupLinksBase(links);
+  return groups.sort((a,b)=>{
+    const aid=Number(entryDisplayId(a.entry))||999999999;
+    const bid=Number(entryDisplayId(b.entry))||999999999;
+    if(aid!==bid)return aid-bid;
+
+    const ap=String(a.plan?.name||"");
+    const bp=String(b.plan?.name||"");
+    return ap.localeCompare(bp,"de",{numeric:true,sensitivity:"base"});
+  });
+};
+</script>
+
+
+<script>
+/* ============================================================
+   V6.33 – PLANMARKIERUNG DIREKT MIT LV-UNTERPOSITION VERKNÜPFT
+   ============================================================ */
+
+function v633EntryForAnnotation(a){
+  if(!a)return null;
+  const p=project();
+  if(!p)return null;
+
+  /* Neue eindeutige Verknüpfung */
+  if(a.lvEntryId){
+    const e=p.entries.find(x=>x.id===a.lvEntryId);
+    if(e)return e;
+  }
+  if(a.lvSyncUuid){
+    const e=p.entries.find(x=>x.syncUuid===a.lvSyncUuid);
+    if(e)return e;
+  }
+
+  /* Bestehende Projekte: anhand Erfassungs-ID + LV-Unterposition auflösen */
+  const anchor=p.entries.find(x=>x.id===a.entryId);
+  if(anchor){
+    const group=v612GroupEntries(anchor);
+    const exact=group.find(x=>x.pos===a.pos);
+    if(exact)return exact;
+    return anchor;
+  }
+  return null;
+}
+
+function v633BindAnnotationToSelectedLv(a){
+  if(!a)return;
+
+  const selectedPos=
+    document.getElementById("planPosSelect")?.value ||
+    document.getElementById("posSelect")?.value ||
+    a.pos || "";
+
+  let base=null;
+  if(a.entryId && !(typeof isDraftEntryId==="function" && isDraftEntryId(a.entryId))){
+    base=project()?.entries?.find(x=>x.id===a.entryId)||null;
+  }
+
+  if(base){
+    const group=v612GroupEntries(base);
+    const lvEntry=group.find(x=>x.pos===selectedPos) || group.find(x=>x.pos===a.pos) || base;
+    const anchor=v612AnchorEntry(base)||base;
+
+    a.entryId=anchor.id;                 // gemeinsame Erfassungs-ID / Planbezug
+    a.lvEntryId=lvEntry.id;              // konkrete LV-Unterposition
+    a.lvSyncUuid=lvEntry.syncUuid||"";
+    a.pos=lvEntry.pos;
+    a.posText=getPos(lvEntry.pos)?.text||a.posText||"";
+    a.label=String(entryDisplayId(anchor));
+  }else{
+    /* Entwurf: zumindest konkrete LV-Unterposition + Text festhalten */
+    a.pos=selectedPos||a.pos||"";
+    a.posText=getPos(a.pos)?.text||a.posText||"";
+  }
+}
+
+/* Jede neu erzeugte Markierung sofort an die konkrete LV-Unterposition binden. */
+const _v633CreateBase=createPlanAnnotation;
+createPlanAnnotation=function(type,pt){
+  const before=activePlan()?.annotations?.length||0;
+  const r=_v633CreateBase(type,pt);
+  const arr=activePlan()?.annotations||[];
+  if(arr.length>before){
+    v633BindAnnotationToSelectedLv(arr[arr.length-1]);
+    persist();
+  }
+  return r;
+};
+
+const _v633LineBase=finishPlanLine;
+finishPlanLine=function(){
+  const before=activePlan()?.annotations?.length||0;
+  const r=_v633LineBase();
+  const arr=activePlan()?.annotations||[];
+  if(arr.length>before){
+    v633BindAnnotationToSelectedLv(arr[arr.length-1]);
+    persist();
+  }
+  return r;
+};
+
+const _v633FreeBase=finishFreehand;
+finishFreehand=function(){
+  const before=activePlan()?.annotations?.length||0;
+  const r=_v633FreeBase();
+  const arr=activePlan()?.annotations||[];
+  if(arr.length>before){
+    v633BindAnnotationToSelectedLv(arr[arr.length-1]);
+    persist();
+  }
+  return r;
+};
+
+if(typeof finishShapeDraft==="function"){
+  const _v633ShapeBase=finishShapeDraft;
+  finishShapeDraft=function(){
+    const before=activePlan()?.annotations?.length||0;
+    const r=_v633ShapeBase.apply(this,arguments);
+    const arr=activePlan()?.annotations||[];
+    if(arr.length>before){
+      v633BindAnnotationToSelectedLv(arr[arr.length-1]);
+      persist();
+    }
+    return r;
+  };
+}
+
+/* Bestehende Markierungen einmal migrieren:
+   a.pos bestimmt die konkrete LV-Unterposition innerhalb der gemeinsamen ID. */
+function v633MigrateAnnotationLvLinks(){
+  const p=project();
+  if(!p)return;
+  plans().forEach(pl=>{
+    (pl.annotations||[]).forEach(a=>{
+      if(!a.entryId || (typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId)))return;
+      const anchor=p.entries.find(x=>x.id===a.entryId);
+      if(!anchor)return;
+      const group=v612GroupEntries(anchor);
+      const lv=group.find(x=>x.pos===a.pos);
+      if(lv){
+        a.lvEntryId=lv.id;
+        a.lvSyncUuid=lv.syncUuid||"";
+        a.posText=getPos(lv.pos)?.text||a.posText||"";
+      }
+    });
+  });
+}
+
+/* Nach einer Bearbeitung:
+   - existiert die markierte LV-Unterposition weiterhin -> Link aktualisieren
+   - wurde nur EINE alte Position durch EINE neue ersetzt -> Markierung mitziehen
+   - sonst bleibt die Markierung bewusst auf ihrer bisherigen Positionsnummer,
+     damit keine falsche automatische Zuordnung entsteht. */
+function v633RepairAnnotationLinks(){
+  const p=project(); if(!p)return;
+
+  plans().forEach(pl=>{
+    (pl.annotations||[]).forEach(a=>{
+      if(!a.entryId || (typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId)))return;
+      const anchor=p.entries.find(x=>x.id===a.entryId);
+      if(!anchor)return;
+      const group=v612GroupEntries(anchor);
+
+      let lv=null;
+      if(a.lvSyncUuid)lv=group.find(x=>x.syncUuid===a.lvSyncUuid);
+      if(!lv && a.lvEntryId)lv=group.find(x=>x.id===a.lvEntryId);
+      if(!lv)lv=group.find(x=>x.pos===a.pos);
+
+      if(lv){
+        a.lvEntryId=lv.id;
+        a.lvSyncUuid=lv.syncUuid||"";
+        a.pos=lv.pos;
+        a.posText=getPos(lv.pos)?.text||a.posText||"";
+        a.label=String(entryDisplayId(anchor));
+      }
+    });
+  });
+}
+
+/* Plan-Nachweise werden pro Erfassungs-ID + Plan + KONKRETER LV-Unterposition gruppiert.
+   Damit können Dose und Kabel derselben ID unterschiedliche Nachweise/Texte haben. */
+v516GroupLinksByEntryAndPlan=function(links){
+  const map=new Map();
+
+  for(const item of links){
+    const anchor=item.entry || v516EntryForAnnotation(item.ann);
+    if(!anchor)continue;
+
+    const lvEntry=v633EntryForAnnotation(item.ann) || anchor;
+    const pos=item.ann.pos || lvEntry.pos || "";
+    const key=`${anchor.id}__${item.plan.id}__${pos}`;
+
+    if(!map.has(key)){
+      map.set(key,{
+        entry:anchor,
+        lvEntry,
+        pos,
+        plan:item.plan,
+        items:[]
+      });
+    }
+    map.get(key).items.push({...item,entry:anchor,lvEntry});
+  }
+
+  return [...map.values()].sort((a,b)=>{
+    const aid=Number(entryDisplayId(a.entry))||999999999;
+    const bid=Number(entryDisplayId(b.entry))||999999999;
+    if(aid!==bid)return aid-bid;
+
+    const pc=String(a.pos||"").localeCompare(String(b.pos||""),"de",{numeric:true,sensitivity:"base"});
+    if(pc!==0)return pc;
+
+    return String(a.plan?.name||"").localeCompare(String(b.plan?.name||""),"de",{numeric:true,sensitivity:"base"});
+  });
+};
+
+v516ExportHeaderText=function(group){
+  const id=entryDisplayId(group.entry);
+  const pos=group.pos || group.lvEntry?.pos || group.items?.[0]?.ann?.pos || "";
+  const text=getPos(pos)?.text || group.items?.[0]?.ann?.posText || "";
+  return `ID ${id} · ${pos}${text?" · "+text:""}`;
+};
+
+/* Lageplan-HTML: exakt die LV-Unterposition der jeweiligen Markierung anzeigen. */
+makePlanEvidenceHtml=async function(sh){
+  const links=annotationsForSheet(sh);
+  if(!links.length)return "";
+
+  const groups=v516GroupLinksByEntryAndPlan(links);
+  const blocks=[];
+
+  for(const group of groups){
+    const clusters=v516ClusterItemsForExport(group.items);
+    const e=group.entry;
+    const lv=group.lvEntry || v633EntryForAnnotation(group.items[0]?.ann) || e;
+    const posCode=group.pos || lv.pos || group.items[0]?.ann?.pos || "";
+    const pos=getPos(posCode);
+    const posText=pos?.text || group.items[0]?.ann?.posText || "";
+    const id=entryDisplayId(e);
+    const headerText=`ID ${id} · ${posCode}${posText?" · "+posText:""}`;
+
+    for(let i=0;i<clusters.length;i++){
+      const cluster=clusters[i];
+      const pics=await v516MakeClusterEvidenceImages(group.plan,cluster,headerText);
+      if(!pics)continue;
+
+      const suffix=clusters.length>1?` · Ausschnitt ${i+1}/${clusters.length}`:"";
+      const notes=[...new Set(cluster.map(x=>x.ann.note).filter(Boolean))].join(" | ");
+      const detailText=e.detail||"";
+
+      blocks.push(`<div class="sheetPlanEvidence">
+        <div class="sheetPlanEvidenceHead">
+          <div>
+            <b>ID ${id} · ${esc(posCode)} · ${esc(posText)}${suffix}</b>
+            <div class="desc">Plan: ${esc(group.plan.name)}</div>
+          </div>
+          <div class="desc">${num(lv.qty)} ${esc(lv.unit||"")} · Erfassungs-ID ${id}</div>
+        </div>
+
+        <div class="sheetPlanEvidenceGrid">
+          <div><img src="${pics.detail}"></div>
+          <div><img src="${pics.overview}"><div class="cap">Lage des Ausschnitts im Gesamtplan</div></div>
+        </div>
+
+        <div class="desc" style="margin-top:7px">
+          <b>Positionsbeschreibung:</b> ${esc(posText||"–")}
+          ${detailText?`<br><b>Detail:</b> ${esc(detailText)}`:""}
+          ${notes?`<br><b>Bemerkung:</b> ${esc(notes)}`:""}
+        </div>
+      </div>`);
+    }
+  }
+
+  return blocks.join("");
+};
+
+/* Auswahl einer bestehenden Markierung zeigt ebenfalls deren konkrete LV-Unterposition. */
+const _v633RenderSelectedBase=renderSelectedAnnotation;
+renderSelectedAnnotation=function(){
+  const box=document.getElementById("selectedAnnBox");
+  const a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);
+  if(!a){ if(box)box.style.display="none"; return; }
+
+  const lv=v633EntryForAnnotation(a);
+  const posCode=a.pos||lv?.pos||"";
+  const pos=getPos(posCode);
+  const posText=pos?.text||a.posText||"";
+  const anchor=project()?.entries?.find(x=>x.id===a.entryId)||lv;
+  const draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
+  const id=draft?currentPlannedEntryDisplayId():(anchor?entryDisplayId(anchor):a.label);
+
+  box.style.display="block";
+  document.getElementById("selectedAnnTitle").textContent=`ID ${id} · ${annotationTypeName(a.type)}`;
+  document.getElementById("selectedAnnInfo").innerHTML=
+    `<b>${esc(posCode)}</b> · ${esc(posText)}<br>`+
+    `${draft?"Aktuelle Erfassungs-ID · noch nicht gespeichert":
+      anchor?`Erfassungs-ID ${id} · ${esc(anchor.lineDesc||"")} · ${num(lv?.qty||0)} ${esc(lv?.unit||"")}`:
+      "keine gespeicherte Erfassung verknüpft"}`+
+    `${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`+
+    `<br>Farbe: <span style="display:inline-block;width:10px;height:10px;border:1px solid #999;vertical-align:middle;background:${esc(a.color||"#b83232")}"></span> · Linienstärke: ${Number(a.width||7)}`;
+  document.getElementById("goEntryBtn").style.display=anchor?"inline-block":"none";
+};
+
+/* Nach Speichern/Bearbeiten Links aktualisieren. */
+const _v633FinalizeBase=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const r=_v633FinalizeBase.apply(this,arguments);
+  try{
+    v633RepairAnnotationLinks();
+    persist();
+    renderPlanAnnotations?.();
+  }catch(e){}
+  return r;
+};
+
+try{
+  v633MigrateAnnotationLvLinks();
+  v633RepairAnnotationLinks();
+  persist();
+}catch(e){console.warn("V6.33 Plan/LV-Migration",e)}
 </script>
 
 </body>
