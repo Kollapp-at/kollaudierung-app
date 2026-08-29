@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.72</title>
+<title>Kollaudierung – V6.73</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -3119,6 +3119,57 @@ main > section.view.active{
   .v671TemplateActions button{width:100%}
 }
 
+
+/* ============================================================
+   V6.73 – TABLET AUFMASSKOPF OHNE UEBERLAPPUNG
+   ============================================================ */
+@media (min-width:701px) and (max-width:1100px){
+  .v669SheetTop{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:14px!important;
+    align-items:start!important;
+  }
+  .v669SheetSelectCard,
+  .v669SheetExportCard{
+    min-width:0!important;
+    width:100%!important;
+  }
+  .v669IdToolbar{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:9px!important;
+    align-items:stretch!important;
+  }
+  .v669IdToolbar .v621SelectWrap{
+    min-width:0!important;
+    width:100%!important;
+  }
+  .v669IdToolbar .v621SelectWrap select{
+    width:100%!important;
+    min-width:0!important;
+  }
+  .v669IdToolbar .v621SheetIdActions{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  .v669IdToolbar .v621SheetIdActions button{
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+  }
+  .v669ExportGrid{
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+@media (min-width:701px) and (max-width:820px){
+  .v669SheetTop{
+    grid-template-columns:1fr!important;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -3146,7 +3197,7 @@ main > section.view.active{
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.72</h1>
+     <h1>Kollaudierung – V6.73</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -4370,8 +4421,8 @@ function previewCalc(){
  catch(e){box.className="calcPreview bad";res.textContent="Fehler im Rechenansatz";hint.textContent="Mögliche Eingabe: Länge + Länge oder Anzahl * Länge";return null}
 }
 function lineNoFor(desc,sheetId,excludeId=null){
- const d=desc.trim().toLowerCase(),same=project().entries.find(e=>e.sheetId===sheetId&&e.id!==excludeId&&(e.lineDesc||"").trim().toLowerCase()===d);
- if(same)return same.lineNo;const nums=project().entries.filter(e=>e.sheetId===sheetId&&e.id!==excludeId).map(e=>Number(e.lineNo)||0);return(nums.length?Math.max(...nums):0)+1;
+ const d=desc.trim().toLowerCase(),same=(project()?.entries||[]).find(e=>e.sheetId===sheetId&&e.id!==excludeId&&(e.lineDesc||"").trim().toLowerCase()===d);
+ if(same)return same.lineNo;const nums=(project()?.entries||[]).filter(e=>e.sheetId===sheetId&&e.id!==excludeId).map(e=>Number(e.lineNo)||0);return(nums.length?Math.max(...nums):0)+1;
 }
 function saveEntry(){
  const s=activeSheet();if(!s){msg("Bitte zuerst ein Aufmaßblatt auswählen oder anlegen.",true);return}
@@ -4379,22 +4430,22 @@ function saveEntry(){
  const desc=document.getElementById("lineDesc").value.trim();if(!desc){msg("Bitte eine Beschreibung der Aufmaßzeile eingeben.",true);return}
  const qty=previewCalc();if(qty===null||qty===0){msg("Bitte einen gültigen Rechenansatz mit Ergebnis ungleich 0 eingeben.",true);return}
  const entry={id:editingEntryId||uid("e"),sheetId:s.id,lineDesc:desc,lineNo:lineNoFor(desc,s.id,editingEntryId),pos:p.pos,calc:document.getElementById("calc").value.trim(),qty,unit:p.unit,detail:document.getElementById("detail").value.trim(),reason:document.getElementById("reason").value,note:document.getElementById("note").value.trim(),updated:new Date().toISOString()};
- if(editingEntryId){const ix=project().entries.findIndex(e=>e.id===editingEntryId);if(ix>=0)project().entries[ix]=entry;editingEntryId=null;document.getElementById("entryCard").classList.remove("editing");if(document.getElementById("finalSaveEntryBtn"))document.getElementById("finalSaveEntryBtn").textContent="Erfassung speichern";document.getElementById("cancelEditBtn").style.display="none";msg("Erfassung aktualisiert.");clearEntryForm(true)}
+ if(editingEntryId){const ix=(project()?.entries||[]).findIndex(e=>e.id===editingEntryId);if(ix>=0)project().entries[ix]=entry;editingEntryId=null;document.getElementById("entryCard").classList.remove("editing");if(document.getElementById("finalSaveEntryBtn"))document.getElementById("finalSaveEntryBtn").textContent="Erfassung speichern";document.getElementById("cancelEditBtn").style.display="none";msg("Erfassung aktualisiert.");clearEntryForm(true)}
  else{project().entries.push(entry);msg(`Gespeichert: Zeile ${entry.lineNo} · ${p.pos} · ${num(qty)} ${p.unit}`);document.getElementById("calc").value="";document.getElementById("detail").value="";document.getElementById("reason").value="";document.getElementById("note").value="";previewCalc()}
  persist();renderAll();showPosInfo();
 }
 function clearEntryForm(keepDesc){if(!keepDesc)document.getElementById("lineDesc").value="";document.getElementById("calc").value="";document.getElementById("detail").value="";document.getElementById("reason").value="";document.getElementById("note").value="";previewCalc()}
 function editEntry(id){
- const e=project().entries.find(x=>x.id===id);if(!e)return;project().activeSheetId=e.sheetId;renderSheetSelect();
+ const e=(project()?.entries||[]).find(x=>x.id===id);if(!e)return;project().activeSheetId=e.sheetId;renderSheetSelect();
  document.getElementById("lineDesc").value=e.lineDesc||"";document.getElementById("posSearch").value=e.pos;filterPositions();document.getElementById("posSelect").value=e.pos;showPosInfo();
  document.getElementById("calc").value=e.calc||String(e.qty);document.getElementById("detail").value=e.detail||"";document.getElementById("reason").value=e.reason||"";document.getElementById("note").value=e.note||"";
  editingEntryId=id;document.getElementById("entryCard").classList.add("editing");document.getElementById("saveEntryBtn").textContent="Änderung speichern";document.getElementById("cancelEditBtn").style.display="inline-block";previewCalc();showView("entry");window.scrollTo({top:document.getElementById("entryCard").offsetTop-80,behavior:"smooth"});
 }
 function cancelEdit(){editingEntryId=null;document.getElementById("entryCard").classList.remove("editing");if(document.getElementById("finalSaveEntryBtn"))document.getElementById("finalSaveEntryBtn").textContent="Erfassung speichern";document.getElementById("cancelEditBtn").style.display="none";clearEntryForm(false);msg("")}
-function deleteEntry(id){if(!confirm("Diese Erfassung wirklich löschen?"))return;project().entries=project().entries.filter(e=>e.id!==id);persist();renderAll();showPosInfo()}
+function deleteEntry(id){if(!confirm("Diese Erfassung wirklich löschen?"))return;project().entries=(project()?.entries||[]).filter(e=>e.id!==id);persist();renderAll();showPosInfo()}
 function msg(t,bad=false){const m=document.getElementById("message");m.textContent=t;m.style.color=bad?"#aa3030":"#1f7a4d"}
 
-function sortedSheetEntries(){const s=activeSheet();if(!s)return[];return project().entries.filter(e=>e.sheetId===s.id).slice().sort((a,b)=>(a.lineNo-b.lineNo)||(a.pos||"").localeCompare(b.pos||""))}
+function sortedSheetEntries(){const s=activeSheet();if(!s)return[];return (project()?.entries||[]).filter(e=>e.sheetId===s.id).slice().sort((a,b)=>(a.lineNo-b.lineNo)||(a.pos||"").localeCompare(b.pos||""))}
 function renderRecent(){
  const rows=sortedSheetEntries().slice(-12).reverse(),b=document.getElementById("recentBody");
  if(!rows.length){b.innerHTML='<tr><td colspan="9" class="empty">Noch keine Erfassungen im aktiven Aufmaßblatt.</td></tr>';return}
@@ -4952,9 +5003,9 @@ function saveManualPosition(){
    if(ix<0)return;
    project().positions[ix]=data;
    if(code!==editingManualPosCode){
-     project().entries.forEach(e=>{if(e.pos===editingManualPosCode){e.pos=code;e.unit=unit}});
+     (project()?.entries||[]).forEach(e=>{if(e.pos===editingManualPosCode){e.pos=code;e.unit=unit}});
    }else{
-     project().entries.forEach(e=>{if(e.pos===code)e.unit=unit});
+     (project()?.entries||[]).forEach(e=>{if(e.pos===code)e.unit=unit});
    }
  }else{
    project().positions.push(data);
@@ -4963,7 +5014,7 @@ function saveManualPosition(){
 }
 function deleteManualPosition(code){
  const p=getPos(code);if(!p||!p.manual)return;
- const uses=project().entries.filter(e=>e.pos===code).length;
+ const uses=(project()?.entries||[]).filter(e=>e.pos===code).length;
  if(uses){alert(`Diese Position wird bereits in ${uses} Erfassung(en) verwendet. Bitte die Aufmaße zuerst ändern oder löschen.`);return}
  if(!confirm(`Neue LV-Unterposition "${code} – ${p.text}" wirklich löschen?`))return;
  project().positions=project().positions.filter(x=>x.pos!==code);
@@ -5294,7 +5345,7 @@ function fitPlan(){
 }
 function populatePlanLinks(){
  const es=document.getElementById("planEntrySelect"),ps=document.getElementById("planPosSelect");
- const entries=project().entries.slice().sort((a,b)=>{
+ const entries=(project()?.entries||[]).slice().sort((a,b)=>{
    const sa=project().sheets.find(s=>s.id===a.sheetId)?.code||"",sb=project().sheets.find(s=>s.id===b.sheetId)?.code||"";
    return sa.localeCompare(sb)||(a.lineNo-b.lineNo);
  });
@@ -5311,7 +5362,7 @@ function populatePlanFilter(){
  if([...f.options].some(o=>o.value===current))f.value=current;
 }
 function planEntryChanged(){
- const id=document.getElementById("planEntrySelect").value,e=project().entries.find(x=>x.id===id);
+ const id=document.getElementById("planEntrySelect").value,e=(project()?.entries||[]).find(x=>x.id===id);
  if(e && [...document.getElementById("planPosSelect").options].some(o=>o.value===e.pos))document.getElementById("planPosSelect").value=e.pos;
 }
 function setPlanTool(tool){
@@ -5426,7 +5477,7 @@ function selectPlanAnnotation(id){
 function renderSelectedAnnotation(){
  const box=document.getElementById("selectedAnnBox"),a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);
  if(!a){box.style.display="none";return}
- box.style.display="block";const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId);
+ box.style.display="block";const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId);
  document.getElementById("selectedAnnTitle").textContent=`${a.label} · ${a.type==="point"?"Punkt":a.type==="line"?"Linie":"Text"}`;
  document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${e?`Erfassung: ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
  document.getElementById("goEntryBtn").style.display=e?"inline-block":"none";
@@ -5448,7 +5499,7 @@ function goToSelectedEntry(){
 function markEntryOnPlan(entryId){
  if(!plans().length){showView("plans");setTimeout(openPlanUpload,100);return}
  showView("plans");
- const e=project().entries.find(x=>x.id===entryId);if(!e)return;
+ const e=(project()?.entries||[]).find(x=>x.id===entryId);if(!e)return;
  if(!activePlanId)activePlanId=plans()[0].id;
  openPlan(activePlanId).then(()=>{
    document.getElementById("planEntrySelect").value=e.id;planEntryChanged();setPlanTool("point");
@@ -5523,7 +5574,7 @@ async function printPlanAppendix(){
  try{
    const {dataUrl,visible}=await composePlanImage(),area=document.getElementById("planPrintArea");
    const rows=visible.map(a=>{
-     const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),sh=e?project().sheets.find(s=>s.id===e.sheetId):null;
+     const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId),sh=e?project().sheets.find(s=>s.id===e.sheetId):null;
      return `<tr><td><b>${esc(a.label)}</b></td><td>${esc(a.pos)}</td><td>${esc(p?.text||"")}</td><td>${e?`${num(e.qty)} ${esc(e.unit)}`:"–"}</td><td>${e?esc(sh?.code||"")+" · Z"+e.lineNo:"–"}</td><td>${esc(a.note||"")}</td></tr>`;
    }).join("");
    area.innerHTML=`<h1>Planbeilage – Kollaudierung</h1>
@@ -5586,7 +5637,7 @@ function renderSheetSelectionGrid(){
  const grid=document.getElementById("sheetCheckGrid"),sheets=project().sheets;
  if(!selectedSheetExportIds.size && project().activeSheetId)selectedSheetExportIds.add(project().activeSheetId);
  grid.innerHTML=sheets.length?sheets.map(sh=>{
-   const cnt=project().entries.filter(e=>e.sheetId===sh.id).length;
+   const cnt=(project()?.entries||[]).filter(e=>e.sheetId===sh.id).length;
    const checked=selectedSheetExportIds.has(sh.id)?"checked":"";
    const id="sheetExport_"+sh.id.replace(/[^A-Za-z0-9_-]/g,"_");
    return `<div class="sheetCheckItem"><input type="checkbox" id="${id}" ${checked} onchange="sheetExportCheckChanged('${sh.id}',this.checked)"><label for="${id}"><b>${esc(sh.code)}</b> · ${esc([sh.topArea,sh.area].filter(Boolean).join(" – ")||"ohne Bereich")}<span class="sm">${cnt} Erfassung(en)</span></label></div>`;
@@ -5609,7 +5660,7 @@ function selectedSheetsForExport(){
  return project().sheets.filter(s=>selectedSheetExportIds.has(s.id)).sort((a,b)=>(order.get(a.id)||0)-(order.get(b.id)||0));
 }
 function entriesForSheet(sh){
- return project().entries.filter(e=>e.sheetId===sh.id).slice().sort((a,b)=>(a.lineNo-b.lineNo)||(a.pos||"").localeCompare(b.pos||""));
+ return (project()?.entries||[]).filter(e=>e.sheetId===sh.id).slice().sort((a,b)=>(a.lineNo-b.lineNo)||(a.pos||"").localeCompare(b.pos||""));
 }
 function sheetTotalsForSheet(sh){
  const rows=entriesForSheet(sh),used=[...new Set(rows.map(e=>e.pos))];
@@ -5782,16 +5833,16 @@ function openSelectedEntryPlan(){
 const _v52SaveEntry=saveEntry;
 saveEntry=function(){
  const wantedPlan=document.getElementById("entryPlanSelect")?.value||"";
- const beforeLen=project().entries.length;
+ const beforeLen=(project()?.entries||[]).length;
  const editId=editingEntryId;
  _v52SaveEntry();
 
  let saved=null,success=false;
  if(editId){
-   saved=project().entries.find(e=>e.id===editId)||null;
+   saved=(project()?.entries||[]).find(e=>e.id===editId)||null;
    success=editingEntryId===null && !!saved;
- }else if(project().entries.length>beforeLen){
-   saved=project().entries[project().entries.length-1]||null;
+ }else if((project()?.entries||[]).length>beforeLen){
+   saved=project().entries[(project()?.entries||[]).length-1]||null;
    success=!!saved;
  }
  if(!success||!saved){v52OpenPlanAfterSave=false;return}
@@ -5817,14 +5868,14 @@ function saveEntryAndOpenPlan(){
 const _v52EditEntry=editEntry;
 editEntry=function(id){
  _v52EditEntry(id);
- const e=project().entries.find(x=>x.id===id);
+ const e=(project()?.entries||[]).find(x=>x.id===id);
  renderEntryPlanSelect(e?.planId||"");
 };
 
 /* Planbutton nutzt bevorzugt den bei der Erfassung gewählten Plan. */
 markEntryOnPlan=function(entryId){
  ensurePlanData();
- const e=project().entries.find(x=>x.id===entryId);if(!e)return;
+ const e=(project()?.entries||[]).find(x=>x.id===entryId);if(!e)return;
  if(!plans().length){
    showView("project");
    setTimeout(()=>{alert("Für dieses Projekt ist noch kein Plan hinterlegt. Bitte zuerst im Reiter Projekt einen Plan hinzufügen.");},50);
@@ -5849,7 +5900,7 @@ createPlanAnnotation=function(type,pt){
  const link=currentPlanLink();
  _v52CreatePlanAnnotation(type,pt);
  if(link.entryId&&activePlanId){
-   const e=project().entries.find(x=>x.id===link.entryId);
+   const e=(project()?.entries||[]).find(x=>x.id===link.entryId);
    if(e){e.planId=activePlanId;persist()}
  }
 };
@@ -5858,7 +5909,7 @@ finishPlanLine=function(){
  const link=currentPlanLink();
  _v52FinishPlanLine();
  if(link.entryId&&activePlanId){
-   const e=project().entries.find(x=>x.id===link.entryId);
+   const e=(project()?.entries||[]).find(x=>x.id===link.entryId);
    if(e){e.planId=activePlanId;persist()}
  }
 };
@@ -5877,7 +5928,7 @@ function annotationsForSheet(sh){
  plans().forEach(pl=>{
    (pl.annotations||[]).forEach(a=>{
      if(a.entryId&&ids.has(a.entryId)){
-       const entry=project().entries.find(e=>e.id===a.entryId);
+       const entry=(project()?.entries||[]).find(e=>e.id===a.entryId);
        if(entry)out.push({plan:pl,ann:a,entry});
      }
    });
@@ -6111,7 +6162,7 @@ openProjectPlan=function(id){
 /* Nach dem Speichern direkt in denselben Reiter zur Markierung springen. */
 markEntryOnPlan=function(entryId){
  ensurePlanData();
- const e=project().entries.find(x=>x.id===entryId);if(!e)return;
+ const e=(project()?.entries||[]).find(x=>x.id===entryId);if(!e)return;
  if(!plans().length){
    showView("entry");
    alert("Für dieses Projekt ist noch kein Plan hinterlegt. Bitte über „+ Plan hinzufügen“ einen Plan hinterlegen.");
@@ -6234,7 +6285,7 @@ async function continueCurrentEntryToPlan(){
  await openPlan(x.planId);
  populatePlanLinks();
  const es=document.getElementById("planEntrySelect");
- if(editingEntryId && project().entries.some(e=>e.id===editingEntryId))es.value=editingEntryId;
+ if(editingEntryId && (project()?.entries||[]).some(e=>e.id===editingEntryId))es.value=editingEntryId;
  else es.value="__CURRENT_DRAFT__";
  planEntryChanged();
  document.getElementById("planPosSelect").value=x.pos.pos;
@@ -6248,7 +6299,7 @@ async function continueCurrentEntryToPlan(){
 populatePlanLinks=function(){
  const es=document.getElementById("planEntrySelect"),ps=document.getElementById("planPosSelect");
  if(!es||!ps)return;
- const x=currentEntryPreview(),entries=project().entries.slice().sort((a,b)=>{
+ const x=currentEntryPreview(),entries=(project()?.entries||[]).slice().sort((a,b)=>{
    const sa=project().sheets.find(s=>s.id===a.sheetId)?.code||"",sb=project().sheets.find(s=>s.id===b.sheetId)?.code||"";
    return sa.localeCompare(sb)||(a.lineNo-b.lineNo);
  });
@@ -6270,7 +6321,7 @@ planEntryChanged=function(){
    if(p&&[...document.getElementById("planPosSelect").options].some(o=>o.value===p.pos))document.getElementById("planPosSelect").value=p.pos;
    return;
  }
- const e=project().entries.find(x=>x.id===id);
+ const e=(project()?.entries||[]).find(x=>x.id===id);
  if(e&&[...document.getElementById("planPosSelect").options].some(o=>o.value===e.pos))document.getElementById("planPosSelect").value=e.pos;
 };
 
@@ -6291,7 +6342,7 @@ currentPlanLink=function(){
 renderSelectedAnnotation=function(){
  const box=document.getElementById("selectedAnnBox"),a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);
  if(!a){box.style.display="none";return}
- box.style.display="block";const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId);
+ box.style.display="block";const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId);
  const draft=isDraftEntryId(a.entryId);
  document.getElementById("selectedAnnTitle").textContent=`${a.label} · ${a.type==="point"?"Punkt":a.type==="line"?"Linie":"Text"}`;
  document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassungs-ID · noch nicht gespeichert":e?`Erfassung: ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
@@ -6319,15 +6370,15 @@ function finalizeCurrentEntry(){
    if(!confirm("Für diese Erfassung wurde noch keine Planmarkierung gesetzt. Trotzdem speichern?"))return;
  }
 
- const before=project().entries.length,editId=editingEntryId;
+ const before=(project()?.entries||[]).length,editId=editingEntryId;
  v54Finalizing=true;
 
  /* V5.2 saveEntry speichert Plan-ID und verwendet die bewährte Validierung. */
  saveEntry();
 
  let saved=null;
- if(editId)saved=project().entries.find(e=>e.id===editId)||null;
- else if(project().entries.length>before)saved=project().entries[project().entries.length-1]||null;
+ if(editId)saved=(project()?.entries||[]).find(e=>e.id===editId)||null;
+ else if((project()?.entries||[]).length>before)saved=project().entries[(project()?.entries||[]).length-1]||null;
 
  if(!saved){
    v54Finalizing=false;
@@ -6461,7 +6512,7 @@ function renderAutoPlanLinkSummary(){
  if(!title||!meta)return;
 
  let e=null;
- if(editingEntryId)e=project().entries.find(x=>x.id===editingEntryId)||null;
+ if(editingEntryId)e=(project()?.entries||[]).find(x=>x.id===editingEntryId)||null;
  const p=getPos(document.getElementById("posSelect")?.value);
  const sh=activeSheet();
  const qty=previewCalc();
@@ -6490,7 +6541,7 @@ function syncAutomaticPlanLink(){
  const ps=document.getElementById("planPosSelect");
  const currentPos=document.getElementById("posSelect")?.value||"";
 
- if(editingEntryId && project().entries.some(e=>e.id===editingEntryId)){
+ if(editingEntryId && (project()?.entries||[]).some(e=>e.id===editingEntryId)){
    es.value=editingEntryId;
  }else{
    es.value="__CURRENT_DRAFT__";
@@ -6522,7 +6573,7 @@ entryPlanSelectionChanged=function(){
 /* Der Plan-Link kommt ausschließlich aus der aktuellen Erfassung. */
 currentPlanLink=function(){
  const currentPos=document.getElementById("posSelect")?.value||"";
- const entryId=editingEntryId && project().entries.some(e=>e.id===editingEntryId)
+ const entryId=editingEntryId && (project()?.entries||[]).some(e=>e.id===editingEntryId)
    ? editingEntryId
    : draftEntryId();
 
@@ -6544,7 +6595,7 @@ openPlan=async function(id){
 /* Markieren einer bestehenden Erfassung: keine manuelle Auswahl. */
 markEntryOnPlan=function(entryId){
  ensurePlanData();
- const e=project().entries.find(x=>x.id===entryId);if(!e)return;
+ const e=(project()?.entries||[]).find(x=>x.id===entryId);if(!e)return;
  if(!plans().length){
    showView("entry");
    alert("Für dieses Projekt ist noch kein Plan hinterlegt. Bitte zuerst einen Plan hinzufügen.");
@@ -6865,7 +6916,7 @@ const _v57RenderSelected=renderSelectedAnnotation;
 renderSelectedAnnotation=function(){
  const box=document.getElementById("selectedAnnBox"),a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);
  if(!a){box.style.display="none";return}
- box.style.display="block";const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
+ box.style.display="block";const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
  const typeName=a.type==="point"?"Punkt":a.type==="line"?"Linie":a.type==="freehand"?"Freihand":"Text";
  document.getElementById("selectedAnnTitle").textContent=`${a.label} · ${typeName}`;
  document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassungs-ID · noch nicht gespeichert":e?`Erfassung: ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
@@ -7630,7 +7681,7 @@ renderSelectedAnnotation=function(){
  const box=document.getElementById("selectedAnnBox"),a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);
  if(!a){box.style.display="none";return}
  box.style.display="block";
- const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
+ const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
  document.getElementById("selectedAnnTitle").textContent=`${a.label} · ${annotationTypeName(a.type)}`;
  document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassungs-ID · noch nicht gespeichert":e?`Erfassung: ${e.lineNo} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}<br>Farbe: <span style="display:inline-block;width:10px;height:10px;border:1px solid #999;vertical-align:middle;background:${esc(a.color||"#b83232")}"></span> · Linienstärke: ${Number(a.width||7)}`;
  document.getElementById("goEntryBtn").style.display=e?"inline-block":"none";
@@ -7739,7 +7790,7 @@ function annotationBelongsToActiveSheet(a){
  if(typeof isDraftEntryId==="function" && isDraftEntryId(a.entryId)) return true;
  const sh=activeSheet();
  if(!sh)return true;
- const e=project().entries.find(x=>x.id===a.entryId);
+ const e=(project()?.entries||[]).find(x=>x.id===a.entryId);
  return !!e && e.sheetId===sh.id;
 }
 function updateOtherAmblButton(){
@@ -8028,7 +8079,7 @@ function assignEntryDisplayId(e,preferred=null){
 }
 function currentPlannedEntryDisplayId(){
  if(editingEntryId){
-   const e=project().entries.find(x=>x.id===editingEntryId);
+   const e=(project()?.entries||[]).find(x=>x.id===editingEntryId);
    if(e)return entryDisplayId(e);
  }
  return peekNextEntryDisplayId();
@@ -8043,7 +8094,7 @@ function syncAnnotationLabelsToEntryIds(){
        a.label=String(currentPlannedEntryDisplayId());
        return;
      }
-     const e=project().entries.find(x=>x.id===a.entryId);
+     const e=(project()?.entries||[]).find(x=>x.id===a.entryId);
      if(e)a.label=String(entryDisplayId(e));
    });
  });
@@ -8054,15 +8105,15 @@ const _v512SaveEntry=saveEntry;
 saveEntry=function(){
  ensureEntryDisplayIds();
  const editId=editingEntryId;
- const old=editId?project().entries.find(e=>e.id===editId):null;
+ const old=editId?(project()?.entries||[]).find(e=>e.id===editId):null;
  const oldDisplayId=old?entryDisplayId(old):null;
- const beforeIds=new Set(project().entries.map(e=>e.id));
+ const beforeIds=new Set((project()?.entries||[]).map(e=>e.id));
 
  const result=_v512SaveEntry();
 
  let saved=null;
- if(editId)saved=project().entries.find(e=>e.id===editId)||null;
- else saved=project().entries.find(e=>!beforeIds.has(e.id))||null;
+ if(editId)saved=(project()?.entries||[]).find(e=>e.id===editId)||null;
+ else saved=(project()?.entries||[]).find(e=>!beforeIds.has(e.id))||null;
 
  if(saved){
    assignEntryDisplayId(saved,oldDisplayId);
@@ -8081,11 +8132,11 @@ nextAnnLabel=function(){
 sortedSheetEntries=function(){
  const sh=activeSheet();if(!sh)return[];
  ensureEntryDisplayIds();
- return project().entries.filter(e=>e.sheetId===sh.id).slice().sort((a,b)=>entryDisplayId(a)-entryDisplayId(b));
+ return (project()?.entries||[]).filter(e=>e.sheetId===sh.id).slice().sort((a,b)=>entryDisplayId(a)-entryDisplayId(b));
 };
 entriesForSheet=function(sh){
  ensureEntryDisplayIds();
- return project().entries.filter(e=>e.sheetId===sh.id).slice().sort((a,b)=>entryDisplayId(a)-entryDisplayId(b));
+ return (project()?.entries||[]).filter(e=>e.sheetId===sh.id).slice().sort((a,b)=>entryDisplayId(a)-entryDisplayId(b));
 };
 
 /* Tabellen im Erfassen-Reiter */
@@ -8154,7 +8205,7 @@ renderSheet=function(){
 renderAutoPlanLinkSummary=function(){
  const title=document.getElementById("autoPlanLinkSummary"),meta=document.getElementById("autoPlanLinkMeta");
  if(!title||!meta)return;
- let e=editingEntryId?project().entries.find(x=>x.id===editingEntryId)||null:null;
+ let e=editingEntryId?(project()?.entries||[]).find(x=>x.id===editingEntryId)||null:null;
  const p=getPos(document.getElementById("posSelect")?.value),sh=activeSheet(),qty=previewCalc();
  const lineDesc=document.getElementById("lineDesc")?.value.trim()||"";
  const pl=plans().find(x=>x.id===(document.getElementById("entryPlanSelect")?.value||activePlanId));
@@ -8202,7 +8253,7 @@ renderSelectedAnnotation=function(){
  const box=document.getElementById("selectedAnnBox"),a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);
  if(!a){box.style.display="none";return}
  box.style.display="block";
- const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
+ const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
  const id=draft?currentPlannedEntryDisplayId():(e?entryDisplayId(e):a.label);
  document.getElementById("selectedAnnTitle").textContent=`ID ${id} · ${annotationTypeName(a.type)}`;
  document.getElementById("selectedAnnInfo").innerHTML=`<b>${esc(a.pos)}</b> · ${esc(p?.text||"")}<br>${draft?"Aktuelle Erfassungs-ID · noch nicht gespeichert":e?`Erfassungs-ID ${id} · ${esc(e.lineDesc)} · ${num(e.qty)} ${esc(e.unit)}`:"keine konkrete Aufmaßerfassung verknüpft"}${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}<br>Farbe: <span style="display:inline-block;width:10px;height:10px;border:1px solid #999;vertical-align:middle;background:${esc(a.color||"#b83232")}"></span> · Linienstärke: ${Number(a.width||7)}`;
@@ -8263,7 +8314,7 @@ printPlanAppendix=async function(){
  try{
    const {dataUrl,visible}=await composePlanImage(),area=document.getElementById("planPrintArea");
    const rows=visible.map(a=>{
-     const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),sh=e?project().sheets.find(s=>s.id===e.sheetId):null;
+     const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId),sh=e?project().sheets.find(s=>s.id===e.sheetId):null;
      const id=e?entryDisplayId(e):a.label;
      return `<tr><td><b>${esc(id)}</b></td><td>${esc(a.pos)}</td><td>${esc(p?.text||"")}</td><td>${e?`${num(e.qty)} ${esc(e.unit)}`:"–"}</td><td>${e?esc(sh?.code||"")+" · ID "+id:"–"}</td><td>${esc(a.note||"")}</td></tr>`;
    }).join("");
@@ -8623,7 +8674,7 @@ cropForAnnotation = function(a){
 };
 
 function v514EntryForAnnotation(a){
-  return project().entries.find(e => e.id === a.entryId) || null;
+  return (project()?.entries||[]).find(e => e.id === a.entryId) || null;
 }
 function v514ExportLabelText(a){
   const pos = getPos(a.pos);
@@ -9166,7 +9217,7 @@ function v516CropForCluster(items){
 }
 
 function v516EntryForAnnotation(a){
-  return project().entries.find(e=>e.id===a.entryId) || null;
+  return (project()?.entries||[]).find(e=>e.id===a.entryId) || null;
 }
 
 function v516GroupLinksByEntryAndPlan(links){
@@ -9652,7 +9703,7 @@ printPlanAppendix=async function(){
   try{
     const {dataUrl,visible}=await composePlanImage(),area=document.getElementById("planPrintArea");
     const rows=visible.map(a=>{
-      const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),sh=e?project().sheets.find(s=>s.id===e.sheetId):null;
+      const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId),sh=e?project().sheets.find(s=>s.id===e.sheetId):null;
       const id=e?entryDisplayId(e):a.label;
       return `<tr><td><b>${esc(id)}</b></td><td>${esc(a.pos)}</td><td>${esc(p?.text||"")}</td><td>${e?`${num(e.qty)} ${esc(e.unit)}`:"–"}</td><td>${e?esc(sh?.code||"")+" · ID "+id:"–"}</td><td>${esc(a.note||"")}</td></tr>`;
     }).join("");
@@ -9920,7 +9971,7 @@ printPlanAppendix=async function(){
   try{
     const {dataUrl,visible}=await composePlanImage(),area=document.getElementById("planPrintArea");
     const rows=visible.map(a=>{
-      const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),sh=e?project().sheets.find(s=>s.id===e.sheetId):null;
+      const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId),sh=e?project().sheets.find(s=>s.id===e.sheetId):null;
       const id=e?entryDisplayId(e):a.label;
       return `<tr><td><b>${esc(id)}</b></td><td>${esc(a.pos)}</td><td>${esc(p?.text||"")}</td><td>${e?`${num(e.qty)} ${esc(e.unit)}`:"–"}</td><td>${e?esc(sh?.code||"")+" · ID "+id:"–"}</td><td>${esc(a.note||"")}</td></tr>`;
     }).join("");
@@ -10245,7 +10296,7 @@ printPlanAppendix=async function(){
     ));
 
     const rows=visible.map(a=>{
-      const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),sh=e?project().sheets.find(s=>s.id===e.sheetId):null;
+      const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId),sh=e?project().sheets.find(s=>s.id===e.sheetId):null;
       const id=e?entryDisplayId(e):a.label;
       return `<tr><td><b>${esc(id)}</b></td><td>${esc(a.pos)}</td><td>${esc(p?.text||"")}</td><td>${e?`${num(e.qty)} ${esc(e.unit)}`:"–"}</td><td>${e?esc(sh?.code||"")+" · ID "+id:"–"}</td><td>${esc(a.note||"")}</td></tr>`;
     });
@@ -11285,7 +11336,7 @@ deleteEntry=function(id){
        deletedByName:syncUserName()
      });
    }
-   project().entries=project().entries.filter(x=>x.id!==id);
+   project().entries=(project()?.entries||[]).filter(x=>x.id!==id);
    /* related annotations become deletion tombstones */
    (project().plans||[]).forEach(pl=>{
      pl.annotations=(pl.annotations||[]).filter(a=>{
@@ -11431,7 +11482,7 @@ function applyReturnedAnnotationsForEntry(returnPack,entrySyncUuid){
  const entryReturn=returnPack.changes.entries.find(e=>e.syncUuid===entrySyncUuid);
  if(!entryReturn)return;
  const returnedInternalId=entryReturn.id;
- const masterEntry=project().entries.find(e=>e.syncUuid===entrySyncUuid);
+ const masterEntry=(project()?.entries||[]).find(e=>e.syncUuid===entrySyncUuid);
  if(!masterEntry)return;
  (returnPack.changes.annotations||[]).filter(x=>x.annotation.entryId===returnedInternalId).forEach(x=>{
    const found=findAnnBySync(x.annotation.syncUuid);
@@ -11464,7 +11515,7 @@ async function importWorkerReturn(ev){
    let added=0,updated=0,unchanged=0,conflicts=0,deleted=0;
 
    for(const ret of (x.changes?.entries||[])){
-     const existing=project().entries.find(e=>e.syncUuid===ret.syncUuid);
+     const existing=(project()?.entries||[]).find(e=>e.syncUuid===ret.syncUuid);
      if(!existing){
        const ne=applyReturnedEntry(null,ret,true);added++;
        applyReturnedAnnotationsForEntry(x,ret.syncUuid);
@@ -11491,7 +11542,7 @@ async function importWorkerReturn(ev){
      const found=findAnnBySync(ret.syncUuid);
      if(!found){
        const pl=project().plans.find(p=>p.id===item.planId);
-       const me=project().entries.find(e=>e.syncUuid===ret.entrySyncUuid);
+       const me=(project()?.entries||[]).find(e=>e.syncUuid===ret.entrySyncUuid);
        if(pl){
          const a=deepClone(ret);a.syncDirty=false;delete a.syncBaseRevision;pl.annotations.push(a);
        }
@@ -11503,9 +11554,9 @@ async function importWorkerReturn(ev){
    }
 
    for(const d of (x.changes?.deletedEntries||[])){
-     const e=project().entries.find(q=>q.syncUuid===d.syncUuid);if(!e)continue;
+     const e=(project()?.entries||[]).find(q=>q.syncUuid===d.syncUuid);if(!e)continue;
      if(Number(e.syncRevision||1)===Number(d.baseRevision||0)){
-       project().entries=project().entries.filter(q=>q!==e);
+       project().entries=(project()?.entries||[]).filter(q=>q!==e);
        (project().plans||[]).forEach(pl=>pl.annotations=(pl.annotations||[]).filter(a=>a.entryId!==e.id));
        deleted++;
      }else{
@@ -11558,7 +11609,7 @@ function resolveMergeConflict(i,choice){
      applyReturnedAnnotationsForEntry(c.pack,c.returned.syncUuid);
    }else if(c.type==="deleteEntry"){
      const e=c.existing;
-     project().entries=project().entries.filter(q=>q!==e);
+     project().entries=(project()?.entries||[]).filter(q=>q!==e);
      (project().plans||[]).forEach(pl=>pl.annotations=(pl.annotations||[]).filter(a=>a.entryId!==e.id));
    }
  }
@@ -11691,7 +11742,7 @@ deleteEntry=function(id){
        so perform master deletion here. */
     if(!confirm("Diese Erfassung wirklich löschen?"))return;
     v60RecordMasterDeletion(e);
-    project().entries=project().entries.filter(x=>x.id!==id);
+    project().entries=(project()?.entries||[]).filter(x=>x.id!==id);
     (project().plans||[]).forEach(pl=>{
       pl.annotations=(pl.annotations||[]).filter(a=>a.entryId!==id);
     });
@@ -11744,7 +11795,7 @@ applyReturnedAnnotationsForEntry=function(returnPack,entrySyncUuid){
   const entryReturn=returnPack.changes.entries.find(e=>e.syncUuid===entrySyncUuid);
   if(!entryReturn)return;
   const returnedInternalId=entryReturn.id;
-  const masterEntry=project().entries.find(e=>e.syncUuid===entrySyncUuid);
+  const masterEntry=(project()?.entries||[]).find(e=>e.syncUuid===entrySyncUuid);
   if(!masterEntry)return;
 
   (returnPack.changes.annotations||[]).filter(x=>x.annotation.entryId===returnedInternalId).forEach(x=>{
@@ -11798,7 +11849,7 @@ importWorkerReturn=async function(ev){
     let added=0,updated=0,unchanged=0,conflicts=0,deleted=0;
 
     for(const ret of (x.changes?.entries||[])){
-      const existing=project().entries.find(e=>e.syncUuid===ret.syncUuid);
+      const existing=(project()?.entries||[]).find(e=>e.syncUuid===ret.syncUuid);
 
       if(!existing){
         const masterDeleted=v60MasterDeletion(ret.syncUuid);
@@ -11829,13 +11880,13 @@ importWorkerReturn=async function(ev){
     }
 
     for(const d of (x.changes?.deletedEntries||[])){
-      const e=project().entries.find(q=>q.syncUuid===d.syncUuid);
+      const e=(project()?.entries||[]).find(q=>q.syncUuid===d.syncUuid);
       if(!e)continue;
 
       const safeBase=Number(e.syncRevision||1)===Number(d.baseRevision||0);
       const safeLater=e.syncOriginWorkPackage===x.workPackageId && !e.syncMasterChangedSinceSource;
       if(safeBase||safeLater){
-        project().entries=project().entries.filter(q=>q!==e);
+        project().entries=(project()?.entries||[]).filter(q=>q!==e);
         (project().plans||[]).forEach(pl=>pl.annotations=(pl.annotations||[]).filter(a=>a.entryId!==e.id));
         v60RecordMasterDeletion(e);
         deleted++;
@@ -11896,7 +11947,7 @@ resolveMergeConflict=function(i,choice){
       applyReturnedAnnotationsForEntry(c.pack,c.returned.syncUuid);
     }else if(c.type==="deleteEntry"){
       const e=c.existing;
-      project().entries=project().entries.filter(q=>q!==e);
+      project().entries=(project()?.entries||[]).filter(q=>q!==e);
       (project().plans||[]).forEach(pl=>pl.annotations=(pl.annotations||[]).filter(a=>a.entryId!==e.id));
       v60RecordMasterDeletion(e);
     }else if(c.type==="masterDeleted"){
@@ -12360,7 +12411,7 @@ function v612ReassignAnnotations(oldIds,newAnchorId){
     (pl.annotations||[]).forEach(a=>{
       if(set.has(a.entryId)){
         a.entryId=newAnchorId;
-        const anchor=project().entries.find(e=>e.id===newAnchorId);
+        const anchor=(project()?.entries||[]).find(e=>e.id===newAnchorId);
         if(anchor)a.label=String(entryDisplayId(anchor));
       }
     });
@@ -12388,7 +12439,7 @@ function v612MarkExistingDirty(e,baseRevision){
 
 /* Edit entire ID, not one sub-position. */
 editEntry=function(id){
- const e=project().entries.find(x=>x.id===id); if(!e)return;
+ const e=(project()?.entries||[]).find(x=>x.id===id); if(!e)return;
  const group=v612GroupEntries(e);
  const groupId=e.multiLvGroup || ("mlv_"+cryptoSafeId());
  const sharedId=entryDisplayId(e);
@@ -12466,7 +12517,7 @@ finalizeCurrentEntry=function(){
      return;
    }
 
-   const oldGroup=project().entries.filter(e=>e.multiLvGroup===v612EditingGroupId);
+   const oldGroup=(project()?.entries||[]).filter(e=>e.multiLvGroup===v612EditingGroupId);
    const oldIds=oldGroup.map(e=>e.id);
    const sharedDisplayId=oldGroup.length?entryDisplayId(oldGroup[0]):currentPlannedEntryDisplayId();
    const oldByPos=new Map(oldGroup.map(e=>[e.pos,e]));
@@ -12526,7 +12577,7 @@ finalizeCurrentEntry=function(){
        }
      });
    }
-   project().entries=project().entries.filter(e=>!removedIds.includes(e.id));
+   project().entries=(project()?.entries||[]).filter(e=>!removedIds.includes(e.id));
 
    /* Keep all plan markers on the surviving anchor of this ID. */
    const newAnchor=newEntries[0]?.id;
@@ -12625,7 +12676,7 @@ deleteEntry=function(id){
    });
  }
 
- project().entries=project().entries.filter(x=>!ids.has(x.id));
+ project().entries=(project()?.entries||[]).filter(x=>!ids.has(x.id));
  plans().forEach(pl=>{
    pl.annotations=(pl.annotations||[]).filter(a=>!ids.has(a.entryId));
  });
@@ -12636,7 +12687,7 @@ deleteEntry=function(id){
 /* Plan editing always edits the whole ID through its anchor. */
 markEntryOnPlan=function(entryId){
  ensurePlanData();
- const e=project().entries.find(x=>x.id===entryId); if(!e)return;
+ const e=(project()?.entries||[]).find(x=>x.id===entryId); if(!e)return;
  const anchor=v612AnchorEntry(e)||e;
  const group=v612GroupEntries(e);
  const target=anchor.planId || group.find(x=>x.planId)?.planId || activePlanId || plans()[0]?.id;
@@ -12659,7 +12710,7 @@ markEntryOnPlan=function(entryId){
 /* Newly drawn plan annotations are assigned to the group's anchor. */
 function v612CanonicalizeAnnotationEntry(a){
   if(!a?.entryId || typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId))return;
-  const e=project().entries.find(x=>x.id===a.entryId); if(!e)return;
+  const e=(project()?.entries||[]).find(x=>x.id===a.entryId); if(!e)return;
   const anchor=v612AnchorEntry(e);
   if(anchor){
     a.entryId=anchor.id;
@@ -13490,7 +13541,7 @@ renderSelectedAnnotation=function(){
  const box=document.getElementById("selectedAnnBox"),a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);
  if(!a){box.style.display="none";return}
  box.style.display="block";
- const p=getPos(a.pos),e=project().entries.find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
+ const p=getPos(a.pos),e=(project()?.entries||[]).find(x=>x.id===a.entryId),draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
  const id=draft?currentPlannedEntryDisplayId():(e?entryDisplayId(e):a.label);
  document.getElementById("selectedAnnTitle").textContent=`ID ${id} · ${annotationTypeName(a.type)}`;
  document.getElementById("selectedAnnInfo").innerHTML=
@@ -15544,7 +15595,7 @@ annotationsForSheet=function(sh){
   plans().forEach((pl,planIndex)=>{
     (pl.annotations||[]).forEach((a,annIndex)=>{
       if(!a.entryId || !ids.has(a.entryId))return;
-      const entry=project().entries.find(e=>e.id===a.entryId);
+      const entry=(project()?.entries||[]).find(e=>e.id===a.entryId);
       if(entry)out.push({plan:pl,ann:a,entry,planIndex,annIndex});
     });
   });
@@ -20833,6 +20884,100 @@ if("serviceWorker" in navigator){
 
 window.addEventListener("load",()=>{
   setTimeout(v672CheckVersionAndReload,350);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.73 – FINALE DIREKTE REITERSTEUERUNG
+   Keine historischen showView-Wrapper mehr im Ausfuehrungspfad.
+   ============================================================ */
+function v673SafeRenderForView(name){
+  const hasProject=(()=>{try{return !!project()}catch(e){return false}})();
+
+  if(!hasProject){
+    try{v670RenderNoProjectState?.()}catch(e){}
+    if(name==="project"){
+      try{renderProjectAdmin?.()}catch(e){}
+    }
+    return;
+  }
+
+  try{
+    if(name==="entry"){
+      renderRecent?.();
+      renderDraftEntrySummary?.();
+      renderEntryPlanSelect?.();
+    }else if(name==="sheet"){
+      renderSheet?.();
+      v671RenderTemplates?.();
+    }else if(name==="lv"){
+      renderLV?.();
+    }else if(name==="export"){
+      try{renderExportSettings?.()}catch(e){}
+    }else if(name==="sync"){
+      try{renderSyncView?.()}catch(e){}
+    }else if(name==="project"){
+      renderProjectAdmin?.();
+      renderProjectPlanLibrary?.();
+    }
+  }catch(err){
+    console.warn("V6.73 View render",name,err);
+  }
+}
+
+/* Replace the accumulated wrapper chain completely. */
+showView=function(name){
+  const valid=new Set(["entry","sheet","lv","export","sync","project"]);
+  if(!valid.has(name))name="entry";
+
+  document.querySelectorAll("main > section.view").forEach(view=>{
+    const active=view.id==="view-"+name;
+    view.classList.toggle("active",active);
+    view.style.display=active?"block":"none";
+  });
+
+  document.querySelectorAll(".tabs .tab").forEach(tab=>{
+    const active=tab.id==="tab-"+name;
+    tab.classList.toggle("active",active);
+    if(active)tab.setAttribute("aria-current","page");
+    else tab.removeAttribute("aria-current");
+  });
+
+  setTimeout(()=>{
+    v673SafeRenderForView(name);
+    try{
+      document.getElementById("tab-"+name)?.scrollIntoView?.({
+        behavior:"smooth",block:"nearest",inline:"nearest"
+      });
+    }catch(e){}
+  },0);
+};
+
+/* Known empty-project legacy errors should not produce a red fatal banner.
+   They originate from old load callbacks which are no longer needed for navigation. */
+window.addEventListener("error",ev=>{
+  const msg=String(ev?.message||"");
+  if(!project?.() && /project\(\)\.entries|null is not an object.*entries/i.test(msg)){
+    ev.preventDefault?.();
+    ev.stopImmediatePropagation?.();
+    console.warn("V6.73 legacy empty-project callback suppressed:",msg);
+    setTimeout(()=>{
+      document.querySelectorAll(".v663Fatal").forEach(el=>el.remove());
+      try{v670RenderNoProjectState?.()}catch(e){}
+    },0);
+  }
+},true);
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    const current=document.querySelector(".tabs .tab.active")?.id?.replace("tab-","")||"entry";
+    showView(current);
+    if(!project?.()){
+      document.querySelectorAll(".v663Fatal").forEach(el=>el.remove());
+    }
+  },130);
 });
 </script>
 
