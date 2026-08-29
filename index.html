@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.46</title>
+<title>Kollaudierung – V6.47</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1875,6 +1875,36 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   height:2.7mm!important;
 }
 
+
+/* ===== V6.47 MEHR INFOS DIREKT UNTER DEN FOTOS ===== */
+.v647PhotoCaption{
+  font-size:6.4pt;
+  line-height:1.32;
+}
+.v647PhotoCaptionTitle{
+  font-size:7.2pt;
+  font-weight:800;
+  margin-bottom:1.2mm;
+}
+.v647PhotoCaptionGrid{
+  display:grid;
+  grid-template-columns:23mm 1fr;
+  gap:.7mm 1.5mm;
+}
+.v647PhotoCaptionGrid .lbl{
+  font-weight:700;
+  color:#4d5f69;
+}
+.v647PhotoCaptionGrid .val{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.v647PhotoCaptionNote{
+  margin-top:1.3mm;
+  padding-top:1.2mm;
+  border-top:.2mm solid #d9e1e5;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1899,7 +1929,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.46</h1>
+   <h1>Kollaudierung – V6.47</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -16209,6 +16239,117 @@ window.addEventListener("load",()=>{
     }catch(e){}
   },0);
 });
+</script>
+
+
+<script>
+/* ============================================================
+   V6.47 – AUSFÜHRLICHERE BILDBESCHRIFTUNG IM PDF
+   ============================================================ */
+
+function v647PhotoContext(anchor,ph){
+  const group=typeof v612GroupEntries==="function"
+    ? v612GroupEntries(anchor)
+    : [anchor];
+
+  let lv=null;
+  if(ph?.targetPos){
+    lv=group.find(x=>x.pos===ph.targetPos)||null;
+  }
+
+  const pos=lv ? getPos(lv.pos) : null;
+  const allCodes=group.map(x=>x.pos).filter(Boolean);
+  const allCodesText=allCodes.join(", ");
+
+  return {
+    lv,
+    pos,
+    assignment: ph?.targetPos
+      ? `${ph.targetPos} · ${pos?.text||"LV-Unterposition"}`
+      : "gesamte Erfassungs-ID",
+    lvText: lv
+      ? (pos?.text||"–")
+      : (allCodesText||"–"),
+    qtyText: lv
+      ? `${num(lv.qty)} ${esc(lv.unit||pos?.unit||"")}`
+      : group.map(x=>`${x.pos}: ${num(x.qty)} ${x.unit||getPos(x.pos)?.unit||""}`).join(" · "),
+    calcText: lv
+      ? (lv.calc||"–")
+      : group.map(x=>`${x.pos}: ${x.calc||"–"}`).join(" · ")
+  };
+}
+
+function v647PhotoCaptionHtml(ph,index,anchor){
+  const ctx=v647PhotoContext(anchor,ph);
+  return `<div class="v647PhotoCaption">
+    <div class="v647PhotoCaptionTitle">Bild ${index} · ID ${entryDisplayId(anchor)}</div>
+    <div class="v647PhotoCaptionGrid">
+      <div class="lbl">Beschreibung</div>
+      <div class="val">${esc(anchor.lineDesc||"–")}</div>
+
+      <div class="lbl">Zuordnung</div>
+      <div class="val">${esc(ctx.assignment)}</div>
+
+      <div class="lbl">LV-Unterposition</div>
+      <div class="val">${esc(ctx.lv ? ctx.lv.pos : ctx.lvText)}</div>
+
+      ${ctx.lv?`<div class="lbl">Leistung</div>
+      <div class="val">${esc(ctx.lvText)}</div>`:""}
+
+      <div class="lbl">Menge</div>
+      <div class="val">${ctx.qtyText||"–"}</div>
+
+      <div class="lbl">Rechenansatz</div>
+      <div class="val">${esc(ctx.calcText||"–")}</div>
+
+      <div class="lbl">Status</div>
+      <div class="val">${esc(anchor.reason||"–")}</div>
+    </div>
+    ${ph.caption?`<div class="v647PhotoCaptionNote"><b>Bildbeschreibung:</b> ${esc(ph.caption)}</div>`:""}
+  </div>`;
+}
+
+/* Haupt-Aufmaß-PDF: kompakte Bilder, aber mit mehr Kontext. */
+v640CompactPhotoPagesForSheet=async function(sh){
+  const groups=v640PhotoGroupsForSheet(sh);
+  if(!groups.length)return [];
+
+  const pages=[];
+  const overview=v640CompactPhotoOverviewPage(sh);
+  if(overview)pages.push(overview);
+
+  for(const {anchor} of groups){
+    const photos=v637PhotosForEntry(anchor);
+    const chunks=[];
+    for(let i=0;i<photos.length;i+=4)chunks.push(photos.slice(i,i+4));
+
+    for(let ci=0;ci<chunks.length;ci++){
+      const chunk=chunks[ci];
+      const body=`<div class="v640CompactPhotoGrid">
+        ${chunk.map((ph,ix)=>{
+          const globalNo=ci*4+ix+1;
+          return `<figure class="v640CompactPhoto">
+            <img src="${ph.dataUrl}" alt="${esc(ph.name||`Bild ${globalNo}`)}">
+            <figcaption>${v647PhotoCaptionHtml(ph,globalNo,anchor)}</figcaption>
+          </figure>`;
+        }).join("")}
+      </div>`;
+
+      pages.push(v519Page(
+        body,
+        `Fotodokumentation · ${sh.code}`,
+        `ID ${entryDisplayId(anchor)} · ${esc(anchor.lineDesc||"–")}${chunks.length>1?` · ${ci+1}/${chunks.length}`:""}`,
+        "v519EvidencePage"
+      ));
+    }
+  }
+  return pages;
+};
+
+/* Vollständiges Fotodoku-PDF verwendet dieselbe Informationslogik. */
+function v638PhotoCaptionHtml(ph,idx,anchor){
+  return v647PhotoCaptionHtml(ph,idx+1,anchor);
+}
 </script>
 
 </body>
