@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.54</title>
+<title>Kollaudierung – V6.59</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2069,6 +2069,71 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   visibility:visible!important;
 }
 
+
+/* ===== V6.55 BAUSTELLEN-FIX ===== */
+.v655QuickSave{
+  margin:14px 0 4px;
+  padding:12px;
+  border:1px solid #b9d3e3;
+  border-radius:10px;
+  background:#f3f9fc;
+}
+.v655QuickSaveBtn{
+  width:100%;
+  min-height:46px;
+  font-size:15px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+#planOverlay.v655TouchFreehand,
+#planViewport.v655TouchFreehand,
+#planStage.v655TouchFreehand{
+  touch-action:none!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  -webkit-touch-callout:none!important;
+}
+
+
+/* ===== V6.56 VORLAGEN + MEDIEN AUF ID-EBENE ===== */
+.v656TemplateBadge{
+ display:inline-flex;
+ align-items:center;
+ gap:5px;
+ margin-top:6px;
+ padding:3px 8px;
+ border-radius:999px;
+ border:1px solid #e0c57b;
+ background:#fff7dd;
+ color:#805d08;
+ font-size:11px;
+ font-weight:800;
+}
+.v656GroupBadge{
+ display:inline-flex;
+ align-items:center;
+ gap:5px;
+ padding:3px 8px;
+ border-radius:999px;
+ border:1px solid #c8d9e7;
+ background:#edf5fb;
+ color:#285774;
+ font-size:11px;
+ font-weight:700;
+}
+.v656ZeroQty{
+ color:#8a6500;
+ font-weight:800;
+}
+
+
+/* ===== V6.59 KRITZEL-Ebene ===== */
+#planScribbleHelp{display:none}
+#planScribbleHelp.show{display:block}
+.planTools #tool-scribble.active{
+  font-weight:800;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -2096,7 +2161,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.54</h1>
+     <h1>Kollaudierung – V6.59</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -2252,6 +2317,12 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
       <input id="detail" placeholder="Detail / Bereich">
      </div>
     </div>
+
+    <div class="v655QuickSave noPrint">
+     <button type="button" class="primary v655QuickSaveBtn" onclick="finalizeCurrentEntry()">Erfassung speichern</button>
+     <div class="small">Kein Plan oder Foto erforderlich? Die Erfassung kann hier direkt gespeichert werden. Planmarkierungen und Bilder können später jederzeit ergänzt werden.</div>
+    </div>
+
     <div class="entryPlanBox">
      <div class="grid2">
       <div>
@@ -2352,6 +2423,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
        <button id="tool-rect" class="secondary toolBtn" onclick="setPlanTool('rect')">▭ Rechteck</button>
        <button id="tool-circle" class="secondary toolBtn" onclick="setPlanTool('circle')">◯ Kreis</button>
        <button id="tool-freehand" class="secondary toolBtn" onclick="setPlanTool('freehand')">✎ Freihand</button>
+       <button id="tool-scribble" class="secondary toolBtn" onclick="v659SelectScribble()">≈ Kritzeln</button>
        <button id="tool-text" class="secondary toolBtn" onclick="setPlanTool('text')">T Text</button>
        <button class="secondary touchIconBtn" onclick="undoLastPlanAnnotation()" title="Letzte Markierung rückgängig">↶ Rückgängig</button>
        <button class="secondary touchIconBtn" onclick="changePlanZoom(-0.15)">− Zoom</button>
@@ -17241,6 +17313,1491 @@ v651ShowReady=function(blob){
     sub.innerHTML=`Dateiname: <b>${esc(v651FileName())}</b><br>Ohne Safari-URL, Browser-Datum oder zusätzliche Browser-Seitenzahl.`;
   }
 };
+</script>
+
+
+<script>
+/* ============================================================
+   V6.55 – BAUSTELLEN-FIX
+   1) iPhone/iPad Finger-Freihand
+   2) Android/Samsung direkter PDF-Export
+   3) zusätzlicher Speicherbutton oben
+   ============================================================ */
+
+/* ---------- 1) Robust finger freehand for iPhone/iPad ---------- */
+let v655TouchFreehandActive=false;
+let v655TouchFreehandIdentifier=null;
+
+function v655TouchPoint(touch){
+  return planCoords({
+    clientX:touch.clientX,
+    clientY:touch.clientY
+  });
+}
+
+function v655ApplyFreehandTouchClass(){
+  const on=planTool==="freehand";
+  document.getElementById("planOverlay")?.classList.toggle("v655TouchFreehand",on);
+  document.getElementById("planViewport")?.classList.toggle("v655TouchFreehand",on);
+  document.getElementById("planStage")?.classList.toggle("v655TouchFreehand",on);
+}
+
+function v655SetupFingerFreehand(){
+  const svg=document.getElementById("planOverlay");
+  if(!svg || svg.dataset.v655TouchFreehand==="1")return;
+  svg.dataset.v655TouchFreehand="1";
+
+  svg.addEventListener("touchstart",ev=>{
+    if(planTool!=="freehand" || !activePlan())return;
+    if(ev.touches.length!==1)return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    const t=ev.touches[0];
+    v655TouchFreehandActive=true;
+    v655TouchFreehandIdentifier=t.identifier;
+
+    /* Sentinel disables the older pointer stream for this touch.
+       iOS may otherwise emit pointercancel after a few pixels. */
+    try{v516FreehandPointerId="v655-touch"}catch(e){}
+    freehandPointerId="v655-touch";
+
+    freehandDraftPoints=[v655TouchPoint(t)];
+    renderPlanAnnotations();
+    try{v516UpdateLivePolyline()}catch(e){}
+  },{capture:true,passive:false});
+
+  svg.addEventListener("touchmove",ev=>{
+    if(!v655TouchFreehandActive || planTool!=="freehand")return;
+
+    const t=[...ev.touches].find(x=>x.identifier===v655TouchFreehandIdentifier);
+    if(!t)return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    const p=v655TouchPoint(t);
+    const last=freehandDraftPoints[freehandDraftPoints.length-1];
+
+    if(!last || Math.hypot(p.x-last.x,p.y-last.y)>0.25){
+      freehandDraftPoints.push(p);
+      try{v516UpdateLivePolyline()}catch(e){renderPlanAnnotations()}
+    }
+  },{capture:true,passive:false});
+
+  const finishTouch=ev=>{
+    if(!v655TouchFreehandActive)return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    const changed=[...(ev.changedTouches||[])].find(x=>x.identifier===v655TouchFreehandIdentifier);
+    if(changed){
+      const p=v655TouchPoint(changed);
+      const last=freehandDraftPoints[freehandDraftPoints.length-1];
+      if(!last || Math.hypot(p.x-last.x,p.y-last.y)>0.15){
+        freehandDraftPoints.push(p);
+      }
+    }
+
+    v655TouchFreehandActive=false;
+    v655TouchFreehandIdentifier=null;
+    try{v516FreehandPointerId=null}catch(e){}
+    freehandPointerId=null;
+
+    try{
+      const live=v516FindLivePolyline?.(svg);
+      if(live)live.remove();
+    }catch(e){}
+
+    finishFreehand();
+  };
+
+  svg.addEventListener("touchend",finishTouch,{capture:true,passive:false});
+
+  svg.addEventListener("touchcancel",ev=>{
+    if(!v655TouchFreehandActive)return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    v655TouchFreehandActive=false;
+    v655TouchFreehandIdentifier=null;
+    try{v516FreehandPointerId=null}catch(e){}
+    freehandPointerId=null;
+
+    if(freehandDraftPoints.length>=3){
+      finishFreehand();
+    }else{
+      freehandDraftPoints=[];
+      renderPlanAnnotations();
+    }
+  },{capture:true,passive:false});
+
+  svg.addEventListener("gesturestart",ev=>{
+    if(planTool==="freehand")ev.preventDefault();
+  },{passive:false});
+}
+
+const _v655SetPlanToolBase=setPlanTool;
+setPlanTool=function(tool){
+  _v655SetPlanToolBase(tool);
+  v655ApplyFreehandTouchClass();
+  v655SetupFingerFreehand();
+};
+
+const _v655OpenPlanBase=openPlan;
+openPlan=async function(id){
+  await _v655OpenPlanBase(id);
+  v655SetupFingerFreehand();
+  v655ApplyFreehandTouchClass();
+};
+
+try{
+  v655SetupFingerFreehand();
+  v655ApplyFreehandTouchClass();
+}catch(e){}
+
+
+/* ---------- 2) Direct Kollapp PDF also on Android/Samsung ---------- */
+/* The later iOS PDF path (html2canvas + jsPDF) is reused on Android.
+   This avoids depending on Samsung/Chrome's print dialog behavior. */
+v651IsIOS=function(){
+  const ua=navigator.userAgent||"";
+  const ios=/iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  const android=/Android/i.test(ua);
+  return ios || android;
+};
+
+
+/* ---------- 3) Synchronize the upper and lower save buttons ---------- */
+function v655SyncSaveButtonText(){
+  const bottom=document.getElementById("finalSaveEntryBtn");
+  const top=document.querySelector(".v655QuickSaveBtn");
+  if(!top)return;
+  top.textContent=bottom?.textContent||"Erfassung speichern";
+}
+
+const _v655RenderDraftSummaryBase=renderDraftEntrySummary;
+renderDraftEntrySummary=function(){
+  const r=_v655RenderDraftSummaryBase.apply(this,arguments);
+  v655SyncSaveButtonText();
+  return r;
+};
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    try{
+      v655SetupFingerFreehand();
+      v655ApplyFreehandTouchClass();
+      v655SyncSaveButtonText();
+    }catch(e){}
+  },0);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.56 – VORLAGEN & MEDIEN AUF ERFASSUNGS-ID-EBENE
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1) MENGE 0 = VORLAGE
+   ------------------------------------------------------------ */
+v610CurrentLvCandidate=function(){
+  const p=getPos(document.getElementById("posSelect")?.value||"");
+  const calc=document.getElementById("calc")?.value.trim()||"";
+  if(!p)return{valid:false,message:"Bitte zuerst eine LV-Unterposition auswählen."};
+
+  /* Empty calculation is intentional: this is a template. */
+  if(!calc){
+    return{
+      valid:true,
+      pos:p.pos,
+      text:p.text||"",
+      unit:p.unit||"",
+      calc:"",
+      qty:0,
+      template:true
+    };
+  }
+
+  const qty=previewCalc();
+  if(qty===null || !Number.isFinite(Number(qty))){
+    return{valid:false,message:"Der Rechenansatz ist ungültig."};
+  }
+
+  return{
+    valid:true,
+    pos:p.pos,
+    text:p.text||"",
+    unit:p.unit||"",
+    calc,
+    qty:Number(qty),
+    template:Number(qty)===0
+  };
+};
+
+function v656GroupIsTemplate(entryOrGroup){
+  const group=Array.isArray(entryOrGroup)
+    ? entryOrGroup
+    : (typeof v612GroupEntries==="function"?v612GroupEntries(entryOrGroup):[entryOrGroup]);
+  return !!group.length && group.every(e=>Number(e?.qty||0)===0);
+}
+
+function v656RefreshTemplateFlags(){
+  const p=project?.();
+  if(!p?.entries)return;
+
+  const seen=new Set();
+  p.entries.forEach(e=>{
+    const key=typeof v612GroupKey==="function"?v612GroupKey(e):(e.multiLvGroup||e.id);
+    if(seen.has(key))return;
+    seen.add(key);
+
+    const group=typeof v612GroupEntries==="function"?v612GroupEntries(e):[e];
+    const isTemplate=v656GroupIsTemplate(group);
+    group.forEach(x=>x.template=isTemplate);
+  });
+}
+
+function v656TemplateBadgeHtml(entry){
+  return v656GroupIsTemplate(entry)
+    ? '<div class="v656TemplateBadge">✎ Vorlage · Menge 0</div>'
+    : "";
+}
+
+/* ------------------------------------------------------------
+   2) New save path permits zero quantities
+   ------------------------------------------------------------ */
+v646NewEntrySave=function(){
+  if(v646NewSaveRunning)return;
+  v646NewSaveRunning=true;
+
+  try{
+    const p=project();
+    const sh=activeSheet();
+
+    if(!p){v646SetFinalizeMessage("Kein Projekt geladen.",true);return}
+    if(!sh){v646SetFinalizeMessage("Bitte zuerst ein Aufmaßblatt auswählen oder anlegen.",true);return}
+
+    if(!Array.isArray(p.entries))p.entries=[];
+    if(!Number.isFinite(Number(p.nextEntryDisplayId)) || Number(p.nextEntryDisplayId)<1)p.nextEntryDisplayId=1;
+
+    const lineDesc=document.getElementById("lineDesc")?.value.trim()||"";
+    if(!lineDesc){v646SetFinalizeMessage("Bitte eine Positionsbeschreibung eingeben.",true);return}
+
+    const items=v646CollectNewItems();
+    if(!items.length){
+      v646SetFinalizeMessage("Bitte mindestens eine LV-Unterposition auswählen. Ohne Mengenermittlung wird die ID als Vorlage gespeichert.",true);
+      return;
+    }
+
+    for(const item of items){
+      if(!getPos(item.pos)){
+        v646SetFinalizeMessage(`LV-Unterposition <b>${esc(item.pos)}</b> ist nicht mehr in der LV-Übersicht vorhanden.`,true);
+        return;
+      }
+      if(!Number.isFinite(Number(item.qty))){
+        v646SetFinalizeMessage(`Ungültige Menge bei <b>${esc(item.pos)}</b>.`,true);
+        return;
+      }
+    }
+
+    const selectedPlanId=document.getElementById("entryPlanSelect")?.value||"";
+    const access=typeof currentAccess==="function"?currentAccess():{mode:"master"};
+
+    if(access?.mode!=="worker"){
+      try{v626RebuildMasterDisplayIds?.(true)}catch(e){}
+    }
+
+    const displayId=Number(
+      typeof peekNextEntryDisplayId==="function"?peekNextEntryDisplayId():p.nextEntryDisplayId
+    )||1;
+
+    const groupId="mlv_"+cryptoSafeId();
+    const isTemplate=items.every(x=>Number(x.qty||0)===0);
+
+    const shared={
+      lineDesc,
+      detail:document.getElementById("detail")?.value.trim()||"",
+      reason:document.getElementById("reason")?.value||"",
+      note:document.getElementById("note")?.value.trim()||"",
+      planId:selectedPlanId,
+      groupId,
+      displayId
+    };
+
+    const saved=[];
+    for(const item of items){
+      const pos=getPos(item.pos);
+      const e={
+        id:uid("e"),
+        sheetId:sh.id,
+        lineDesc:shared.lineDesc,
+        lineNo:lineNoFor(shared.lineDesc,sh.id,null),
+        pos:item.pos,
+        calc:item.calc||"",
+        qty:Number(item.qty||0),
+        unit:item.unit||pos?.unit||"",
+        detail:shared.detail,
+        reason:shared.reason,
+        note:shared.note,
+        planId:shared.planId||"",
+        updated:new Date().toISOString(),
+        multiLvGroup:groupId,
+        displayId,
+        template:isTemplate
+      };
+
+      if(access?.mode==="worker"){
+        markEntrySyncDirty?.(e,true);
+      }else{
+        e.syncUuid="entry_"+cryptoSafeId();
+        e.syncRevision=1;
+        e.syncUpdatedAt=new Date().toISOString();
+        e.syncDirty=false;
+      }
+
+      p.entries.push(e);
+      saved.push(e);
+    }
+
+    const anchor=saved[0];
+    saved.forEach(e=>e.displayId=displayId);
+    p.nextEntryDisplayId=Math.max(Number(p.nextEntryDisplayId)||1,displayId+1);
+
+    /* Draft markers are assigned once to the ID anchor. */
+    if(typeof convertDraftAnnotations==="function"){
+      convertDraftAnnotations(v54DraftToken,anchor.id);
+    }
+
+    /* Every draft marker created for a multi-LV ID is group-wide. */
+    try{
+      plans().forEach(pl=>{
+        (pl.annotations||[]).forEach(a=>{
+          if(a.entryId!==anchor.id)return;
+          if(items.length>1 || a.groupScope){
+            a.groupScope=true;
+            a.pos="";
+            a.posText="";
+            a.lvEntryId="";
+            a.lvSyncUuid="";
+            a.label=String(displayId);
+          }
+        });
+      });
+    }catch(e){}
+
+    /* Photos already live on group / ID level; keep their optional targetPos. */
+    try{
+      if(Array.isArray(v637DraftPhotos) && v637DraftPhotos.length){
+        v637SetPhotosForKey(groupId,v637ClonePhotos(v637DraftPhotos));
+      }
+    }catch(e){}
+
+    multiLvDraft=[];
+    newDraftToken?.();
+    v637ClearDraftPhotos?.();
+    clearEntryForm(false);
+    const eps=document.getElementById("entryPlanSelect");if(eps)eps.value="";
+    selectedAnnotationId=null;
+
+    v656RefreshTemplateFlags();
+    persist();
+
+    try{v626RebuildMasterDisplayIds?.(true)}catch(e){}
+    try{renderMultiLvDraft?.()}catch(e){}
+    try{renderAll?.()}catch(e){}
+    try{renderRecent?.()}catch(e){}
+    try{renderSheet?.()}catch(e){}
+    try{renderLV?.()}catch(e){}
+    try{renderPlanAnnotations?.()}catch(e){}
+    try{renderDraftEntrySummary?.()}catch(e){}
+    try{populatePlanLinks?.()}catch(e){}
+
+    v646SetFinalizeMessage(
+      isTemplate
+        ? `Vorlage <b>ID ${entryDisplayId(anchor)||displayId}</b> gespeichert · ${saved.length} LV-Unterposition(en) · Menge 0.`
+        : `Erfassungs-ID <b>${entryDisplayId(anchor)||displayId}</b> gespeichert · ${saved.length} LV-Unterposition(en).`
+    );
+
+  }catch(err){
+    console.error("V6.56 speichern",err);
+    v646SetFinalizeMessage("Erfassung konnte nicht gespeichert werden: "+esc(err?.message||String(err)),true);
+  }finally{
+    v646NewSaveRunning=false;
+  }
+};
+
+/* ------------------------------------------------------------
+   3) PLAN MARKING MAY REFER TO THE WHOLE ID
+   ------------------------------------------------------------ */
+function v656DraftLvPositions(){
+  const list=(multiLvDraft||[]).map(x=>x.pos).filter(Boolean);
+  const current=document.getElementById("posSelect")?.value||"";
+  if(current && !list.includes(current))list.push(current);
+  return [...new Set(list)];
+}
+
+function v656PlanGroupSelected(){
+  return document.getElementById("planPosSelect")?.value==="__GROUP__";
+}
+
+function v656AddPlanGroupOption(){
+  const es=document.getElementById("planEntrySelect");
+  const ps=document.getElementById("planPosSelect");
+  if(!es||!ps)return;
+
+  const raw=es.value||"";
+  let count=0;
+
+  if(raw==="__CURRENT_DRAFT__"){
+    count=v656DraftLvPositions().length;
+  }else{
+    const e=project()?.entries?.find(x=>x.id===raw);
+    if(e)count=(typeof v612GroupEntries==="function"?v612GroupEntries(e):[e]).length;
+  }
+
+  if(count>1){
+    if(![...ps.options].some(o=>o.value==="__GROUP__")){
+      ps.insertAdjacentHTML("afterbegin",'<option value="__GROUP__">Gesamte Erfassungs-ID · alle LV-Unterpositionen</option>');
+    }
+    /* Multi-LV IDs default to one shared marker. */
+    ps.value="__GROUP__";
+  }else{
+    [...ps.options].filter(o=>o.value==="__GROUP__").forEach(o=>o.remove());
+  }
+}
+
+const _v656PopulatePlanLinksBase=populatePlanLinks;
+populatePlanLinks=function(){
+  const r=_v656PopulatePlanLinksBase.apply(this,arguments);
+  v656AddPlanGroupOption();
+  return r;
+};
+
+const _v656PlanEntryChangedBase=planEntryChanged;
+planEntryChanged=function(){
+  const r=_v656PlanEntryChangedBase.apply(this,arguments);
+  v656AddPlanGroupOption();
+  return r;
+};
+
+/* Binding rule:
+   - multi-position draft => whole ID
+   - saved group + "whole ID" selected => whole ID
+   - otherwise concrete LV position remains possible */
+v633BindAnnotationToSelectedLv=function(a){
+  if(!a)return;
+
+  let base=null;
+  if(a.entryId && !(typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId))){
+    base=project()?.entries?.find(x=>x.id===a.entryId)||null;
+  }
+
+  const draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
+  const draftCount=v656DraftLvPositions().length;
+  const groupRequested=v656PlanGroupSelected() || (draft && draftCount>1);
+
+  if(groupRequested){
+    a.groupScope=true;
+    a.pos="";
+    a.posText="";
+    a.lvEntryId="";
+    a.lvSyncUuid="";
+    if(base){
+      const anchor=v612AnchorEntry(base)||base;
+      a.entryId=anchor.id;
+      a.label=String(entryDisplayId(anchor));
+    }
+    return;
+  }
+
+  a.groupScope=false;
+  const selectedPos=
+    document.getElementById("planPosSelect")?.value ||
+    document.getElementById("posSelect")?.value ||
+    a.pos||"";
+
+  if(base){
+    const group=v612GroupEntries(base);
+    const lvEntry=group.find(x=>x.pos===selectedPos)||group.find(x=>x.pos===a.pos)||base;
+    const anchor=v612AnchorEntry(base)||base;
+    a.entryId=anchor.id;
+    a.lvEntryId=lvEntry.id;
+    a.lvSyncUuid=lvEntry.syncUuid||"";
+    a.pos=lvEntry.pos;
+    a.posText=getPos(lvEntry.pos)?.text||"";
+    a.label=String(entryDisplayId(anchor));
+  }else{
+    a.pos=selectedPos||"";
+    a.posText=getPos(a.pos)?.text||"";
+  }
+};
+
+/* Do not "repair" whole-ID markers back onto one individual LV position. */
+const _v656RepairLinksBase=v633RepairAnnotationLinks;
+v633RepairAnnotationLinks=function(){
+  _v656RepairLinksBase?.();
+  try{
+    plans().forEach(pl=>{
+      (pl.annotations||[]).forEach(a=>{
+        if(!a.groupScope)return;
+        const anchor=project()?.entries?.find(x=>x.id===a.entryId);
+        if(anchor){
+          const ca=v612AnchorEntry(anchor)||anchor;
+          a.entryId=ca.id;
+          a.label=String(entryDisplayId(ca));
+        }
+        a.pos="";
+        a.posText="";
+        a.lvEntryId="";
+        a.lvSyncUuid="";
+      });
+    });
+  }catch(e){}
+};
+
+/* Selected marker information clearly says it belongs to the entire ID. */
+const _v656SelectedAnnBase=renderSelectedAnnotation;
+renderSelectedAnnotation=function(){
+  const a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);
+  if(!a || !a.groupScope)return _v656SelectedAnnBase.apply(this,arguments);
+
+  const box=document.getElementById("selectedAnnBox");
+  if(!box)return;
+  const draft=typeof isDraftEntryId==="function"&&isDraftEntryId(a.entryId);
+  const anchor=draft?null:project()?.entries?.find(x=>x.id===a.entryId);
+  const group=anchor?v612GroupEntries(anchor):[];
+  const codes=draft?v656DraftLvPositions():group.map(x=>x.pos);
+
+  box.style.display="block";
+  const id=draft?currentPlannedEntryDisplayId():entryDisplayId(anchor);
+  document.getElementById("selectedAnnTitle").textContent=`ID ${id} · ${annotationTypeName(a.type)}`;
+  document.getElementById("selectedAnnInfo").innerHTML=
+    `<span class="v656GroupBadge">Gesamte Erfassungs-ID</span><br>`+
+    `${codes.length?`LV-Unterpositionen: <b>${esc(codes.join(", "))}</b><br>`:""}`+
+    `${draft?"Noch nicht gespeichert":esc(anchor?.lineDesc||"")}`+
+    `${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
+  document.getElementById("goEntryBtn").style.display=anchor?"inline-block":"none";
+};
+
+/* ------------------------------------------------------------
+   4) EXPORT WHOLE-ID MARKERS WITH ALL LV POSITIONS
+   ------------------------------------------------------------ */
+v516GroupLinksByEntryAndPlan=function(links){
+  const map=new Map();
+
+  for(const item of links){
+    const anchor=item.entry||v516EntryForAnnotation(item.ann);
+    if(!anchor)continue;
+
+    const whole=!!item.ann?.groupScope;
+    const lv=whole?null:(v633EntryForAnnotation(item.ann)||anchor);
+    const pos=whole?"__GROUP__":(lv?.pos||item.ann?.pos||"");
+    const key=`${anchor.id}__${item.plan.id}__${pos}`;
+
+    if(!map.has(key)){
+      map.set(key,{
+        entry:anchor,
+        lvEntry:lv,
+        wholeId:whole,
+        pos,
+        plan:item.plan,
+        items:[]
+      });
+    }
+    map.get(key).items.push({...item,entry:anchor,lvEntry:lv});
+  }
+
+  return [...map.values()].sort((a,b)=>{
+    const ai=Number(entryDisplayId(a.entry))||999999999;
+    const bi=Number(entryDisplayId(b.entry))||999999999;
+    if(ai!==bi)return ai-bi;
+    if(a.wholeId!==b.wholeId)return a.wholeId?-1:1;
+    return String(a.pos||"").localeCompare(String(b.pos||""),"de",{numeric:true,sensitivity:"base"});
+  });
+};
+
+function v656GroupEvidenceInfoHtml(entry,plan,cluster){
+  const sh=v634SheetForEntry(entry);
+  const group=v612GroupEntries(entry);
+  const markerNotes=[...new Set((cluster||[]).map(x=>x.ann?.note).filter(Boolean))].join(" | ");
+  const rows=group.map(e=>{
+    const p=getPos(e.pos);
+    return `<div class="v634EvidenceText" style="border-top:1px solid #e2e8eb">
+      <b>${esc(e.pos)}</b> · ${esc(p?.text||"–")} ·
+      ${num(e.qty)} ${esc(e.unit||p?.unit||"")} · Ansatz: ${esc(e.calc||"–")}
+    </div>`;
+  }).join("");
+
+  return `<div class="v634EvidenceInfo">
+    <div class="v634EvidenceGrid">
+      <div class="v634EvidenceCell"><b>Erfassungs-ID</b><span>${entryDisplayId(entry)}</span></div>
+      <div class="v634EvidenceCell"><b>Aufmaßblatt</b><span>${esc(sh?.code||"–")}</span></div>
+      <div class="v634EvidenceCell"><b>Planmarkierung</b><span>gesamte Erfassungs-ID</span></div>
+      <div class="v634EvidenceCell"><b>Bereich</b><span>${esc([sh?.topArea,sh?.area].filter(Boolean).join(" – ")||"–")}</span></div>
+      <div class="v634EvidenceCell"><b>Plan</b><span>${esc(plan?.name||"–")}</span></div>
+      <div class="v634EvidenceCell"><b>Status</b><span>${v656GroupIsTemplate(entry)?"Vorlage":esc(entry.reason||"–")}</span></div>
+    </div>
+    <div class="v634EvidenceText"><b>Positionsbeschreibung:</b> ${esc(entry.lineDesc||"–")}</div>
+    ${rows}
+    ${markerNotes?`<div class="v634EvidenceText"><b>Bemerkung zur Planmarkierung:</b> ${esc(markerNotes)}</div>`:""}
+  </div>`;
+}
+
+makePlanEvidenceHtml=async function(sh){
+  const links=annotationsForSheet(sh);
+  if(!links.length)return "";
+
+  const groups=v516GroupLinksByEntryAndPlan(links);
+  const blocks=[];
+
+  for(const group of groups){
+    const clusters=v516ClusterItemsForExport(group.items);
+    const entry=group.entry;
+    const id=entryDisplayId(entry);
+
+    for(let i=0;i<clusters.length;i++){
+      const cluster=clusters[i];
+      const suffix=clusters.length>1?` · Ausschnitt ${i+1}/${clusters.length}`:"";
+
+      if(group.wholeId){
+        const entries=v612GroupEntries(entry);
+        const codes=entries.map(x=>x.pos).join(", ");
+        const headerText=`ID ${id} · gesamte Erfassungs-ID · ${codes}`;
+        const pics=await v516MakeClusterEvidenceImages(group.plan,cluster,headerText);
+        if(!pics)continue;
+
+        blocks.push(`<div class="sheetPlanEvidence">
+          <div class="sheetPlanEvidenceHead">
+            <div>
+              <b>ID ${id} · gesamte Erfassungs-ID${suffix}</b>
+              <div class="desc">${esc(entry.lineDesc||"")}</div>
+            </div>
+            <div class="desc">${entries.length} LV-Unterposition(en) · ${esc(group.plan.name)}</div>
+          </div>
+          <div class="sheetPlanEvidenceGrid">
+            <div><img src="${pics.detail}"><div class="cap">Detailausschnitt der Erfassungs-ID</div></div>
+            <div><img src="${pics.overview}"><div class="cap">Lage des Ausschnitts im Gesamtplan</div></div>
+          </div>
+          ${v656GroupEvidenceInfoHtml(entry,group.plan,cluster)}
+        </div>`);
+        continue;
+      }
+
+      const lv=v633EntryForAnnotation(cluster?.[0]?.ann)||group.lvEntry||entry;
+      const posCode=lv.pos||"";
+      const pos=getPos(posCode);
+      const posText=pos?.text||cluster?.[0]?.ann?.posText||"";
+      const headerText=`ID ${id} · ${posCode}${posText?" · "+posText:""}`;
+      const pics=await v516MakeClusterEvidenceImages(group.plan,cluster,headerText);
+      if(!pics)continue;
+
+      blocks.push(`<div class="sheetPlanEvidence">
+        <div class="sheetPlanEvidenceHead">
+          <div><b>ID ${id} · ${esc(posCode)} · ${esc(posText)}${suffix}</b><div class="desc">${esc(entry.lineDesc||"")}</div></div>
+          <div class="desc">${num(lv.qty)} ${esc(lv.unit||pos?.unit||"")} · ${esc(group.plan.name)}</div>
+        </div>
+        <div class="sheetPlanEvidenceGrid">
+          <div><img src="${pics.detail}"><div class="cap">Detailausschnitt der markierten LV-Unterposition</div></div>
+          <div><img src="${pics.overview}"><div class="cap">Lage des Ausschnitts im Gesamtplan</div></div>
+        </div>
+        ${v634EvidenceInfoHtml(entry,lv,group.plan,cluster)}
+      </div>`);
+    }
+  }
+  return blocks.join("");
+};
+
+/* ------------------------------------------------------------
+   5) TEMPLATE BADGES IN THE WORK VIEWS
+   ------------------------------------------------------------ */
+function v656DecorateTemplateRows(){
+  try{
+    const byDisplay=new Map();
+    (project()?.entries||[]).forEach(e=>{
+      const id=Number(e.displayId||0);
+      if(id && !byDisplay.has(id))byDisplay.set(id,e);
+    });
+
+    ["recentBody","sheetBody"].forEach(bodyId=>{
+      const body=document.getElementById(bodyId);
+      if(!body)return;
+
+      [...body.querySelectorAll("tr")].forEach(tr=>{
+        const id=parseInt((tr.children?.[0]?.textContent||"").trim(),10);
+        const e=byDisplay.get(id);
+        if(!e || !v656GroupIsTemplate(e))return;
+
+        const cell=tr.children?.[1];
+        if(cell && !cell.querySelector(".v656TemplateBadge")){
+          cell.insertAdjacentHTML("beforeend",v656TemplateBadgeHtml(e));
+        }
+      });
+    });
+  }catch(e){}
+}
+
+const _v656RecentBase=renderRecent;
+renderRecent=function(){
+  const r=_v656RecentBase.apply(this,arguments);
+  v656DecorateTemplateRows();
+  return r;
+};
+
+const _v656SheetBase=renderSheet;
+renderSheet=function(){
+  const r=_v656SheetBase.apply(this,arguments);
+  v656DecorateTemplateRows();
+  return r;
+};
+
+/* Recompute template state after ANY save/edit. */
+const _v656FinalizeBase=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const r=_v656FinalizeBase.apply(this,arguments);
+  try{
+    v656RefreshTemplateFlags();
+    persist();
+    renderRecent?.();
+    renderSheet?.();
+  }catch(e){}
+  return r;
+};
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    try{
+      v656RefreshTemplateFlags();
+      persist();
+      renderRecent?.();
+      renderSheet?.();
+    }catch(e){}
+  },0);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.57 – ERFASSUNGS-IDs SIND DAUERHAFT / UNVERÄNDERLICH
+   ============================================================ */
+
+let v657IdRepairRunning=false;
+
+function v657RawGroupsInStorageOrder(p=project()){
+  if(!p)return[];
+  const map=new Map(), out=[];
+
+  for(const e of (p.entries||[])){
+    const key=e.multiLvGroup
+      ? "g:"+e.multiLvGroup
+      : (typeof v619RawGroupKey==="function" ? v619RawGroupKey(e) : "e:"+e.id);
+
+    let g=map.get(key);
+    if(!g){
+      g=[];
+      map.set(key,g);
+      out.push(g);
+    }
+    g.push(e);
+  }
+  return out;
+}
+
+function v657MaxDisplayId(p=project()){
+  if(!p)return 0;
+  let max=0;
+  for(const e of (p.entries||[])){
+    const n=Number(e.displayId);
+    if(Number.isInteger(n) && n>max)max=n;
+  }
+  return max;
+}
+
+/* Repair only genuinely broken/missing IDs.
+   Existing valid IDs are NEVER compacted or reordered. */
+function v657RepairIds(p=project()){
+  if(!p || v657IdRepairRunning)return false;
+  v657IdRepairRunning=true;
+
+  try{
+    if(!Array.isArray(p.entries))p.entries=[];
+
+    const groups=v657RawGroupsInStorageOrder(p);
+    const owner=new Map();
+    let max=v657MaxDisplayId(p);
+    let changed=false;
+
+    for(const g of groups){
+      const valid=[...new Set(
+        g.map(e=>Number(e.displayId))
+         .filter(n=>Number.isInteger(n)&&n>0)
+      )];
+
+      let chosen=null;
+
+      /* Preserve the group's existing ID whenever it is not owned by
+         another, unrelated group. */
+      for(const n of valid){
+        if(!owner.has(n)){
+          chosen=n;
+          break;
+        }
+      }
+
+      if(chosen===null){
+        chosen=++max;
+        changed=true;
+      }else{
+        max=Math.max(max,chosen);
+      }
+
+      owner.set(chosen,g);
+
+      for(const e of g){
+        if(Number(e.displayId)!==chosen){
+          e.displayId=chosen;
+          changed=true;
+        }
+      }
+
+      /* Plan markers follow the permanent ID but do not change it. */
+      const anchor=g[0];
+      const memberIds=new Set(g.map(e=>e.id));
+      try{
+        plans().forEach(pl=>{
+          (pl.annotations||[]).forEach(a=>{
+            if(!memberIds.has(a.entryId))return;
+            if(a.entryId!==anchor.id){
+              a.entryId=anchor.id;
+              changed=true;
+            }
+            if(String(a.label)!==String(chosen)){
+              a.label=String(chosen);
+              changed=true;
+            }
+          });
+        });
+      }catch(e){}
+    }
+
+    const access=typeof currentAccess==="function"
+      ? currentAccess()
+      : {mode:"master"};
+
+    const currentNext=Number(p.nextEntryDisplayId);
+    const reservedStart=Number(p.sync?.idRangeStart);
+
+    if(access?.mode==="worker"){
+      const next=Math.max(
+        Number.isInteger(currentNext)&&currentNext>0?currentNext:1,
+        Number.isInteger(reservedStart)&&reservedStart>0?reservedStart:1,
+        max+1
+      );
+      if(Number(p.nextEntryDisplayId)!==next){
+        p.nextEntryDisplayId=next;
+        changed=true;
+      }
+    }else{
+      /* Never move the master counter backwards. Deleted IDs are not reused. */
+      const next=Math.max(
+        Number.isInteger(currentNext)&&currentNext>0?currentNext:1,
+        max+1
+      );
+      if(Number(p.nextEntryDisplayId)!==next){
+        p.nextEntryDisplayId=next;
+        changed=true;
+      }
+    }
+
+    return changed;
+  } finally {
+    v657IdRepairRunning=false;
+  }
+}
+
+/* Old "compact IDs" calls remain in historical wrappers.
+   From V6.57 onward they only perform a non-destructive repair. */
+v626RebuildMasterDisplayIds=function(){
+  return v657RepairIds(project());
+};
+
+v615CompactVisibleIds=function(){
+  return v657RepairIds(project());
+};
+
+ensureEntryDisplayIds=function(p=project()){
+  v657RepairIds(p);
+};
+
+entryDisplayId=function(e){
+  if(!e)return "";
+  const n=Number(e.displayId);
+  if(Number.isInteger(n)&&n>0)return n;
+  v657RepairIds(project());
+  return Number(e.displayId)||"";
+};
+
+v615NextVisibleId=function(){
+  const p=project();
+  if(!p)return 1;
+
+  v657RepairIds(p);
+
+  const access=typeof currentAccess==="function"
+    ? currentAccess()
+    : {mode:"master"};
+
+  const max=v657MaxDisplayId(p);
+  if(access?.mode==="worker"){
+    return Math.max(
+      Number(p.nextEntryDisplayId)||1,
+      Number(p.sync?.idRangeStart)||1,
+      max+1
+    );
+  }
+
+  return Math.max(Number(p.nextEntryDisplayId)||1,max+1);
+};
+
+peekNextEntryDisplayId=function(){
+  return v615NextVisibleId();
+};
+
+currentPlannedEntryDisplayId=function(){
+  if(editingEntryId){
+    const e=project()?.entries?.find(x=>x.id===editingEntryId);
+    if(e)return Number(e.displayId)||entryDisplayId(e);
+  }
+
+  if(v612EditingGroupId){
+    const e=(project()?.entries||[]).find(x=>x.multiLvGroup===v612EditingGroupId);
+    if(e)return Number(e.displayId)||entryDisplayId(e);
+  }
+
+  return v615NextVisibleId();
+};
+
+/* Assignment may set the ID of a NEW group or keep the group's existing ID.
+   It never renumbers any other group. */
+assignEntryDisplayId=function(e,preferred=null){
+  if(!e)return null;
+  const p=project();
+  if(!p)return null;
+
+  let existing=Number(e.displayId);
+  if(Number.isInteger(existing)&&existing>0){
+    const key=e.multiLvGroup||null;
+    if(key){
+      (p.entries||[])
+        .filter(x=>x.multiLvGroup===key)
+        .forEach(x=>x.displayId=existing);
+    }
+    p.nextEntryDisplayId=Math.max(Number(p.nextEntryDisplayId)||1,existing+1);
+    return existing;
+  }
+
+  let n=Number(preferred);
+  if(!Number.isInteger(n)||n<=0)n=v615NextVisibleId();
+
+  const key=e.multiLvGroup||null;
+  if(key){
+    (p.entries||[])
+      .filter(x=>x.multiLvGroup===key)
+      .forEach(x=>x.displayId=n);
+  }
+  e.displayId=n;
+
+  p.nextEntryDisplayId=Math.max(Number(p.nextEntryDisplayId)||1,n+1);
+  return n;
+};
+
+/* Normalization may still group equal descriptions, but it must never
+   call a destructive compact/re-number operation. */
+const _v657NormalizeGroupsBase=v618NormalizeAllGroups;
+v618NormalizeAllGroups=function(){
+  if(v619NormalizeRunning)return;
+
+  const p=project();
+  if(!p)return;
+
+  /* Remember every permanent ID before the historical grouping pass. */
+  const idByInternalId=new Map(
+    (p.entries||[]).map(e=>[e.id,Number(e.displayId)||null])
+  );
+
+  try{
+    _v657NormalizeGroupsBase?.();
+  }catch(err){
+    console.warn("V6.57 Gruppen-Normalisierung",err);
+  }
+
+  /* If the old pass compacted IDs internally, restore each group's
+     pre-existing permanent ID where possible. */
+  const groups=v657RawGroupsInStorageOrder(p);
+  for(const g of groups){
+    const previous=g.map(e=>idByInternalId.get(e.id))
+      .filter(n=>Number.isInteger(n)&&n>0);
+
+    if(previous.length){
+      const keep=previous[0];
+      g.forEach(e=>e.displayId=keep);
+    }
+  }
+
+  v657RepairIds(p);
+};
+
+/* Editing safety net:
+   remember the ID before save and restore it to the edited group afterwards. */
+const _v657FinalizeBase=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const p=project();
+
+  let permanentId=null;
+  let editingGroup=null;
+
+  if(p && (editingEntryId || v612EditingGroupId)){
+    const e=editingEntryId
+      ? p.entries.find(x=>x.id===editingEntryId)
+      : p.entries.find(x=>x.multiLvGroup===v612EditingGroupId);
+
+    if(e){
+      permanentId=Number(e.displayId)||null;
+      editingGroup=e.multiLvGroup||v612EditingGroupId||null;
+    }
+  }
+
+  const result=_v657FinalizeBase.apply(this,arguments);
+
+  if(permanentId && p){
+    let members=[];
+
+    if(editingGroup){
+      members=p.entries.filter(e=>e.multiLvGroup===editingGroup);
+    }
+
+    /* Fallback: the editing save may have recreated the group while keeping
+       description/sheet. Find the group currently carrying the permanent ID. */
+    if(!members.length){
+      members=p.entries.filter(e=>Number(e.displayId)===permanentId);
+    }
+
+    members.forEach(e=>e.displayId=permanentId);
+
+    if(members.length){
+      const anchor=members[0];
+      const memberIds=new Set(members.map(e=>e.id));
+      try{
+        plans().forEach(pl=>{
+          (pl.annotations||[]).forEach(a=>{
+            if(memberIds.has(a.entryId) || Number(a.label)===permanentId){
+              a.entryId=anchor.id;
+              a.label=String(permanentId);
+            }
+          });
+        });
+      }catch(e){}
+    }
+  }
+
+  v657RepairIds(p);
+  try{persist()}catch(e){}
+  return result;
+};
+
+/* Initial non-destructive repair. */
+try{
+  v657RepairIds(project());
+  persist();
+}catch(e){console.warn("V6.57 ID-Reparatur",e)}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.58 – IDs NUR NACH DEM LÖSCHEN KOMPAKTIEREN
+   Bearbeiten: ID bleibt unverändert.
+   Löschen: nachfolgende IDs rücken um genau eine Stelle auf.
+   ============================================================ */
+
+function v658CompactIdsAfterDelete(deletedDisplayId){
+  const p=project();
+  const deleted=Number(deletedDisplayId);
+  if(!p || !Number.isInteger(deleted) || deleted<=0)return;
+
+  /* Only IDs ABOVE the deleted ID move.
+     Example: delete 7 => 8→7, 9→8, 10→9 ... */
+  for(const e of (p.entries||[])){
+    const n=Number(e.displayId);
+    if(Number.isInteger(n) && n>deleted){
+      e.displayId=n-1;
+    }
+  }
+
+  /* Plan labels always follow the entry's current permanent display ID.
+     Whole-ID and LV-specific annotations are both covered. */
+  try{
+    const byInternalId=new Map((p.entries||[]).map(e=>[e.id,e]));
+    const bySyncUuid=new Map(
+      (p.entries||[]).filter(e=>e.syncUuid).map(e=>[e.syncUuid,e])
+    );
+
+    plans().forEach(pl=>{
+      (pl.annotations||[]).forEach(a=>{
+        let e=byInternalId.get(a.entryId);
+
+        if(!e && a.lvEntryId)e=byInternalId.get(a.lvEntryId);
+        if(!e && a.lvSyncUuid)e=bySyncUuid.get(a.lvSyncUuid);
+
+        if(e){
+          const anchor=(typeof v612AnchorEntry==="function" ? v612AnchorEntry(e) : e) || e;
+          if(anchor?.id)a.entryId=anchor.id;
+          if(Number(anchor?.displayId)>0)a.label=String(anchor.displayId);
+        }else{
+          /* Legacy marker without usable internal link:
+             its numeric label can still be shifted safely. */
+          const label=Number(a.label);
+          if(Number.isInteger(label) && label>deleted){
+            a.label=String(label-1);
+          }
+        }
+      });
+    });
+  }catch(err){
+    console.warn("V6.58 Plan-ID-Anpassung",err);
+  }
+
+  /* After an explicit deletion, ID numbers should again be continuous.
+     In contrast to V6.57 this is the ONLY event allowed to move IDs. */
+  const max=Math.max(
+    0,
+    ...(p.entries||[])
+      .map(e=>Number(e.displayId))
+      .filter(n=>Number.isInteger(n)&&n>0)
+  );
+
+  const access=typeof currentAccess==="function"
+    ? currentAccess()
+    : {mode:"master"};
+
+  if(access?.mode==="worker"){
+    /* Respect a reserved worker range if one exists, but otherwise use max+1. */
+    const rangeStart=Number(p.sync?.idRangeStart);
+    p.nextEntryDisplayId=Math.max(
+      max+1,
+      Number.isInteger(rangeStart)&&rangeStart>0 ? rangeStart : 1
+    );
+  }else{
+    p.nextEntryDisplayId=max+1;
+  }
+
+  /* V6.57's repair is now safe because all remaining IDs are already correct. */
+  try{v657RepairIds?.(p)}catch(err){}
+
+  try{persist?.()}catch(err){}
+  try{renderDraftEntrySummary?.()}catch(err){}
+  try{renderRecent?.()}catch(err){}
+  try{renderSheet?.()}catch(err){}
+  try{renderLV?.()}catch(err){}
+  try{renderPlanAnnotations?.()}catch(err){}
+  try{populatePlanLinks?.()}catch(err){}
+}
+
+/* Wrap the FINAL delete implementation so this executes only if a deletion
+   really happened (not when the confirmation dialog was cancelled). */
+const _v658DeleteBase=deleteEntry;
+deleteEntry=function(id){
+  const p=project();
+  const beforeEntry=p?.entries?.find(e=>e.id===id)||null;
+
+  let deletedDisplayId=null;
+  let beforeCount=(p?.entries||[]).length;
+
+  if(beforeEntry){
+    const anchor=(typeof v612AnchorEntry==="function"
+      ? v612AnchorEntry(beforeEntry)
+      : beforeEntry) || beforeEntry;
+
+    deletedDisplayId=Number(anchor.displayId)||Number(beforeEntry.displayId)||null;
+  }
+
+  const result=_v658DeleteBase.apply(this,arguments);
+
+  const afterP=project();
+  const afterCount=(afterP?.entries||[]).length;
+
+  /* Only compact after an ACTUAL completed deletion. */
+  if(deletedDisplayId && afterCount<beforeCount){
+    v658CompactIdsAfterDelete(deletedDisplayId);
+  }
+
+  return result;
+};
+</script>
+
+
+<script>
+/* ============================================================
+   V6.59 – KRITZELN ALS HINTERGRUND-ELEMENT DER GESAMTEN ID
+   ============================================================ */
+
+let v659FreehandMode="freehand"; // "freehand" | "scribble"
+
+function v659SelectScribble(){
+  v659FreehandMode="scribble";
+  setPlanTool("freehand");
+  document.getElementById("tool-freehand")?.classList.remove("active");
+  document.getElementById("tool-scribble")?.classList.add("active");
+  document.getElementById("planFreehandHelp")?.classList.remove("show");
+  document.getElementById("planScribbleHelp")?.classList.add("show");
+}
+
+const _v659SetPlanToolBase=setPlanTool;
+setPlanTool=function(tool){
+  if(tool!=="freehand"){
+    v659FreehandMode="freehand";
+  }
+  _v659SetPlanToolBase(tool);
+
+  const scribbleBtn=document.getElementById("tool-scribble");
+  const freehandBtn=document.getElementById("tool-freehand");
+  const scribbleHelp=document.getElementById("planScribbleHelp");
+  const freehandHelp=document.getElementById("planFreehandHelp");
+
+  if(tool==="freehand" && v659FreehandMode==="scribble"){
+    freehandBtn?.classList.remove("active");
+    scribbleBtn?.classList.add("active");
+    freehandHelp?.classList.remove("show");
+    scribbleHelp?.classList.add("show");
+  }else{
+    scribbleBtn?.classList.remove("active");
+    if(tool!=="freehand"){
+      scribbleHelp?.classList.remove("show");
+    }
+  }
+};
+
+const _v659AnnTypeNameBase=annotationTypeName;
+annotationTypeName=function(t){
+  if(t==="scribble")return "Kritzelei";
+  return _v659AnnTypeNameBase(t);
+};
+
+function v659CurrentWholeIdEntry(){
+  const p=project();
+  if(!p)return null;
+
+  if(editingEntryId){
+    const e=p.entries.find(x=>x.id===editingEntryId);
+    if(e)return (typeof v612AnchorEntry==="function" ? v612AnchorEntry(e) : e) || e;
+  }
+
+  if(v612EditingGroupId){
+    const e=p.entries.find(x=>x.multiLvGroup===v612EditingGroupId);
+    if(e)return (typeof v612AnchorEntry==="function" ? v612AnchorEntry(e) : e) || e;
+  }
+
+  const raw=document.getElementById("planEntrySelect")?.value || "";
+  if(raw && raw!=="__CURRENT_DRAFT__"){
+    const e=p.entries.find(x=>x.id===raw);
+    if(e)return (typeof v612AnchorEntry==="function" ? v612AnchorEntry(e) : e) || e;
+  }
+
+  return null;
+}
+
+const _v659FinishFreehandBase=finishFreehand;
+finishFreehand=function(){
+  if(v659FreehandMode!=="scribble"){
+    return _v659FinishFreehandBase.apply(this,arguments);
+  }
+
+  if(freehandDraftPoints.length<2){
+    freehandDraftPoints=[];freehandPointerId=null;renderPlanAnnotations();return;
+  }
+
+  const pl=activePlan();
+  if(!pl){
+    freehandDraftPoints=[];freehandPointerId=null;renderPlanAnnotations();return;
+  }
+
+  const style=currentPlanStyle();
+  const points=simplifyFreehand(freehandDraftPoints);
+  const link=currentPlanLink();
+  const anchor=v659CurrentWholeIdEntry();
+  const draft=typeof isDraftEntryId==="function" && isDraftEntryId(link.entryId);
+  const displayId=anchor ? entryDisplayId(anchor) : currentPlannedEntryDisplayId();
+
+  const ann={
+    id:uid("ann"),
+    type:"scribble",
+    label:String(displayId||""),
+    entryId:anchor?.id || link.entryId,
+    pos:"",
+    posText:"",
+    lvEntryId:"",
+    lvSyncUuid:"",
+    groupScope:true,
+    background:true,
+    note:link.note||"",
+    text:"",
+    points,
+    width:style.width,
+    color:style.color,
+    createdAt:new Date().toISOString()
+  };
+
+  pl.annotations.push(ann);
+  selectedAnnotationId=ann.id;
+  freehandDraftPoints=[];freehandPointerId=null;
+  persist(); populatePlanFilter(); renderPlanList(); renderPlanAnnotations(); renderSelectedAnnotation();
+  try{renderDraftEntrySummary(); renderAutoPlanLinkSummary();}catch(e){}
+};
+
+function v659SortedAnnotations(arr){
+  return [...(arr||[])].sort((a,b)=>{
+    const aw = a.type==="scribble" ? 0 : 1;
+    const bw = b.type==="scribble" ? 0 : 1;
+    if(aw!==bw)return aw-bw;   // scribbles first = background
+    return 0;
+  });
+}
+
+/* Draw scribbles in the background without visible ID label */
+const _v659RenderPlanAnnotationsBase=renderPlanAnnotations;
+renderPlanAnnotations=function(){
+  const pl=activePlan();
+  if(!pl?.annotations){
+    return _v659RenderPlanAnnotationsBase.apply(this,arguments);
+  }
+
+  const original=pl.annotations;
+  pl.annotations=v659SortedAnnotations(original);
+  try{
+    _v659RenderPlanAnnotationsBase.apply(this,arguments);
+  }finally{
+    pl.annotations=original;
+  }
+
+  const svg=document.getElementById("planOverlay");
+  if(!svg)return;
+
+  [...svg.querySelectorAll('g.ann[data-id]')].forEach(g=>{
+    const a=activePlan()?.annotations?.find(x=>x.id===g.getAttribute("data-id"));
+    if(!a || a.type!=="scribble")return;
+
+    const label=g.querySelector("text");
+    if(label)label.remove();
+
+    const shape=g.querySelector("polyline,path,line,rect,circle");
+    if(shape){
+      shape.setAttribute("opacity","0.65");
+      shape.setAttribute("stroke-linejoin","round");
+      shape.setAttribute("stroke-linecap","round");
+    }
+  });
+};
+
+const _v659BoundsBase=boundsForAnnotation;
+boundsForAnnotation=function(a){
+  if(a?.type==="scribble" && a.points?.length){
+    const xs=a.points.map(p=>p.x), ys=a.points.map(p=>p.y);
+    return {minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys)};
+  }
+  return _v659BoundsBase(a);
+};
+
+const _v659DrawSingleBase=drawSingleAnnotation;
+drawSingleAnnotation=function(ctx,a,transform,opts={}){
+  if(a?.type!=="scribble"){
+    return _v659DrawSingleBase(ctx,a,transform,opts);
+  }
+
+  const X=x=>transform.x+(x-transform.cropX)*transform.sx;
+  const Y=y=>transform.y+(y-transform.cropY)*transform.sy;
+  const scale=(transform.sx+transform.sy)/2;
+  const c=a.color || "#666";
+  const w=Number(a.width||7);
+
+  ctx.save();
+  ctx.strokeStyle=c;
+  ctx.globalAlpha=0.65;
+  ctx.lineWidth=Math.max(2,w*scale);
+  ctx.lineJoin="round";
+  ctx.lineCap="round";
+
+  if(a.points?.length){
+    ctx.beginPath();
+    a.points.forEach((p,i)=>i?ctx.lineTo(X(p.x),Y(p.y)):ctx.moveTo(X(p.x),Y(p.y)));
+    ctx.stroke();
+  }
+  ctx.restore();
+};
+
+/* Optional clearer text in selected box for whole-ID scribble */
+const _v659SelectedAnnBase=renderSelectedAnnotation;
+renderSelectedAnnotation=function(){
+  const a=activePlan()?.annotations.find(x=>x.id===selectedAnnotationId);
+  if(!a || a.type!=="scribble"){
+    return _v659SelectedAnnBase.apply(this,arguments);
+  }
+
+  const box=document.getElementById("selectedAnnBox");
+  if(!box)return;
+  box.style.display="block";
+
+  const draft=typeof isDraftEntryId==="function" && isDraftEntryId(a.entryId);
+  const anchor=draft ? null : project()?.entries?.find(x=>x.id===a.entryId);
+  const group=anchor && typeof v612GroupEntries==="function" ? v612GroupEntries(anchor) : [];
+  const codes=group.map(x=>x.pos).filter(Boolean);
+
+  document.getElementById("selectedAnnTitle").textContent=`ID ${a.label||currentPlannedEntryDisplayId()} · Kritzelei`;
+  document.getElementById("selectedAnnInfo").innerHTML=
+    `<span class="v656GroupBadge">Hintergrund-Kritzelei · gesamte Erfassungs-ID</span><br>`+
+    `${codes.length?`LV-Unterpositionen: <b>${esc(codes.join(", "))}</b><br>`:""}`+
+    `${draft?"Noch nicht gespeichert":esc(anchor?.lineDesc||"")}`+
+    `${a.note?`<br>Bemerkung: ${esc(a.note)}`:""}`;
+  document.getElementById("goEntryBtn").style.display=anchor?"inline-block":"none";
+};
+
+/* Ensure whole-ID binding survives generic repair helpers */
+const _v659RepairLinksBase=v633RepairAnnotationLinks;
+v633RepairAnnotationLinks=function(){
+  _v659RepairLinksBase?.();
+  try{
+    plans().forEach(pl=>{
+      (pl.annotations||[]).forEach(a=>{
+        if(a.type!=="scribble")return;
+        const anchor=project()?.entries?.find(x=>x.id===a.entryId);
+        if(anchor){
+          const ca=(typeof v612AnchorEntry==="function" ? v612AnchorEntry(anchor) : anchor) || anchor;
+          a.entryId=ca.id;
+          a.label=String(entryDisplayId(ca));
+        }
+        a.groupScope=true;
+        a.background=true;
+        a.pos="";
+        a.posText="";
+        a.lvEntryId="";
+        a.lvSyncUuid="";
+      });
+    });
+  }catch(e){}
+};
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    document.getElementById("tool-scribble")?.classList.remove("active");
+    document.getElementById("planScribbleHelp")?.classList.remove("show");
+  },0);
+});
 </script>
 
 </body>
