@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.69</title>
+<title>Kollaudierung – V6.70</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -3046,7 +3046,7 @@ main > section.view.active{
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.69</h1>
+     <h1>Kollaudierung – V6.70</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -20284,6 +20284,179 @@ window.addEventListener("load",()=>{
       view.style.display=show?"block":"none";
     });
   },50);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.70 – STABILER LEERZUSTAND: APP OHNE ANGELEGTES PROJEKT
+   ============================================================ */
+
+function v670HasProject(){
+  try{return !!project()}catch(e){return false}
+}
+
+function v670SetEmptyTable(id,cols,text){
+  const el=document.getElementById(id);
+  if(el)el.innerHTML=`<tr><td colspan="${cols}" class="empty">${esc(text)}</td></tr>`;
+}
+
+function v670RenderNoProjectState(){
+  /* Entry / recent */
+  v670SetEmptyTable("recentBody",12,"Noch kein Projekt angelegt.");
+
+  /* Sheet */
+  const title=document.getElementById("sheetTitle");
+  if(title)title.textContent="Noch kein Projekt angelegt.";
+  const ph=document.getElementById("sheetPrintHead");
+  if(ph)ph.innerHTML="";
+  v670SetEmptyTable("sheetBody",12,"Noch kein Projekt angelegt.");
+  v670SetEmptyTable("sheetTotalsBody",8,"Keine Summen vorhanden.");
+
+  /* LV */
+  v670SetEmptyTable("lvBody",14,"Noch kein Projekt angelegt.");
+
+  /* Plan selection */
+  const eps=document.getElementById("entryPlanSelect");
+  if(eps)eps.innerHTML='<option value="">– kein Projekt / kein Plan –</option>';
+
+  const ppl=document.getElementById("projectPlanLibrary");
+  if(ppl){
+    ppl.innerHTML='<div class="empty" style="grid-column:1/-1">Noch kein Projekt angelegt.</div>';
+  }
+
+  /* Sheet selectors */
+  const sv=document.getElementById("sheetViewSelect");
+  if(sv)sv.innerHTML='<option value="">– kein Aufmaßblatt –</option>';
+
+  const sid=document.getElementById("sheetEntryIdSelect");
+  if(sid)sid.innerHTML='<option value="">– ID auswählen –</option>';
+
+  document.getElementById("sheetEditIdBtn")?.setAttribute("disabled","");
+  document.getElementById("sheetDeleteIdBtn")?.setAttribute("disabled","");
+}
+
+/* The original early render functions contain direct project().entries calls.
+   Guard every startup-visible renderer before historical wrappers can reach them. */
+const _v670RecentBase=renderRecent;
+renderRecent=function(){
+  if(!v670HasProject()){
+    v670RenderNoProjectState();
+    return;
+  }
+  return _v670RecentBase.apply(this,arguments);
+};
+
+const _v670SheetBase=renderSheet;
+renderSheet=function(){
+  if(!v670HasProject()){
+    v670RenderNoProjectState();
+    return;
+  }
+  return _v670SheetBase.apply(this,arguments);
+};
+
+const _v670LvBase=renderLV;
+renderLV=function(){
+  if(!v670HasProject()){
+    v670RenderNoProjectState();
+    return;
+  }
+  return _v670LvBase.apply(this,arguments);
+};
+
+const _v670ProjectPlanLibraryBase=renderProjectPlanLibrary;
+renderProjectPlanLibrary=function(){
+  if(!v670HasProject()){
+    v670RenderNoProjectState();
+    return;
+  }
+  return _v670ProjectPlanLibraryBase.apply(this,arguments);
+};
+
+const _v670EntryPlanSelectBase=renderEntryPlanSelect;
+renderEntryPlanSelect=function(){
+  if(!v670HasProject()){
+    v670RenderNoProjectState();
+    return;
+  }
+  return _v670EntryPlanSelectBase.apply(this,arguments);
+};
+
+if(typeof renderDraftEntrySummary==="function"){
+  const _v670DraftSummaryBase=renderDraftEntrySummary;
+  renderDraftEntrySummary=function(){
+    if(!v670HasProject()){
+      /* There is no upcoming measurement ID until a project exists. */
+      const box=document.getElementById("draftEntrySummary");
+      if(box)box.innerHTML="";
+      return;
+    }
+    return _v670DraftSummaryBase.apply(this,arguments);
+  };
+}
+
+/* Guard the final renderAll chain itself. */
+const _v670RenderAllBase=renderAll;
+renderAll=function(){
+  if(!v670HasProject()){
+    try{renderStats?.()}catch(e){}
+    v670RenderNoProjectState();
+    try{renderProjectAdmin?.()}catch(e){}
+    try{v627ApplyManualMasterUi?.()}catch(e){}
+    return;
+  }
+  return _v670RenderAllBase.apply(this,arguments);
+};
+
+/* Some historical functions are used by newer wrappers. Make their primitives
+   harmless if called during the empty state. */
+const _v670SortedSheetEntriesBase=sortedSheetEntries;
+sortedSheetEntries=function(){
+  if(!v670HasProject())return [];
+  return _v670SortedSheetEntriesBase.apply(this,arguments);
+};
+
+if(typeof entriesForSheet==="function"){
+  const _v670EntriesForSheetBase=entriesForSheet;
+  entriesForSheet=function(){
+    if(!v670HasProject())return [];
+    return _v670EntriesForSheetBase.apply(this,arguments);
+  };
+}
+
+if(typeof annotationsForSheet==="function"){
+  const _v670AnnotationsForSheetBase=annotationsForSheet;
+  annotationsForSheet=function(){
+    if(!v670HasProject())return [];
+    return _v670AnnotationsForSheetBase.apply(this,arguments);
+  };
+}
+
+/* Project tab is allowed with no project, but should never attempt entry access. */
+const _v670ShowViewBase=showView;
+showView=function(name){
+  const r=_v670ShowViewBase.apply(this,arguments);
+  if(!v670HasProject()){
+    setTimeout(()=>{
+      try{
+        v670RenderNoProjectState();
+        if(name==="project")renderProjectAdmin?.();
+      }catch(e){}
+    },0);
+  }
+  return r;
+};
+
+/* Clean any old V6.63 fatal banner after this specific empty-state fix loads. */
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    if(!v670HasProject()){
+      document.querySelectorAll(".v663Fatal").forEach(el=>el.remove());
+      try{v670RenderNoProjectState()}catch(e){}
+    }
+  },80);
 });
 </script>
 
