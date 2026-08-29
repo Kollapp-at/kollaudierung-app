@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.52</title>
+<title>Kollaudierung – V6.53</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2056,6 +2056,19 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   box-shadow:none!important;
 }
 
+
+/* ===== V6.53 iOS CAPTURE MUSS AUCH IM SCREEN-MODUS SICHTBAR SEIN ===== */
+.v652CaptureHost .v519PrintPage{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+.v652CaptureHost .v519PageHeader,
+.v652CaptureHost .v519PageBody,
+.v652CaptureHost .v519PageFooter{
+  visibility:visible!important;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -2083,7 +2096,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.52</h1>
+     <h1>Kollaudierung – V6.53</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -17038,6 +17051,67 @@ const _v652PrintPrepared=v519PrintPrepared;
 v519PrintPrepared=function(areaId,pages,modeClass){
   window.v652LastPrintArgs=[areaId,pages,modeClass];
   return _v652PrintPrepared.apply(this,arguments);
+};
+</script>
+
+
+<script>
+/* ============================================================
+   V6.53 – DRUCK-CSS EXPLIZIT IN DEN iOS-RENDERCONTAINER LADEN
+   ============================================================ */
+
+/* Override the V6.52 mount function.
+   The normal app intentionally hides .v519PrintPage on screen.
+   For html2canvas we therefore inject the dedicated capture CSS directly
+   into the temporary render container. */
+v652MountPage=function(page,index,total){
+  const landscape=String(page.extraClass||"").includes("v520LandscapePage");
+  const host=document.createElement("div");
+  host.className="v652CaptureHost";
+  host.style.width=(landscape?1123:794)+"px";
+  host.style.height=(landscape?794:1123)+"px";
+
+  const captureStyle=document.createElement("style");
+  captureStyle.textContent=v651CaptureCss()+`
+    .v651CaptureRoot .v519PrintPage{
+      display:flex!important;
+      visibility:visible!important;
+      opacity:1!important;
+    }
+  `;
+  host.appendChild(captureStyle);
+
+  const wrapper=document.createElement("div");
+  wrapper.className="v651CaptureRoot";
+  wrapper.style.width="100%";
+  wrapper.style.height="100%";
+  wrapper.style.background="#fff";
+  wrapper.innerHTML=v651PageHtml(page,index,total);
+
+  host.appendChild(wrapper);
+  document.body.appendChild(host);
+
+  const pageEl=wrapper.querySelector(".v519PrintPage");
+  if(pageEl){
+    pageEl.style.display="flex";
+    pageEl.style.visibility="visible";
+    pageEl.style.opacity="1";
+    pageEl.style.width="100%";
+    pageEl.style.height="100%";
+    pageEl.style.margin="0";
+  }
+
+  return {host,pageEl,landscape};
+};
+
+/* Extra sanity check: fail visibly instead of producing a blank PDF. */
+const _v653RenderCanvasBase=v652RenderCanvas;
+v652RenderCanvas=async function(page,index,total){
+  const out=await _v653RenderCanvasBase(page,index,total);
+  if(!out?.dataUrl || out.dataUrl.length<2000){
+    throw new Error(`PDF-Seite ${index+1} wurde nicht korrekt gerendert.`);
+  }
+  return out;
 };
 </script>
 
