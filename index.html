@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.45</title>
+<title>Kollaudierung – V6.46</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1899,7 +1899,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.45</h1>
+   <h1>Kollaudierung – V6.46</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -15941,6 +15941,272 @@ window.addEventListener("load",()=>{
       });
       persist();
     }catch(e){console.warn("V6.45 Plan/LV-Reparatur",e)}
+  },0);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.46 – ROBUSTER DIREKTER SPEICHERWEG FÜR NEUE ERFASSUNGEN
+   ============================================================ */
+
+const _v646ExistingFinalize = finalizeCurrentEntry;
+let v646NewSaveRunning = false;
+
+function v646SetFinalizeMessage(text,bad=false){
+  const fm=document.getElementById("finalizeMessage");
+  if(!fm)return;
+  fm.style.color=bad?"#aa3030":"#1f7a4d";
+  fm.innerHTML=text;
+}
+
+function v646CollectNewItems(){
+  let items=(Array.isArray(multiLvDraft)?multiLvDraft:[]).map(x=>({...x}));
+  const current=typeof v610CurrentLvCandidate==="function"
+    ? v610CurrentLvCandidate()
+    : {valid:false};
+
+  if(current?.valid){
+    const ix=items.findIndex(x=>x.pos===current.pos);
+    if(ix>=0)items[ix]={...items[ix],...current};
+    else items.push({...current});
+  }
+
+  /* one LV position may only occur once inside one ID */
+  const map=new Map();
+  items.forEach(x=>{
+    if(x?.pos)map.set(x.pos,x);
+  });
+  return [...map.values()];
+}
+
+function v646NewEntrySave(){
+  if(v646NewSaveRunning)return;
+  v646NewSaveRunning=true;
+
+  try{
+    const p=project();
+    const sh=activeSheet();
+
+    if(!p){
+      v646SetFinalizeMessage("Kein Projekt geladen.",true);
+      return;
+    }
+    if(!sh){
+      v646SetFinalizeMessage("Bitte zuerst ein Aufmaßblatt auswählen oder anlegen.",true);
+      return;
+    }
+
+    if(!Array.isArray(p.entries))p.entries=[];
+    if(!Array.isArray(p.sheets))p.sheets=[];
+    if(!Array.isArray(p.positions))p.positions=[];
+    if(!Number.isFinite(Number(p.nextEntryDisplayId)) || Number(p.nextEntryDisplayId)<1){
+      p.nextEntryDisplayId=1;
+    }
+
+    const lineDesc=document.getElementById("lineDesc")?.value.trim()||"";
+    if(!lineDesc){
+      v646SetFinalizeMessage("Bitte eine Positionsbeschreibung eingeben.",true);
+      return;
+    }
+
+    const items=v646CollectNewItems();
+    if(!items.length){
+      v646SetFinalizeMessage("Bitte mindestens eine LV-Unterposition und einen gültigen Rechenansatz eingeben.",true);
+      return;
+    }
+
+    for(const item of items){
+      if(!getPos(item.pos)){
+        v646SetFinalizeMessage(`LV-Unterposition <b>${esc(item.pos)}</b> ist nicht mehr in der LV-Übersicht vorhanden.`,true);
+        return;
+      }
+      if(!Number.isFinite(Number(item.qty)) || Number(item.qty)===0){
+        v646SetFinalizeMessage(`Bitte einen gültigen Rechenansatz für <b>${esc(item.pos)}</b> eingeben.`,true);
+        return;
+      }
+    }
+
+    const draftAnns=typeof currentDraftAnnotations==="function"
+      ? currentDraftAnnotations()
+      : [];
+    const selectedPlanId=document.getElementById("entryPlanSelect")?.value||"";
+
+    if(selectedPlanId && !draftAnns.length){
+      if(!confirm("Für diese Erfassung wurde noch keine Planmarkierung gesetzt. Trotzdem speichern?")){
+        return;
+      }
+    }
+
+    /* Master: rebuild first so the next visible ID is always deterministic.
+       Worker: keep the allocated worker ID range. */
+    const access=typeof currentAccess==="function"?currentAccess():{mode:"master"};
+    if(access?.mode!=="worker"){
+      try{v626RebuildMasterDisplayIds?.(true)}catch(e){}
+    }
+
+    const displayId=Number(
+      typeof peekNextEntryDisplayId==="function"
+        ? peekNextEntryDisplayId()
+        : p.nextEntryDisplayId
+    ) || 1;
+
+    const groupId="mlv_"+cryptoSafeId();
+    const shared={
+      lineDesc,
+      detail:document.getElementById("detail")?.value.trim()||"",
+      reason:document.getElementById("reason")?.value||"",
+      note:document.getElementById("note")?.value.trim()||"",
+      planId:selectedPlanId,
+      groupId,
+      displayId
+    };
+
+    const beforeIds=new Set(p.entries.map(e=>e.id));
+    const saved=[];
+
+    for(const item of items){
+      const pos=getPos(item.pos);
+      const e={
+        id:uid("e"),
+        sheetId:sh.id,
+        lineDesc:shared.lineDesc,
+        lineNo:lineNoFor(shared.lineDesc,sh.id,null),
+        pos:item.pos,
+        calc:item.calc,
+        qty:Number(item.qty),
+        unit:item.unit||pos?.unit||"",
+        detail:shared.detail,
+        reason:shared.reason,
+        note:shared.note,
+        planId:shared.planId||"",
+        updated:new Date().toISOString(),
+        multiLvGroup:groupId,
+        displayId
+      };
+
+      if(access?.mode==="worker"){
+        if(typeof markEntrySyncDirty==="function"){
+          markEntrySyncDirty(e,true);
+        }
+      }else{
+        e.syncUuid="entry_"+cryptoSafeId();
+        e.syncRevision=1;
+        e.syncUpdatedAt=new Date().toISOString();
+        e.syncDirty=false;
+      }
+
+      p.entries.push(e);
+      saved.push(e);
+    }
+
+    if(!saved.length){
+      throw new Error("Es wurde keine Erfassung erzeugt.");
+    }
+
+    /* One common visible ID for all LV-underpositions. */
+    saved.forEach(e=>{
+      e.displayId=displayId;
+    });
+
+    p.nextEntryDisplayId=Math.max(Number(p.nextEntryDisplayId)||1,displayId+1);
+
+    /* Draft plan marks now belong to the saved ID anchor.
+       Their concrete LV-position is preserved and repaired afterwards. */
+    const anchor=saved[0];
+    if(typeof convertDraftAnnotations==="function"){
+      convertDraftAnnotations(v54DraftToken,anchor.id);
+    }
+    try{
+      v633RepairAnnotationLinks?.();
+      syncAnnotationLabelsToEntryIds?.();
+    }catch(e){}
+
+    /* Store current photo draft directly on the new group. */
+    try{
+      if(Array.isArray(v637DraftPhotos) && v637DraftPhotos.length){
+        v637SetPhotosForKey(groupId,v637ClonePhotos(v637DraftPhotos));
+      }
+    }catch(e){}
+
+    /* Reset entry UI only AFTER all data has been committed. */
+    try{multiLvDraft=[]}catch(e){}
+    try{newDraftToken?.()}catch(e){}
+    try{v637ClearDraftPhotos?.()}catch(e){}
+    try{clearEntryForm(false)}catch(e){}
+    try{
+      const eps=document.getElementById("entryPlanSelect");
+      if(eps)eps.value="";
+    }catch(e){}
+    try{selectedAnnotationId=null}catch(e){}
+
+    persist();
+
+    /* Rendering errors must never undo a successful first save. */
+    try{v626RebuildMasterDisplayIds?.(true)}catch(e){}
+    try{renderMultiLvDraft?.()}catch(e){}
+    try{renderAll?.()}catch(e){}
+    try{renderRecent?.()}catch(e){}
+    try{renderSheet?.()}catch(e){}
+    try{renderLV?.()}catch(e){}
+    try{renderPlanAnnotations?.()}catch(e){}
+    try{renderDraftEntrySummary?.()}catch(e){}
+    try{populatePlanLinks?.()}catch(e){}
+
+    const actualId=entryDisplayId(anchor)||displayId;
+    v646SetFinalizeMessage(
+      `Erfassungs-ID <b>${actualId}</b> gespeichert · ${saved.length} LV-Unterposition${saved.length===1?"":"en"}.`
+    );
+
+  }catch(err){
+    console.error("V6.46 neue Erfassung speichern",err);
+    v646SetFinalizeMessage(
+      "Erfassung konnte nicht gespeichert werden: "+esc(err?.message||String(err)),
+      true
+    );
+  }finally{
+    v646NewSaveRunning=false;
+  }
+}
+
+/* Existing-ID editing still uses the mature editing chain.
+   ONLY a genuinely new ID uses the new direct path. */
+finalizeCurrentEntry=function(){
+  const isEditing=!!editingEntryId || !!v612EditingGroupId;
+  if(isEditing){
+    return _v646ExistingFinalize.apply(this,arguments);
+  }
+  return v646NewEntrySave();
+};
+
+/* New projects can have empty structures from older project templates.
+   Normalize them once on load/switch without inventing example data. */
+function v646NormalizeEmptyProject(){
+  const p=project?.();
+  if(!p)return;
+  if(!Array.isArray(p.entries))p.entries=[];
+  if(!Array.isArray(p.sheets))p.sheets=[];
+  if(!Array.isArray(p.positions))p.positions=[];
+  if(!Array.isArray(p.plans))p.plans=[];
+  if(!p.entryPhotoStore || typeof p.entryPhotoStore!=="object")p.entryPhotoStore={};
+  if(!Number.isFinite(Number(p.nextEntryDisplayId)) || Number(p.nextEntryDisplayId)<1){
+    p.nextEntryDisplayId=1;
+  }
+}
+
+try{
+  v646NormalizeEmptyProject();
+  persist();
+}catch(e){}
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    try{
+      v646NormalizeEmptyProject();
+      persist();
+      renderDraftEntrySummary?.();
+    }catch(e){}
   },0);
 });
 </script>
