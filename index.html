@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.29</title>
+<title>Kollaudierung – V6.30</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1066,7 +1066,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
 
 
-/* ===== V6.29 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
+/* ===== V6.30 MEHRERE LV-POSITIONEN JE BESCHREIBUNG ===== */
 .multiLvBox{
  margin-top:12px;
  padding:10px;
@@ -1096,14 +1096,14 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.29 alter Testhinweis entfernt ===== */
+/* ===== V6.30 alter Testhinweis entfernt ===== */
 .notice.noPrint{
   display:none !important;
 }
 
 
 
-/* ===== V6.29 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
+/* ===== V6.30 GRUPPIERTE DARSTELLUNG / EXPORT ===== */
 #recentBody td{vertical-align:top}
 .v614RecentTable{table-layout:fixed}
 .v614RecentTable th:nth-child(1){width:5%}
@@ -1163,7 +1163,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.29 HINWEISE / TEXTE ===== */
+/* ===== V6.30 HINWEISE / TEXTE ===== */
 #autoPlanLinkSummary{line-height:1.25}
 #autoPlanLinkMeta{line-height:1.35}
 #draftEntrySummary .fsCell .smallHint{
@@ -1174,13 +1174,13 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.29 EINHEITLICHE BEGRIFFE ===== */
+/* ===== V6.30 EINHEITLICHE BEGRIFFE ===== */
 .terminologyHint{
   line-height:1.4;
 }
 
 
-/* ===== V6.29 LETZTE ERFASSUNGEN ===== */
+/* ===== V6.30 LETZTE ERFASSUNGEN ===== */
 .v620RecentTable{
  table-layout:fixed!important;
  width:100%!important;
@@ -1288,7 +1288,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.29 ID-AUSWAHL IM AUFMASSBLATT ===== */
+/* ===== V6.30 ID-AUSWAHL IM AUFMASSBLATT ===== */
 .v621SheetIdToolbar{
  display:flex;
  align-items:flex-end;
@@ -1316,7 +1316,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.29 LV-ÜBERSICHT / NEUE POSITION ===== */
+/* ===== V6.30 LV-ÜBERSICHT / NEUE POSITION ===== */
 .v623AddLvCard{
  margin-bottom:12px;
  border:1px solid #b9cfda;
@@ -1343,7 +1343,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 }
 
 
-/* ===== V6.29 MANUELLE LV-STAMMDATEN NUR IM MASTER ===== */
+/* ===== V6.30 MANUELLE LV-STAMMDATEN NUR IM MASTER ===== */
 .v627LvActions{
  display:flex;
  gap:6px;
@@ -1357,6 +1357,80 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
  margin-top:6px;
  font-size:11px;
  color:var(--muted);
+}
+
+
+/* ===== V6.30 AUFTRAGGEBER IM EXPORT ===== */
+.v630ClientCard{
+ margin-top:4px;
+ border:1px solid #b9cfda;
+ background:#f8fbfc;
+}
+.v630ClientToggle{
+ margin:0!important;
+ display:flex!important;
+ align-items:center;
+ gap:7px;
+ font-weight:700;
+}
+.v630ClientDisabled{
+ opacity:.48;
+ pointer-events:none;
+}
+.v630DualHeader{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) minmax(150px,.72fr) minmax(0,1fr)!important;
+ gap:12px!important;
+ align-items:start!important;
+}
+.v630Party{
+ display:flex;
+ gap:8px;
+ align-items:flex-start;
+ min-width:0;
+}
+.v630Party.right{
+ justify-content:flex-end;
+ text-align:right;
+}
+.v630Party img{
+ max-width:110px!important;
+ max-height:48px!important;
+ object-fit:contain;
+ flex:0 0 auto;
+}
+.v630PartyLabel{
+ font-size:7px;
+ font-weight:800;
+ text-transform:uppercase;
+ letter-spacing:.04em;
+ color:#687984;
+ margin-bottom:2px;
+}
+.v630DocCenter{
+ text-align:center;
+ min-width:0;
+}
+.v630DocCenter .docTitle,
+.v630DocCenter .v519PageTitle{
+ text-align:center!important;
+}
+.v519PageHeader.v630DualHeader{
+ grid-template-columns:minmax(0,1fr) minmax(150px,.75fr) minmax(0,1fr)!important;
+}
+.v519PageHeader .v630Party .v519CompanyName{
+ font-size:9pt;
+}
+.v519PageHeader .v630Party .v519CompanyMeta{
+ font-size:6.5pt;
+ line-height:1.25;
+}
+.v519PageHeader .v630Party img{
+ max-width:34mm!important;
+ max-height:15mm!important;
+}
+@media(max-width:700px){
+ #v630ClientFields{grid-template-columns:1fr!important}
 }
 
 </style>
@@ -1373,7 +1447,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <body>
 
 <div class="notice noPrint" style="margin:8px 12px">
- <b>V6.29version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
+ <b>V6.30version:</b> Für iPhone/Samsung über den mitgelieferten Testserver öffnen.
 </div>
 
 
@@ -1389,7 +1463,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.29</h1>
+   <h1>Kollaudierung – V6.30</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -1855,7 +1929,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
    <div class="grid2">
     <div>
-     <h3>Firmenlogo</h3>
+     <h3>Auftragnehmer · Logo</h3>
      <div id="exportLogoPreviewBox" class="exportLogoPreviewBox">
       <img id="exportLogoPreview" alt="Firmenlogo" style="display:none">
       <div id="exportLogoEmpty" class="small">Noch kein Logo hinterlegt.</div>
@@ -1868,7 +1942,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
     </div>
 
     <div>
-     <h3>Firmendaten</h3>
+     <h3>Auftragnehmer · Firmendaten</h3>
      <label>Firmenname</label>
      <input id="exCompanyName" placeholder="Firmenname">
 
@@ -1906,6 +1980,48 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 
      <div class="notice" style="margin-top:10px">
       <b>Hinweis zum Browser-Druck:</b> Chrome, Edge und Safari können zusätzlich eigene Kopf-/Fußzeilen mit Datum und <code>file:///...</code> drucken. Diese lassen sich nicht durch die App steuern. Im Druckdialog bitte <b>„Kopf- und Fußzeilen“ deaktivieren</b>, wenn nur das hier eingestellte Firmenlayout erscheinen soll.
+     </div>
+    </div>
+   </div>
+
+
+   <div class="spacer"></div>
+
+   <div class="card v630ClientCard">
+    <div class="toolbar" style="justify-content:space-between;align-items:center">
+     <div>
+      <h2 style="margin:0">Auftraggeber im Export</h2>
+      <div class="small" style="margin-top:4px">Optionales zweites Logo und Auftraggeberdaten für den Dokumentkopf.</div>
+     </div>
+     <label class="exportOption v630ClientToggle">
+      <input id="exClientEnabled" type="checkbox" onchange="v630ClientEnabledChanged()">
+      Auftraggeber anzeigen
+     </label>
+    </div>
+
+    <div id="v630ClientFields" class="grid2" style="margin-top:12px">
+     <div>
+      <h3>Auftraggeber · Logo</h3>
+      <div id="clientLogoPreviewBox" class="exportLogoPreviewBox">
+       <img id="clientLogoPreview" alt="Auftraggeberlogo" style="display:none">
+       <div id="clientLogoEmpty" class="small">Noch kein Auftraggeberlogo hinterlegt.</div>
+      </div>
+      <div class="toolbar" style="margin-top:9px">
+       <input id="clientLogoFile" type="file" accept=".png,.jpg,.jpeg,.webp" onchange="clientLogoFileChanged(event)">
+       <button class="danger" onclick="removeClientLogo()">Logo entfernen</button>
+      </div>
+     </div>
+
+     <div>
+      <h3>Auftraggeber · Daten</h3>
+      <label>Auftraggeber / Firmenname</label>
+      <input id="exClientName" placeholder="Auftraggeber / Firmenname">
+
+      <label>Adresse / Kontaktdaten</label>
+      <textarea id="exClientAddress" placeholder="Straße · PLZ Ort · Telefon · E-Mail"></textarea>
+
+      <label>Zusatztext</label>
+      <input id="exClientExtra" placeholder="Abteilung / Ansprechpartner / Zusatz">
      </div>
     </div>
    </div>
@@ -10093,7 +10209,7 @@ window.addEventListener("load",()=>{
 
 
 <script>
-/* ================= V6.29 MULTI-LV ================= */
+/* ================= V6.30 MULTI-LV ================= */
 let multiLvDraft=[];
 
 function v610CurrentLvCandidate(){
@@ -10292,7 +10408,7 @@ window.addEventListener("load",()=>renderMultiLvDraft());
 
 <script>
 /* ============================================================
-   V6.29 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
+   V6.30 – EINE ERFASSUNGS-ID MIT MEHREREN LV-POSITIONEN
    ============================================================ */
 let v612EditingGroupId=null;
 let v612EditingAnchorId=null;
@@ -10872,13 +10988,13 @@ try{
   syncAnnotationLabelsToEntryIds?.();
   persist();
   renderAll?.();
-}catch(e){console.warn("V6.29 Gruppenmigration",e)}
+}catch(e){console.warn("V6.30 Gruppenmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.29 – GLEICHE BESCHREIBUNG = GLEICHE ID
+   V6.30 – GLEICHE BESCHREIBUNG = GLEICHE ID
    ============================================================ */
 
 function v613NormDesc(v){
@@ -10984,7 +11100,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.29 Beschreibung zusammenführen",e)}
+  }catch(e){console.warn("V6.30 Beschreibung zusammenführen",e)}
   return result;
 };
 
@@ -11031,13 +11147,13 @@ try{
   v613MergeSameDescriptions();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.29 Migration",e)}
+}catch(e){console.warn("V6.30 Migration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.29 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
+   V6.30 – SAUBERE GRUPPENDARSTELLUNG UND EXPORT
    ============================================================ */
 
 function v614SheetGroups(sh){
@@ -11273,13 +11389,13 @@ try{
   v613MergeSameDescriptions?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.29 Gruppendarstellung",e)}
+}catch(e){console.warn("V6.30 Gruppendarstellung",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.29 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
+   V6.30 – SICHTBARE ERFASSUNGS-IDs LÜCKENLOS 1,2,3,...
    ============================================================ */
 
 function v615OrderedEntryGroups(){
@@ -11401,7 +11517,7 @@ finalizeCurrentEntry=function(){
     renderRecent?.();
     renderSheet?.();
     renderLV?.();
-  }catch(e){console.warn("V6.29 ID-Kompaktierung",e)}
+  }catch(e){console.warn("V6.30 ID-Kompaktierung",e)}
   return r;
 };
 
@@ -11455,13 +11571,13 @@ try{
   renderDraftEntrySummary?.();
   renderRecent?.();
   renderSheet?.();
-}catch(e){console.warn("V6.29 Startmigration",e)}
+}catch(e){console.warn("V6.30 Startmigration",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.29 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
+   V6.30 – HINWEISE AN DIE AKTUELLE LOGIK ANGEPASST
    ============================================================ */
 
 function v616DraftLvItems(){
@@ -11627,7 +11743,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.29 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
+   V6.30 – ERFASSUNGS-ID KONSISTENT SPEICHERN / LÖSCHEN
    ============================================================ */
 
 function v618GroupForId(id){
@@ -11787,7 +11903,7 @@ finalizeCurrentEntry=function(){
     }
     return result;
   }catch(err){
-    console.error("V6.29 Erfassung speichern",err);
+    console.error("V6.30 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -11812,7 +11928,7 @@ editEntry=function(id){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.29 Erfassung bearbeiten",err);
+    console.error("V6.30 Erfassung bearbeiten",err);
     alert("Erfassung konnte nicht zum Bearbeiten geöffnet werden: "+(err?.message||err));
   }
 };
@@ -11904,13 +12020,13 @@ try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.29 Datenkonsistenz",e)}
+}catch(e){console.warn("V6.30 Datenkonsistenz",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.29 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
+   V6.30 – GRUPPENFÄHIGE ID-VERWALTUNG / REKURSION BEHOBEN
    ============================================================ */
 
 let v619IdMaintenanceRunning=false;
@@ -12221,7 +12337,7 @@ finalizeCurrentEntry=function(){
     v618RefreshEverywhere();
     return r;
   }catch(err){
-    console.error("V6.29 Erfassung speichern",err);
+    console.error("V6.30 Erfassung speichern",err);
     if(fm){
       fm.style.color="#aa3030";
       fm.textContent="Erfassung konnte nicht gespeichert werden: "+(err?.message||err);
@@ -12231,18 +12347,18 @@ finalizeCurrentEntry=function(){
   }
 };
 
-/* Repair current project once after loading V6.29. */
+/* Repair current project once after loading V6.30. */
 try{
   v618NormalizeAllGroups();
   persist();
   v618RefreshEverywhere();
-}catch(e){console.warn("V6.29 ID-Reparatur",e)}
+}catch(e){console.warn("V6.30 ID-Reparatur",e)}
 </script>
 
 
 <script>
 /* ============================================================
-   V6.29 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
+   V6.30 – LETZTE ERFASSUNGEN SAUBER FORMATIERT
    ============================================================ */
 
 function v620RecentLvHtml(group){
@@ -12340,7 +12456,7 @@ try{renderRecent?.()}catch(e){}
 
 <script>
 /* ============================================================
-   V6.29 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
+   V6.30 – ERFASSUNGS-ID IM AUFMASSBLATT AUSWÄHLEN
    ============================================================ */
 
 function v621CurrentSheetViewIds(){
@@ -12473,7 +12589,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.29 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
+   V6.30 – EXPORT IMMER AUS DEM AKTUELLEN PROJEKTSTAND
    ============================================================ */
 
 function v622PrepareCurrentDataForExport(){
@@ -12532,7 +12648,7 @@ printSheetsV52=async function(selected){
     if(progress)progress.classList.remove("show");
     v519PrintPrepared("sheetMultiPrintArea",pages,"sheetMultiPrintMode");
   }catch(err){
-    console.error("V6.29 PDF Export",err);
+    console.error("V6.30 PDF Export",err);
     const progress=document.getElementById("sheetExportProgress");
     if(progress)progress.classList.remove("show");
     alert("Export nicht möglich: "+(err?.message||err));
@@ -12681,7 +12797,7 @@ v519BuildSheetPages=async function(sh,includeBilling){
 
 <script>
 /* ============================================================
-   V6.29 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
+   V6.30 – LV-ÜBERSICHT AUFRÄUMEN / NEUE POSITION DIREKT ANLEGEN
    ============================================================ */
 
 function v623OpenNewLvPosition(){
@@ -12711,7 +12827,7 @@ showView=function(name){
 
 <script>
 /* ============================================================
-   V6.29 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
+   V6.30 – FEHLENDE LV-REFERENZEN SICHER BEHANDELN
    ============================================================ */
 
 /* A missing position can never have a target/LV quantity. */
@@ -12752,7 +12868,7 @@ renderSheet=function(){
   try{
     return _v625RenderSheetBase();
   }catch(err){
-    console.warn("V6.29 renderSheet fallback",err);
+    console.warn("V6.30 renderSheet fallback",err);
 
     const sh=activeSheet();
     const body=document.getElementById("sheetBody");
@@ -12842,7 +12958,7 @@ finalizeCurrentEntry=function(){
   try{
     return _v625FinalizeBase();
   }catch(err){
-    console.error("V6.29 finalize fallback",err);
+    console.error("V6.30 finalize fallback",err);
 
     const after=JSON.stringify((project()?.entries||[]).map(e=>[e.id,e.syncRevision,e.updated,e.qty,e.calc,e.pos,e.lineDesc]));
     const fm=document.getElementById("finalizeMessage");
@@ -12879,7 +12995,7 @@ try{
 
 <script>
 /* ============================================================
-   V6.29 – MASTER-IDs KONSISTENT NEU AUFBAUEN
+   V6.30 – MASTER-IDs KONSISTENT NEU AUFBAUEN
    ============================================================ */
 let v626RebuildRunning=false;
 
@@ -13084,7 +13200,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V6.29 – MANUELLE LV-UNTERPOSITIONEN:
+   V6.30 – MANUELLE LV-UNTERPOSITIONEN:
    MASTER VERWALTET, MONTEUR VERWENDET
    ============================================================ */
 
@@ -13233,7 +13349,7 @@ try{v627ApplyManualMasterUi();renderLV();}catch(e){}
 
 <script>
 /* ============================================================
-   V6.29 – BERECHTIGUNG "REGIEPOSITIONEN" STEUERT
+   V6.30 – BERECHTIGUNG "REGIEPOSITIONEN" STEUERT
    ANLEGEN + BEARBEITEN + LÖSCHEN
    ============================================================ */
 
@@ -13385,6 +13501,246 @@ try{
   v627ApplyManualMasterUi();
   renderLV();
 }catch(e){}
+</script>
+
+
+<script>
+/* ============================================================
+   V6.30 – ZWEITES LOGO / AUFTRAGGEBERDATEN IM EXPORT
+   ============================================================ */
+
+const _v630EnsureExportSettingsBase=ensureExportSettings;
+ensureExportSettings=function(){
+  const ex=_v630EnsureExportSettingsBase();
+  if(typeof ex.clientEnabled!=="boolean")ex.clientEnabled=false;
+  if(typeof ex.clientName!=="string")ex.clientName="";
+  if(typeof ex.clientAddress!=="string")ex.clientAddress="";
+  if(typeof ex.clientExtra!=="string")ex.clientExtra="";
+  if(typeof ex.clientLogoData!=="string")ex.clientLogoData="";
+  return ex;
+};
+
+function renderClientLogoPreview(){
+  const ex=exportSettings();
+  const img=document.getElementById("clientLogoPreview");
+  const empty=document.getElementById("clientLogoEmpty");
+  if(!img||!empty)return;
+
+  if(ex.clientLogoData){
+    img.src=ex.clientLogoData;
+    img.style.display="block";
+    empty.style.display="none";
+  }else{
+    img.removeAttribute("src");
+    img.style.display="none";
+    empty.style.display="block";
+  }
+}
+
+function v630ClientEnabledChanged(){
+  const ex=exportSettings();
+  ex.clientEnabled=!!document.getElementById("exClientEnabled")?.checked;
+  const fields=document.getElementById("v630ClientFields");
+  if(fields)fields.classList.toggle("v630ClientDisabled",!ex.clientEnabled);
+  persist();
+  renderExportBrandPreview();
+}
+
+async function v630ImageFileToPngData(file){
+  if(!file || !file.type.startsWith("image/"))throw new Error("Bitte eine Bilddatei auswählen.");
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((resolve,reject)=>{
+      const i=new Image();
+      i.onload=()=>resolve(i);
+      i.onerror=reject;
+      i.src=url;
+    });
+    const maxW=900,maxH=300;
+    const scale=Math.min(1,maxW/img.naturalWidth,maxH/img.naturalHeight);
+    const w=Math.max(1,Math.round(img.naturalWidth*scale));
+    const h=Math.max(1,Math.round(img.naturalHeight*scale));
+    const c=document.createElement("canvas");
+    c.width=w;c.height=h;
+    const ctx=c.getContext("2d");
+    ctx.clearRect(0,0,w,h);
+    ctx.drawImage(img,0,0,w,h);
+    return c.toDataURL("image/png");
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+async function clientLogoFileChanged(ev){
+  const file=ev.target.files?.[0];
+  if(!file)return;
+  try{
+    exportSettings().clientLogoData=await v630ImageFileToPngData(file);
+    persist();
+    renderClientLogoPreview();
+    renderExportBrandPreview();
+  }catch(e){
+    alert(e?.message||"Auftraggeberlogo konnte nicht verarbeitet werden.");
+  }finally{
+    ev.target.value="";
+  }
+}
+
+function removeClientLogo(){
+  exportSettings().clientLogoData="";
+  persist();
+  renderClientLogoPreview();
+  renderExportBrandPreview();
+}
+
+/* Extend settings UI */
+const _v630RenderExportSettingsBase=renderExportSettings;
+renderExportSettings=function(){
+  _v630RenderExportSettingsBase();
+  const ex=exportSettings();
+
+  const enabled=document.getElementById("exClientEnabled");
+  if(enabled)enabled.checked=!!ex.clientEnabled;
+
+  const map={
+    exClientName:ex.clientName||"",
+    exClientAddress:ex.clientAddress||"",
+    exClientExtra:ex.clientExtra||""
+  };
+  Object.entries(map).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el)el.value=val;
+  });
+
+  renderClientLogoPreview();
+  const fields=document.getElementById("v630ClientFields");
+  if(fields)fields.classList.toggle("v630ClientDisabled",!ex.clientEnabled);
+  renderExportBrandPreview();
+};
+
+const _v630SaveExportSettingsBase=saveExportSettings;
+saveExportSettings=function(){
+  const ex=exportSettings();
+  ex.clientEnabled=!!document.getElementById("exClientEnabled")?.checked;
+  ex.clientName=document.getElementById("exClientName")?.value.trim()||"";
+  ex.clientAddress=document.getElementById("exClientAddress")?.value.trim()||"";
+  ex.clientExtra=document.getElementById("exClientExtra")?.value.trim()||"";
+
+  _v630SaveExportSettingsBase();
+
+  /* Base save reuses same object; persist client fields once more explicitly. */
+  persist();
+  renderClientLogoPreview();
+  renderExportBrandPreview();
+};
+
+function v630ClientHtml(ex,cssPrefix=""){
+  if(!ex.clientEnabled)return "";
+  return `<div class="v630Party right">
+    <div>
+      <div class="v630PartyLabel">Auftraggeber</div>
+      <div class="${cssPrefix}companyName">${esc(ex.clientName||"")}</div>
+      ${ex.clientAddress?`<div class="${cssPrefix}companyMeta">${esc(ex.clientAddress)}</div>`:""}
+      ${ex.clientExtra?`<div class="${cssPrefix}companyMeta" style="margin-top:2px"><b>${esc(ex.clientExtra)}</b></div>`:""}
+    </div>
+    ${ex.clientLogoData?`<img src="${ex.clientLogoData}" alt="Auftraggeberlogo">`:""}
+  </div>`;
+}
+
+/* Header used by older export/preview paths */
+exportBrandHeaderHtml=function(title,subtitle=""){
+  const ex=exportSettings();
+  return `<div class="exportBrandHeader v630DualHeader">
+    <div class="v630Party">
+      ${ex.logoData?`<img src="${ex.logoData}" alt="Auftragnehmerlogo">`:""}
+      <div>
+        <div class="v630PartyLabel">Auftragnehmer</div>
+        <div class="companyName">${esc(ex.companyName||"")}</div>
+        ${ex.companyAddress?`<div class="companyMeta">${esc(ex.companyAddress)}</div>`:""}
+        ${ex.headerText?`<div class="companyMeta" style="margin-top:4px"><b>${esc(ex.headerText)}</b></div>`:""}
+      </div>
+    </div>
+    <div class="v630DocCenter">
+      <div class="docTitle">${esc(title||"")}</div>
+      ${subtitle?`<div class="docSub">${esc(subtitle)}</div>`:""}
+    </div>
+    ${ex.clientEnabled?v630ClientHtml(ex):'<div></div>'}
+  </div>`;
+};
+
+renderExportBrandPreview=function(){
+  const box=document.getElementById("exportBrandPreview");
+  if(!box)return;
+
+  const ex=exportSettings();
+  const live={
+    ...ex,
+    companyName:document.getElementById("exCompanyName")?.value||ex.companyName||"",
+    companyAddress:document.getElementById("exCompanyAddress")?.value||ex.companyAddress||"",
+    headerText:document.getElementById("exHeaderText")?.value||ex.headerText||"",
+    clientEnabled:!!document.getElementById("exClientEnabled")?.checked,
+    clientName:document.getElementById("exClientName")?.value||ex.clientName||"",
+    clientAddress:document.getElementById("exClientAddress")?.value||ex.clientAddress||"",
+    clientExtra:document.getElementById("exClientExtra")?.value||ex.clientExtra||""
+  };
+
+  box.innerHTML=`<div class="exportBrandHeader v630DualHeader">
+    <div class="v630Party">
+      ${live.logoData?`<img src="${live.logoData}" alt="Auftragnehmerlogo">`:""}
+      <div>
+        <div class="v630PartyLabel">Auftragnehmer</div>
+        <div class="companyName">${esc(live.companyName||"Firmenname")}</div>
+        <div class="companyMeta">${esc(live.companyAddress||"Adresse / Kontaktdaten")}</div>
+        ${live.headerText?`<div class="companyMeta" style="margin-top:4px"><b>${esc(live.headerText)}</b></div>`:""}
+      </div>
+    </div>
+    <div class="v630DocCenter">
+      <div class="docTitle">Aufmaßblatt</div>
+      <div class="docSub">Dokumentvorschau</div>
+    </div>
+    ${live.clientEnabled?v630ClientHtml(live):'<div></div>'}
+   </div>
+   ${document.getElementById("exFooterText")?.value?`<div class="exportFooter">${esc(document.getElementById("exFooterText").value)}</div>`:""}`;
+};
+
+/* Current V5.19/V6 print-page header */
+v519HeaderHtml=function(title,subtitle=""){
+  const ex=v519Settings();
+  return `<div class="v519PageHeader v630DualHeader">
+    <div class="v630Party">
+      ${ex.logoData?`<img src="${ex.logoData}" alt="Auftragnehmerlogo">`:""}
+      <div>
+        <div class="v630PartyLabel">Auftragnehmer</div>
+        <div class="v519CompanyName">${esc(ex.companyName||"")}</div>
+        ${ex.companyAddress?`<div class="v519CompanyMeta">${esc(ex.companyAddress)}</div>`:""}
+        ${ex.headerText?`<div class="v519CompanyMeta" style="margin-top:1mm"><b>${esc(ex.headerText)}</b></div>`:""}
+      </div>
+    </div>
+
+    <div class="v630DocCenter">
+      <div class="v519PageTitle">${esc(title||"")}</div>
+      ${subtitle?`<div class="v519PageSub">${esc(subtitle)}</div>`:""}
+    </div>
+
+    ${ex.clientEnabled?`<div class="v630Party right">
+      <div>
+        <div class="v630PartyLabel">Auftraggeber</div>
+        <div class="v519CompanyName">${esc(ex.clientName||"")}</div>
+        ${ex.clientAddress?`<div class="v519CompanyMeta">${esc(ex.clientAddress)}</div>`:""}
+        ${ex.clientExtra?`<div class="v519CompanyMeta" style="margin-top:1mm"><b>${esc(ex.clientExtra)}</b></div>`:""}
+      </div>
+      ${ex.clientLogoData?`<img src="${ex.clientLogoData}" alt="Auftraggeberlogo">`:""}
+    </div>`:'<div></div>'}
+  </div>`;
+};
+
+/* Live preview listeners */
+["exClientName","exClientAddress","exClientExtra"].forEach(id=>{
+  document.getElementById(id)?.addEventListener("input",renderExportBrandPreview);
+});
+
+/* initialize */
+try{renderExportSettings();}catch(e){}
 </script>
 
 </body>
