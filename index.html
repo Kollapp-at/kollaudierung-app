@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.67</title>
+<title>Kollaudierung – V6.69</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2782,6 +2782,243 @@ img,canvas,svg{
   border-color:var(--v667-accent,#527f9d);
 }
 
+
+/* ============================================================
+   V6.68 – TABLET-NAVIGATION + STRIKTE REITER-TRENNUNG
+   ============================================================ */
+
+/* Icons only where there is enough room. */
+@media(max-width:1100px){
+  .v667TabIcon{
+    display:none!important;
+  }
+  .tab{
+    gap:0!important;
+  }
+}
+
+/* Tablet navigation: cleaner and more compact. */
+@media(min-width:601px) and (max-width:1100px){
+  .tabs{
+    gap:5px!important;
+    padding:5px!important;
+  }
+  .tab{
+    min-height:42px!important;
+    padding:8px 11px!important;
+    font-size:12px!important;
+  }
+}
+
+/* Phone: text only, no decorative icon displacement. */
+@media(max-width:600px){
+  .tab{
+    padding:8px 10px!important;
+  }
+}
+
+/* Defensive isolation: only the explicitly active view is visible. */
+main > section.view{
+  display:none;
+}
+main > section.view.active{
+  display:block;
+}
+
+
+/* ============================================================
+   V6.69 – AUFMASSBLATT: AUSWAHL UND EXPORT KLAR GETRENNT
+   ============================================================ */
+.v669SheetTop{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) minmax(360px,.9fr);
+ gap:12px;
+ margin-bottom:12px;
+}
+.v669SheetSelectCard,
+.v669SheetExportCard{
+ border:1px solid #d6e0e6;
+ border-radius:12px;
+ padding:14px;
+ background:#fbfcfd;
+ box-shadow:0 1px 5px rgba(25,45,60,.045);
+}
+.v669SheetSelectCard{
+ border-left:4px solid #648aa4;
+}
+.v669SheetExportCard{
+ border-left:4px solid #759674;
+ background:#fbfdfb;
+}
+.v669SectionHead{
+ display:flex;
+ align-items:flex-start;
+ gap:10px;
+ margin-bottom:12px;
+}
+.v669SectionHead h2{
+ margin:1px 0 2px!important;
+ font-size:15px;
+}
+.v669Step{
+ width:26px;
+ height:26px;
+ border-radius:50%;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex:0 0 26px;
+ background:#e8f0f5;
+ color:#315d79;
+ font-size:12px;
+ font-weight:800;
+}
+.v669SheetExportCard .v669Step{
+ background:#eaf2e9;
+ color:#436b47;
+}
+.v669MultiPanel .v669Step{
+ background:#f2eee5;
+ color:#796743;
+}
+.v669Field label{
+ margin-top:0!important;
+}
+.v669SheetTitle{
+ margin-top:5px!important;
+ padding-left:2px;
+}
+.v669IdToolbar{
+ margin:12px 0 0!important;
+ background:#f5f8fa!important;
+ border-color:#d7e1e7!important;
+}
+.v669BillingOption{
+ padding:9px 10px;
+ margin:0 0 10px!important;
+ border:1px solid #d9e3d8;
+ border-radius:9px;
+ background:#f5f9f4;
+}
+.v669ExportGrid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:8px;
+}
+.v669ExportGrid button{
+ min-height:58px!important;
+ display:flex;
+ flex-direction:column;
+ align-items:flex-start;
+ justify-content:center;
+ text-align:left;
+ gap:2px;
+ padding:9px 11px!important;
+}
+.v669BtnMain{
+ font-size:13px;
+ font-weight:800;
+}
+.v669BtnSub{
+ font-size:10.5px;
+ opacity:.78;
+ font-weight:500;
+}
+.v669MultiExportBtn{
+ width:100%;
+ margin-top:9px;
+ border-style:dashed!important;
+}
+.v669MultiPanel{
+ margin:0 0 12px!important;
+ padding:14px!important;
+ border-left:4px solid #a99369!important;
+ background:#fcfbf7!important;
+}
+.v669MultiHead{
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:12px;
+ margin-bottom:10px;
+}
+.v669SelectionInfo{
+ margin-top:5px!important;
+ font-weight:700;
+ color:#4e606c;
+}
+.v669MultiActions{
+ justify-content:flex-end;
+}
+.v669MultiActions button{
+ min-height:38px!important;
+}
+
+/* Neutralize older V6.67 first-toolbar grid assumptions. */
+#view-sheet > .card > .v669SheetTop{
+ display:grid!important;
+}
+#view-sheet > .card > .v669SheetTop .toolbar{
+ display:flex!important;
+}
+
+@media(min-width:601px) and (max-width:1100px){
+ .v669SheetTop{
+   grid-template-columns:minmax(0,1fr) minmax(330px,.9fr)!important;
+   gap:10px;
+ }
+ .v669SheetSelectCard,
+ .v669SheetExportCard{
+   padding:12px;
+ }
+ .v669ExportGrid{
+   grid-template-columns:1fr 1fr;
+ }
+ .v669MultiHead{
+   display:grid;
+   grid-template-columns:1fr;
+ }
+ .v669MultiActions{
+   display:grid!important;
+   grid-template-columns:repeat(3,minmax(0,1fr))!important;
+   width:100%;
+ }
+ .v669MultiActions button{
+   width:100%;
+ }
+}
+@media(max-width:700px){
+ .v669SheetTop{
+   grid-template-columns:1fr!important;
+ }
+ .v669ExportGrid{
+   grid-template-columns:1fr 1fr;
+ }
+ .v669IdToolbar{
+   flex-direction:column;
+   align-items:stretch;
+ }
+ .v669MultiHead{
+   display:block;
+ }
+ .v669MultiActions{
+   display:grid!important;
+   grid-template-columns:1fr 1fr!important;
+   margin-top:10px;
+ }
+ .v669MultiActions button{
+   width:100%;
+ }
+}
+@media(max-width:420px){
+ .v669ExportGrid{
+   grid-template-columns:1fr;
+ }
+ .v669MultiActions{
+   grid-template-columns:1fr!important;
+ }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -2809,7 +3046,7 @@ img,canvas,svg{
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.67</h1>
+     <h1>Kollaudierung – V6.69</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -3205,14 +3442,23 @@ img,canvas,svg{
 
  <section id="view-sheet" class="view v667ManagedView">
   <div class="card v667MainCard">
-   <div class="toolbar noPrint" style="justify-content:space-between;align-items:flex-end">
-    <div style="min-width:320px">
-     <h2 style="margin:0">Digitales Aufmaßblatt</h2>
-     <label style="margin-top:8px">Aufmaßblatt anzeigen</label>
-     <select id="sheetViewSelect" onchange="changeSheetFromView()"></select>
-     <div id="sheetTitle" class="small" style="margin-top:4px"></div>
+   <div class="v669SheetTop noPrint">
+    <div class="v669SheetSelectCard">
+     <div class="v669SectionHead">
+      <div class="v669Step">1</div>
+      <div>
+       <h2>Auswahl & Bearbeiten</h2>
+       <div class="small">Aufmaßblatt und Erfassungs-ID auswählen.</div>
+      </div>
+     </div>
 
-     <div class="v621SheetIdToolbar noPrint">
+     <div class="v669Field">
+      <label>Aufmaßblatt anzeigen</label>
+      <select id="sheetViewSelect" onchange="changeSheetFromView()"></select>
+      <div id="sheetTitle" class="small v669SheetTitle"></div>
+     </div>
+
+     <div class="v621SheetIdToolbar v669IdToolbar noPrint">
       <div class="v621SelectWrap">
        <label for="sheetEntryIdSelect">Erfassungs-ID auswählen</label>
        <select id="sheetEntryIdSelect" onchange="v621SheetIdSelectionChanged()">
@@ -3225,23 +3471,57 @@ img,canvas,svg{
       </div>
      </div>
     </div>
-    <div class="toolbar">
-     <label class="exportOption"><input id="exportBillingSummary" type="checkbox" checked> Abrechnungsaufstellung</label>
-     <button class="secondary" onclick="toggleSheetSelection()">Blätter auswählen</button>
-     <button class="secondary" onclick="exportEntriesCSV()">Aktuelles CSV</button>
-     <button class="secondary" onclick="exportCurrentSheetPDF()">Aktuelles PDF</button>
-     <button class="okBtn" onclick="exportCurrentPlanAppendixPDF()">Planbeilage PDF</button>
-     <button class="secondary v640PhotoPdfBtn" onclick="exportCurrentPhotoDocPDF()">Fotodoku PDF</button>
+
+    <div class="v669SheetExportCard">
+     <div class="v669SectionHead">
+      <div class="v669Step">2</div>
+      <div>
+       <h2>Export aktuelles Blatt</h2>
+       <div class="small">Gewünschte Ausgabe für das aktuell angezeigte Aufmaßblatt.</div>
+      </div>
+     </div>
+
+     <label class="exportOption v669BillingOption">
+      <input id="exportBillingSummary" type="checkbox" checked>
+      <span>Abrechnungsaufstellung im Aufmaß-PDF mit ausgeben</span>
+     </label>
+
+     <div class="v669ExportGrid">
+      <button class="primary" onclick="exportCurrentSheetPDF()">
+       <span class="v669BtnMain">Aufmaß-PDF</span>
+       <span class="v669BtnSub">Aufmaß + Nachweise</span>
+      </button>
+      <button class="okBtn" onclick="exportCurrentPlanAppendixPDF()">
+       <span class="v669BtnMain">Planbeilage</span>
+       <span class="v669BtnSub">nur Plan-Nachweise</span>
+      </button>
+      <button class="secondary v640PhotoPdfBtn" onclick="exportCurrentPhotoDocPDF()">
+       <span class="v669BtnMain">Fotodoku</span>
+       <span class="v669BtnSub">vollständige Bilder</span>
+      </button>
+      <button class="secondary" onclick="exportEntriesCSV()">
+       <span class="v669BtnMain">CSV</span>
+       <span class="v669BtnSub">Tabellendaten</span>
+      </button>
+     </div>
+
+     <button class="secondary v669MultiExportBtn" onclick="toggleSheetSelection()">
+      Mehrere Aufmaßblätter auswählen
+     </button>
     </div>
    </div>
 
-   <div id="sheetSelectPanel" class="sheetSelectPanel noPrint">
-    <div class="toolbar" style="justify-content:space-between">
-     <div>
-      <div class="strong">Blätter für Sammel-Export auswählen</div>
-      <div id="sheetSelectionInfo" class="small" style="margin-top:3px">0 Blätter ausgewählt</div>
+   <div id="sheetSelectPanel" class="sheetSelectPanel v669MultiPanel noPrint">
+    <div class="v669MultiHead">
+     <div class="v669SectionHead">
+      <div class="v669Step">3</div>
+      <div>
+       <div class="strong">Sammel-Export</div>
+       <div class="small">Mehrere Aufmaßblätter auswählen und gemeinsam ausgeben.</div>
+       <div id="sheetSelectionInfo" class="small v669SelectionInfo">0 Blätter ausgewählt</div>
+      </div>
      </div>
-     <div class="toolbar">
+     <div class="toolbar v669MultiActions">
       <button class="secondary" onclick="selectAllSheetsForExport()">Alle auswählen</button>
       <button class="secondary" onclick="clearSheetsForExport()">Keine</button>
       <button class="primary" onclick="exportSelectedSheetsPDF()">Auswahl PDF</button>
@@ -19964,6 +20244,47 @@ showView=function(name){
   return r;
 };
 window.addEventListener("load",()=>setTimeout(v667SyncTabState,0));
+</script>
+
+
+<script>
+/* ============================================================
+   V6.68 – NUR EIN HAUPTREITER DARF SICHTBAR SEIN
+   ============================================================ */
+const _v668ShowViewBase=showView;
+showView=function(name){
+  const r=_v668ShowViewBase.apply(this,arguments);
+
+  /* Historical wrappers have accumulated over many versions.
+     Enforce the final state explicitly so content from Sync can never
+     remain visible inside Project (or vice versa). */
+  document.querySelectorAll("main > section.view").forEach(view=>{
+    const shouldShow=view.id==="view-"+name;
+    view.classList.toggle("active",shouldShow);
+    view.style.display=shouldShow?"block":"none";
+  });
+
+  document.querySelectorAll(".tabs .tab").forEach(tab=>{
+    const active=tab.id==="tab-"+name;
+    tab.classList.toggle("active",active);
+    if(active)tab.setAttribute("aria-current","page");
+    else tab.removeAttribute("aria-current");
+  });
+
+  return r;
+};
+
+/* Ensure a clean initial state after all historical startup handlers ran. */
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    const active=document.querySelector(".tabs .tab.active")?.id?.replace("tab-","") || "entry";
+    document.querySelectorAll("main > section.view").forEach(view=>{
+      const show=view.id==="view-"+active;
+      view.classList.toggle("active",show);
+      view.style.display=show?"block":"none";
+    });
+  },50);
+});
 </script>
 
 </body>
