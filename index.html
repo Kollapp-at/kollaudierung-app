@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.84</title>
+<title>Kollaudierung – V6.85</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -4863,6 +4863,37 @@ main{
   font-weight:800;
 }
 
+
+/* ============================================================
+   V6.85 – VORLAGENBEREICH IMMER SICHTBAR
+   ============================================================ */
+.v685NoTemplates{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:11px 12px;
+  border:1px dashed #dccf9f;
+  border-radius:9px;
+  background:#fffdf7;
+  color:#5e5334;
+}
+.v685NoTemplatesIcon{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  background:#fff3c9;
+  color:#7b641d;
+  font-weight:800;
+}
+.v685NoTemplates .small{
+  margin-top:3px;
+  line-height:1.35;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -4893,7 +4924,7 @@ main{
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V6.84</h1>
+     <h1>Kollaudierung – V6.85</h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -5404,11 +5435,11 @@ main{
    </div>
    <div id="sheetPrintHead" style="margin:8px 0 14px"></div>
 
-   <div id="sheetTemplatePanel" class="v671TemplatePanel noPrint" style="display:none">
+   <div id="sheetTemplatePanel" class="v671TemplatePanel noPrint">
     <div class="v671TemplateHead">
      <div>
       <div class="v671TemplateTitle">Vorlagen</div>
-      <div class="small">Erfassungs-IDs mit Menge 0 – vorbereitet, aber noch nicht tatsächlich aufgemessen.</div>
+      <div class="small">LV-Unterpositionen mit Menge 0 – vorbereitet, aber noch nicht tatsächlich aufgemessen.</div>
      </div>
      <div id="sheetTemplateCount" class="v671TemplateCount">0</div>
     </div>
@@ -22543,7 +22574,7 @@ window.addEventListener("load",()=>{
    V6.72 – ERZWUNGENE VERSIONSAKTUALISIERUNG / CACHE-SYNC
    ============================================================ */
 
-const KOLLAPP_VERSION="6.84";
+const KOLLAPP_VERSION="6.85";
 const KOLLAPP_VERSION_KEY="kollapp_loaded_version";
 const KOLLAPP_RELOAD_KEY="kollapp_update_reload_guard";
 
@@ -23293,8 +23324,14 @@ v671RenderTemplates=function(){
   count.textContent=String(templateCount);
 
   if(!groups.length){
-    panel.style.display="none";
-    list.innerHTML="";
+    panel.style.display="block";
+    list.innerHTML=`<div class="v685NoTemplates">
+      <div class="v685NoTemplatesIcon">✎</div>
+      <div>
+       <b>Aktuell keine Vorlagen vorhanden.</b>
+       <div class="small">Eine LV-Unterposition mit Rechenansatz <b>0</b> wird automatisch als Vorlage gespeichert und hier angezeigt.</div>
+      </div>
+    </div>`;
     return;
   }
 
