@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.50</title>
+<title>Kollaudierung – V6.51</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1997,6 +1997,47 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
   }
 }
 
+
+/* ===== V6.51 iPHONE: EIGENE PDF-ERZEUGUNG STATT SAFARI-DRUCK ===== */
+.v651PdfOverlay{
+ position:fixed;
+ inset:0;
+ z-index:99999;
+ background:rgba(15,27,36,.68);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:18px;
+}
+.v651PdfDialog{
+ width:min(520px,100%);
+ background:#fff;
+ border-radius:14px;
+ padding:18px;
+ box-shadow:0 12px 40px rgba(0,0,0,.28);
+}
+.v651PdfDialog h2{margin:0 0 8px}
+.v651PdfProgress{
+ height:8px;
+ background:#e7edf1;
+ border-radius:999px;
+ overflow:hidden;
+ margin:12px 0 8px;
+}
+.v651PdfProgress > div{
+ height:100%;
+ width:0%;
+ background:var(--accent);
+ transition:width .15s linear;
+}
+.v651PdfReadyActions{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+ margin-top:14px;
+}
+.v651PdfReadyActions button{flex:1;min-width:130px}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -2024,7 +2065,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.50</h1>
+     <h1>Kollaudierung – V6.51</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -16448,6 +16489,384 @@ v640CompactPhotoPagesForSheet=async function(sh){
 function v638PhotoCaptionHtml(ph,idx,anchor){
   return v647PhotoCaptionHtml(ph,idx+1,anchor);
 }
+</script>
+
+
+<script>
+/* ============================================================
+   V6.51 – iOS PDF OHNE SAFARI-URL / DATUM / DOPPELTE SEITENZAHL
+   PDF wird in Kollapp selbst als Bild-PDF aufgebaut.
+   Desktop verwendet weiterhin den bewährten Druckdialog.
+   ============================================================ */
+
+let v651PdfUrl=null;
+let v651PdfFile=null;
+
+function v651IsIOS(){
+  const ua=navigator.userAgent||"";
+  return /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+}
+
+function v651PdfOverlay(text="PDF wird erstellt …"){
+  let ov=document.getElementById("v651PdfOverlay");
+  if(!ov){
+    ov=document.createElement("div");
+    ov.id="v651PdfOverlay";
+    ov.className="v651PdfOverlay";
+    ov.innerHTML=`<div class="v651PdfDialog">
+      <h2>PDF-Export</h2>
+      <div id="v651PdfText">${esc(text)}</div>
+      <div class="v651PdfProgress"><div id="v651PdfBar"></div></div>
+      <div id="v651PdfSub" class="small">Bitte kurz warten.</div>
+      <div id="v651PdfActions" class="v651PdfReadyActions" style="display:none"></div>
+    </div>`;
+    document.body.appendChild(ov);
+  }
+  return ov;
+}
+function v651PdfProgress(done,total,text=""){
+  v651PdfOverlay();
+  const pct=total?Math.round(done/total*100):0;
+  const bar=document.getElementById("v651PdfBar");
+  const sub=document.getElementById("v651PdfSub");
+  const txt=document.getElementById("v651PdfText");
+  if(bar)bar.style.width=pct+"%";
+  if(sub)sub.textContent=`Seite ${done} von ${total} · ${pct}%`;
+  if(txt && text)txt.textContent=text;
+}
+function v651CloseOverlay(){
+  document.getElementById("v651PdfOverlay")?.remove();
+}
+function v651CssText(){
+  return [...document.querySelectorAll("style")].map(x=>x.textContent||"").join("\n");
+}
+function v651CaptureCss(){
+ return `
+ .v651CaptureRoot{
+   margin:0!important;padding:0!important;background:#fff!important;
+   font-family:Arial,Helvetica,sans-serif;color:#17222c;
+ }
+ .v651CaptureRoot .v519PrintPage{
+   box-sizing:border-box!important;
+   padding:9mm 10mm 8mm!important;
+   margin:0!important;
+   display:flex!important;
+   flex-direction:column!important;
+   overflow:hidden!important;
+   background:#fff!important;
+   width:210mm!important;height:297mm!important;
+ }
+ .v651CaptureRoot .v519PrintPage.v520LandscapePage{
+   width:297mm!important;height:210mm!important;
+   padding:8mm 9mm 7mm!important;
+ }
+ .v651CaptureRoot .v519PrintPage.v520PortraitPage,
+ .v651CaptureRoot .v519PrintPage.v519EvidencePage{
+   width:210mm!important;height:297mm!important;
+   padding:9mm 10mm 8mm!important;
+ }
+ .v651CaptureRoot .v519PageHeader{
+   flex:0 0 auto;min-height:16mm;display:grid;
+   grid-template-columns:minmax(0,1fr) auto;gap:8mm;align-items:start;
+   padding-bottom:2.2mm;margin-bottom:3mm;border-bottom:.35mm solid #9aa6ad;
+ }
+ .v651CaptureRoot .v520LandscapePage .v519PageHeader{
+   min-height:14mm;margin-bottom:2.5mm;
+ }
+ .v651CaptureRoot .v519Brand{display:flex;gap:4mm;align-items:flex-start;min-width:0}
+ .v651CaptureRoot .v519Brand img{max-width:37mm;max-height:14mm;object-fit:contain}
+ .v651CaptureRoot .v519CompanyName{font-size:9pt;font-weight:800;line-height:1.15}
+ .v651CaptureRoot .v519CompanyMeta{font-size:6.5pt;line-height:1.2;white-space:pre-line}
+ .v651CaptureRoot .v519PageTitle{text-align:right;font-size:10pt;font-weight:800;line-height:1.2}
+ .v651CaptureRoot .v519PageSub{text-align:right;font-size:6.8pt;margin-top:1mm;color:#555}
+ .v651CaptureRoot .v519PageBody{flex:1 1 auto;min-height:0;overflow:hidden}
+ .v651CaptureRoot .v519PageFooter{
+   flex:0 0 auto;min-height:8mm;margin-top:3mm;padding-top:1.5mm;
+   border-top:.25mm solid #b0b9be;display:grid;
+   grid-template-columns:1fr auto 1fr;gap:4mm;align-items:end;color:#555;
+ }
+ .v651CaptureRoot .v520LandscapePage .v519PageFooter{min-height:7mm;margin-top:2mm}
+ .v651CaptureRoot .v519PageFooter .center{text-align:center}
+ .v651CaptureRoot .v519PageFooter .right{text-align:right}
+ .v651CaptureRoot .v519PrintPage table{
+   width:100%!important;table-layout:auto;border-collapse:collapse;font-size:6.4pt!important;
+ }
+ .v651CaptureRoot .v519PrintPage th{
+   font-size:6.1pt!important;padding:1.3mm 1mm!important;white-space:nowrap;
+ }
+ .v651CaptureRoot .v519PrintPage td{
+   padding:1.25mm 1mm!important;vertical-align:top;
+ }
+ .v651CaptureRoot .v519PrintPage .printMeta{
+   display:grid!important;grid-template-columns:repeat(4,1fr)!important;
+   gap:1.5mm!important;margin:0 0 3mm!important;
+ }
+ .v651CaptureRoot .v519PrintPage .printMeta div{
+   padding:1.5mm!important;font-size:6.5pt!important;border:.25mm solid #bbb!important;
+ }
+ .v651CaptureRoot .v519EvidencePage .sheetPlanEvidence{border:0!important;padding:0!important;margin:0!important}
+ .v651CaptureRoot .v519EvidencePage .sheetPlanEvidenceHead{margin-bottom:2mm!important}
+ .v651CaptureRoot .v519EvidencePage .sheetPlanEvidenceGrid{
+   display:grid!important;grid-template-columns:2.15fr 1fr!important;
+   gap:2.5mm!important;align-items:start!important;
+ }
+ .v651CaptureRoot .v519EvidencePage .sheetPlanEvidence img{
+   width:100%!important;max-height:178mm!important;object-fit:contain!important;
+ }
+ .v651CaptureRoot .v519EvidencePage .sheetPlanEvidence .desc{font-size:7pt!important}
+ .v651CaptureRoot .v519EvidencePage .sheetPlanEvidence .cap{font-size:6.5pt!important}
+ .v651CaptureRoot .v520EntryTable{
+   width:100%!important;table-layout:fixed!important;font-size:6.2pt!important;
+ }
+ .v651CaptureRoot .v520EntryTable th,
+ .v651CaptureRoot .v520EntryTable td{
+   white-space:normal!important;overflow-wrap:anywhere!important;
+   line-height:1.18!important;padding:1.15mm .8mm!important;
+ }
+ .v651CaptureRoot .v520EntryTable th{font-size:5.9pt!important}
+ .v651CaptureRoot .v520EntryTable th:nth-child(1),.v651CaptureRoot .v520EntryTable td:nth-child(1){width:4%}
+ .v651CaptureRoot .v520EntryTable th:nth-child(2),.v651CaptureRoot .v520EntryTable td:nth-child(2){width:12%}
+ .v651CaptureRoot .v520EntryTable th:nth-child(3),.v651CaptureRoot .v520EntryTable td:nth-child(3){width:8%}
+ .v651CaptureRoot .v520EntryTable th:nth-child(4),.v651CaptureRoot .v520EntryTable td:nth-child(4){width:19%}
+ .v651CaptureRoot .v520EntryTable th:nth-child(5),.v651CaptureRoot .v520EntryTable td:nth-child(5){width:12%}
+ .v651CaptureRoot .v520EntryTable th:nth-child(6),.v651CaptureRoot .v520EntryTable td:nth-child(6){width:6%}
+ .v651CaptureRoot .v520EntryTable th:nth-child(7),.v651CaptureRoot .v520EntryTable td:nth-child(7){width:4%}
+ .v651CaptureRoot .v520EntryTable th:nth-child(8),.v651CaptureRoot .v520EntryTable td:nth-child(8){width:9%}
+ .v651CaptureRoot .v520EntryTable th:nth-child(9),.v651CaptureRoot .v520EntryTable td:nth-child(9){width:9%}
+ .v651CaptureRoot .v520EntryTable th:nth-child(10),.v651CaptureRoot .v520EntryTable td:nth-child(10){width:17%}
+ .v651CaptureRoot .v520BillingTable{
+   width:100%!important;table-layout:fixed!important;font-size:5.8pt!important;
+ }
+ .v651CaptureRoot .v520BillingTable th,
+ .v651CaptureRoot .v520BillingTable td{
+   white-space:normal!important;overflow-wrap:anywhere!important;
+   line-height:1.15!important;padding:1.05mm .65mm!important;
+ }
+ .v651CaptureRoot .v520BillingTable th{font-size:5.5pt!important}
+ .v651CaptureRoot .v520BillingTable th:nth-child(1),.v651CaptureRoot .v520BillingTable td:nth-child(1){width:7%}
+ .v651CaptureRoot .v520BillingTable th:nth-child(2),.v651CaptureRoot .v520BillingTable td:nth-child(2){width:20%}
+ .v651CaptureRoot .v520BillingTable th:nth-child(3),.v651CaptureRoot .v520BillingTable td:nth-child(3){width:6%}
+ .v651CaptureRoot .v520BillingTable th:nth-child(4),.v651CaptureRoot .v520BillingTable td:nth-child(4){width:4%}
+ .v651CaptureRoot .v520BillingTable th:nth-child(n+5),.v651CaptureRoot .v520BillingTable td:nth-child(n+5){width:7%}
+ `;
+}
+function v651PageHtml(page,index,total){
+  return `<section class="v519PrintPage ${page.extraClass||""}">
+    ${v519HeaderHtml(page.title,page.subtitle)}
+    <div class="v519PageBody">${page.body}</div>
+    ${v519FooterHtml(index+1,total)}
+  </section>`;
+}
+async function v651RenderPageJpeg(page,index,total){
+  const landscape=String(page.extraClass||"").includes("v520LandscapePage");
+  const logicalW=landscape?1123:794;
+  const logicalH=landscape?794:1123;
+  /* 1.5x keeps iPhone memory reasonable while remaining readable. */
+  const scale=1.5;
+
+  const root=document.createElement("div");
+  root.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
+  root.className="v651CaptureRoot";
+  root.style.width=logicalW+"px";
+  root.style.height=logicalH+"px";
+  root.style.background="#fff";
+
+  const style=document.createElement("style");
+  style.textContent=v651CssText()+"\n"+v651CaptureCss();
+  root.appendChild(style);
+
+  const holder=document.createElement("div");
+  holder.innerHTML=v651PageHtml(page,index,total);
+  root.appendChild(holder.firstElementChild);
+
+  const serialized=new XMLSerializer().serializeToString(root);
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${logicalW}" height="${logicalH}" viewBox="0 0 ${logicalW} ${logicalH}">
+    <foreignObject width="100%" height="100%">${serialized}</foreignObject>
+  </svg>`;
+
+  const svgUrl=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml;charset=utf-8"}));
+  try{
+    const img=await new Promise((resolve,reject)=>{
+      const im=new Image();
+      im.onload=()=>resolve(im);
+      im.onerror=()=>reject(new Error("PDF-Seite konnte nicht gerendert werden."));
+      im.src=svgUrl;
+    });
+    const canvas=document.createElement("canvas");
+    canvas.width=Math.round(logicalW*scale);
+    canvas.height=Math.round(logicalH*scale);
+    const ctx=canvas.getContext("2d",{alpha:false});
+    ctx.fillStyle="#fff";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    const dataUrl=canvas.toDataURL("image/jpeg",0.9);
+    return {
+      jpeg:v651DataUrlBytes(dataUrl),
+      width:canvas.width,
+      height:canvas.height,
+      landscape
+    };
+  }finally{
+    URL.revokeObjectURL(svgUrl);
+  }
+}
+function v651DataUrlBytes(dataUrl){
+  const b64=dataUrl.split(",")[1]||"";
+  const bin=atob(b64);
+  const out=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);
+  return out;
+}
+function v651Ascii(str){
+  return new TextEncoder().encode(str);
+}
+function v651Concat(parts){
+  const len=parts.reduce((n,p)=>n+p.length,0);
+  const out=new Uint8Array(len);
+  let off=0;
+  for(const p of parts){out.set(p,off);off+=p.length}
+  return out;
+}
+function v651MakePdf(rendered){
+  const count=rendered.length;
+  const maxObj=2+count*3;
+  const objParts=new Array(maxObj+1);
+
+  objParts[1]=[v651Ascii(`1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n`)];
+  const kids=[];
+  for(let i=0;i<count;i++)kids.push(`${3+i*3} 0 R`);
+  objParts[2]=[v651Ascii(`2 0 obj\n<< /Type /Pages /Count ${count} /Kids [${kids.join(" ")}] >>\nendobj\n`)];
+
+  for(let i=0;i<count;i++){
+    const r=rendered[i];
+    const pageObj=3+i*3,imgObj=4+i*3,contentObj=5+i*3;
+    const pw=r.landscape?841.89:595.28;
+    const ph=r.landscape?595.28:841.89;
+    const content=`q\n${pw.toFixed(2)} 0 0 ${ph.toFixed(2)} 0 0 cm\n/Im0 Do\nQ\n`;
+    const contentBytes=v651Ascii(content);
+
+    objParts[pageObj]=[v651Ascii(
+      `${pageObj} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pw.toFixed(2)} ${ph.toFixed(2)}] `+
+      `/Resources << /XObject << /Im0 ${imgObj} 0 R >> >> /Contents ${contentObj} 0 R >>\nendobj\n`
+    )];
+    objParts[imgObj]=[
+      v651Ascii(`${imgObj} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${r.width} /Height ${r.height} `+
+        `/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${r.jpeg.length} >>\nstream\n`),
+      r.jpeg,
+      v651Ascii(`\nendstream\nendobj\n`)
+    ];
+    objParts[contentObj]=[
+      v651Ascii(`${contentObj} 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`),
+      contentBytes,
+      v651Ascii(`endstream\nendobj\n`)
+    ];
+  }
+
+  const header=v651Ascii("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+  const chunks=[header];
+  const offsets=new Array(maxObj+1).fill(0);
+  let size=header.length;
+
+  for(let i=1;i<=maxObj;i++){
+    offsets[i]=size;
+    for(const part of objParts[i]){
+      chunks.push(part);
+      size+=part.length;
+    }
+  }
+
+  const xrefOffset=size;
+  let xref=`xref\n0 ${maxObj+1}\n0000000000 65535 f \n`;
+  for(let i=1;i<=maxObj;i++){
+    xref+=String(offsets[i]).padStart(10,"0")+" 00000 n \n";
+  }
+  xref+=`trailer\n<< /Size ${maxObj+1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+  chunks.push(v651Ascii(xref));
+  return new Blob(chunks,{type:"application/pdf"});
+}
+function v651FileName(){
+  const p=project?.();
+  const raw=`Kollapp_${p?.meta?.number||p?.meta?.name||"Export"}.pdf`;
+  return raw.replace(/[\\/:*?"<>|]+/g,"_");
+}
+function v651ShowReady(blob){
+  if(v651PdfUrl)URL.revokeObjectURL(v651PdfUrl);
+  v651PdfUrl=URL.createObjectURL(blob);
+  v651PdfFile=new File([blob],v651FileName(),{type:"application/pdf"});
+
+  const txt=document.getElementById("v651PdfText");
+  const sub=document.getElementById("v651PdfSub");
+  const bar=document.getElementById("v651PdfBar");
+  const acts=document.getElementById("v651PdfActions");
+  if(txt)txt.textContent="PDF ist fertig.";
+  if(sub)sub.textContent="Ohne Safari-URL, Browser-Datum oder zusätzliche Browser-Seitenzahl.";
+  if(bar)bar.style.width="100%";
+  if(acts){
+    acts.style.display="flex";
+    acts.innerHTML=`
+      <button class="primary" onclick="v651OpenPdf()">PDF öffnen</button>
+      <button class="secondary" onclick="v651SharePdf()">Teilen / sichern</button>
+      <button class="secondary" onclick="v651CloseOverlay()">Schließen</button>`;
+  }
+}
+function v651OpenPdf(){
+  if(!v651PdfUrl)return;
+  window.open(v651PdfUrl,"_blank");
+}
+async function v651SharePdf(){
+  if(!v651PdfFile)return;
+  try{
+    if(navigator.share && navigator.canShare?.({files:[v651PdfFile]})){
+      await navigator.share({files:[v651PdfFile],title:v651PdfFile.name});
+      return;
+    }
+  }catch(e){
+    if(e?.name==="AbortError")return;
+  }
+  const a=document.createElement("a");
+  a.href=v651PdfUrl;
+  a.download=v651PdfFile.name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+async function v651CreateIosPdf(pages){
+  v651PdfOverlay("PDF wird direkt in Kollapp erstellt …");
+  const rendered=[];
+  try{
+    for(let i=0;i<pages.length;i++){
+      v651PdfProgress(i+1,pages.length,"PDF-Seiten werden aufgebaut …");
+      /* Let Safari breathe between pages to reduce memory pressure. */
+      await new Promise(r=>setTimeout(r,30));
+      rendered.push(await v651RenderPageJpeg(pages[i],i,pages.length));
+    }
+    const blob=v651MakePdf(rendered);
+    v651ShowReady(blob);
+  }catch(err){
+    console.error("V6.51 iOS PDF",err);
+    const txt=document.getElementById("v651PdfText");
+    const sub=document.getElementById("v651PdfSub");
+    const acts=document.getElementById("v651PdfActions");
+    if(txt)txt.textContent="PDF konnte auf diesem Gerät nicht erstellt werden.";
+    if(sub)sub.textContent=err?.message||String(err);
+    if(acts){
+      acts.style.display="flex";
+      acts.innerHTML=`<button class="secondary" onclick="v651CloseOverlay()">Schließen</button>`;
+    }
+  }
+}
+
+/* Existing export routing:
+   iPhone/iPad -> Kollapp PDF
+   PC/Android/Desktop -> existing print engine */
+const _v651PrintPreparedBase=v519PrintPrepared;
+v519PrintPrepared=function(areaId,pages,modeClass){
+  if(v651IsIOS()){
+    return v651CreateIosPdf(pages);
+  }
+  return _v651PrintPreparedBase(areaId,pages,modeClass);
+};
 </script>
 
 </body>
