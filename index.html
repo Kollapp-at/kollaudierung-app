@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.73</title>
+<title>Kollaudierung – V6.74</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -3170,6 +3170,185 @@ main > section.view.active{
   }
 }
 
+
+/* ============================================================
+   V6.74 – PROJEKTREITER NEU GEORDNET
+   ============================================================ */
+.v674ProjectGrid{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+ gap:12px;
+}
+.v674ProjectCard{
+ position:relative;
+ overflow:hidden;
+ padding:14px!important;
+}
+.v674ProjectCard::before{
+ content:"";
+ position:absolute;
+ top:0;left:0;bottom:0;
+ width:4px;
+}
+.v674DataCard::before{background:#718b9c}
+.v674LvCard::before{background:#77967e}
+.v674PlanCard::before{background:#6f8fa7}
+.v674TableCard::before{background:#8d819b}
+.v674Head{
+ display:flex;
+ align-items:flex-start;
+ gap:10px;
+ margin-bottom:12px;
+}
+.v674Head h2{
+ margin:1px 0 2px!important;
+ font-size:15px;
+}
+.v674Step{
+ width:27px;
+ height:27px;
+ border-radius:50%;
+ flex:0 0 27px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:#edf2f5;
+ color:#425e70;
+ font-size:12px;
+ font-weight:800;
+}
+.v674LvCard .v674Step{background:#edf5ef;color:#4f7259}
+.v674PlanCard .v674Step{background:#eef4f8;color:#4c6f88}
+.v674TableCard .v674Step{background:#f2eff5;color:#685e76}
+.v674FullBtn{
+ width:100%;
+ margin-bottom:10px;
+}
+.v674ProjectMeta{
+ margin-top:0!important;
+}
+.v674ActionGrid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:8px;
+ margin-bottom:10px;
+}
+.v674ActionGrid button{
+ min-height:60px!important;
+ display:flex;
+ flex-direction:column;
+ align-items:flex-start;
+ justify-content:center;
+ text-align:left;
+ gap:2px;
+ padding:10px 12px!important;
+}
+.v674BtnMain{
+ font-weight:800;
+ font-size:13px;
+}
+.v674BtnSub{
+ font-size:10.5px;
+ opacity:.76;
+ font-weight:500;
+}
+.v674SourceInfo{
+ margin-top:8px!important;
+ border-radius:9px!important;
+}
+.v674PlanCard,
+.v674TableCard,
+.v674DangerCard{
+ grid-column:1/-1;
+}
+.v674HeadRow{
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:12px;
+}
+.v674HeadRow .v674Head{
+ margin-bottom:8px;
+}
+.v674PlanGrid{
+ margin-top:5px!important;
+}
+.v674TableCard .tablewrap{
+ margin-top:4px;
+}
+.v674DangerCard{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:16px;
+ border:1px solid #e5caca!important;
+ border-left:4px solid #b65c5c!important;
+ background:#fff8f8!important;
+ padding:12px 14px!important;
+}
+.v674DangerTitle{
+ font-size:13px;
+ font-weight:800;
+ color:#873c3c;
+ margin-bottom:3px;
+}
+.v674DangerCard button{
+ flex:0 0 auto;
+ min-width:180px;
+}
+
+/* Tablet */
+@media(min-width:701px) and (max-width:1100px){
+ .v674ProjectGrid{
+   grid-template-columns:1fr 1fr;
+   gap:10px;
+ }
+ .v674ProjectCard{
+   padding:12px!important;
+ }
+ .v674ActionGrid{
+   grid-template-columns:1fr;
+ }
+ .v674ActionGrid button{
+   min-height:54px!important;
+ }
+ .v674ProjectMeta{
+   grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ }
+}
+
+/* Narrow tablet / phone */
+@media(max-width:780px){
+ .v674ProjectGrid{
+   grid-template-columns:1fr;
+ }
+ .v674PlanCard,
+ .v674TableCard,
+ .v674DangerCard{
+   grid-column:auto;
+ }
+ .v674HeadRow{
+   display:block;
+ }
+ .v674HeadRow > button{
+   width:100%;
+   margin-bottom:8px;
+ }
+ .v674DangerCard{
+   flex-direction:column;
+   align-items:stretch;
+ }
+ .v674DangerCard button{
+   width:100%;
+   min-width:0;
+ }
+}
+@media(max-width:480px){
+ .v674ActionGrid{
+   grid-template-columns:1fr;
+ }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -3197,7 +3376,7 @@ main > section.view.active{
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.73</h1>
+     <h1>Kollaudierung – V6.74</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -3962,41 +4141,79 @@ main > section.view.active{
  </section>
 
  <section id="view-project" class="view v667ManagedView">
-  <div class="card v667MainCard">
-   <div class="toolbar" style="justify-content:space-between">
-    <div>
-     <h2 style="margin:0">Projektverwaltung</h2>
-     <div class="small" style="margin-top:4px">Projektdaten und importiertes Leistungsverzeichnis</div>
-    </div>
-    <div class="toolbar noPrint">
-     <button class="secondary" onclick="editCurrentProject()">Projektdaten bearbeiten</button>
-     <button class="okBtn" onclick="openManualPosition()">+ Neue LV-Unterposition / Regie</button>
-     <button class="primary" onclick="openImportForCurrent()">Excel / PDF importieren</button>
-     <button class="danger" id="deleteProjectBtn" onclick="deleteCurrentProject()">Projekt lokal löschen</button>
-    </div>
-   </div>
-   <div id="projectDetails" class="projectMeta"></div>
-   <div class="spacer"></div>
-   <div id="projectSourceInfo" class="info"></div>
-   <div class="spacer"></div>
+  <div class="v674ProjectGrid">
 
-   <div class="toolbar" style="justify-content:space-between">
-    <div>
-     <h3 style="margin:0">Projektpläne</h3>
-     <div class="small" style="margin-top:3px">Grundrisse und Pläne zentral für dieses Projekt hinterlegen.</div>
+   <div class="card v674ProjectCard v674DataCard">
+    <div class="v674Head">
+     <div class="v674Step">1</div>
+     <div>
+      <h2>Projektdaten</h2>
+      <div class="small">Stammdaten und Projektinformationen verwalten.</div>
+     </div>
     </div>
-    <button class="primary noPrint" onclick="openPlanUpload()">+ Plan hinzufügen</button>
+    <button class="secondary v674FullBtn noPrint" onclick="editCurrentProject()">Projektdaten bearbeiten</button>
+    <div id="projectDetails" class="projectMeta v674ProjectMeta"></div>
    </div>
-   <div id="projectPlanLibrary" class="projectPlanGrid" style="margin-top:9px"></div>
 
-   <div class="spacer"></div>
-   <h3>Importierte LV-Unterpositionen</h3>
-   <div class="tablewrap">
-    <table>
-     <thead><tr><th>LG</th><th>Pos.</th><th>Leistung</th><th>Menge</th><th>EH</th><th>Lohn/EH</th><th>Sonst./EH</th><th>EH-Preis</th></tr></thead>
-     <tbody id="projectLvBody"></tbody>
-    </table>
+   <div class="card v674ProjectCard v674LvCard">
+    <div class="v674Head">
+     <div class="v674Step">2</div>
+     <div>
+      <h2>Leistungsverzeichnis</h2>
+      <div class="small">LV importieren oder manuelle Regie-/Zusatzpositionen anlegen.</div>
+     </div>
+    </div>
+    <div class="v674ActionGrid noPrint">
+     <button class="primary" onclick="openImportForCurrent()">
+      <span class="v674BtnMain">Excel / PDF importieren</span>
+      <span class="v674BtnSub">Leistungsverzeichnis übernehmen</span>
+     </button>
+     <button class="okBtn" onclick="openManualPosition()">
+      <span class="v674BtnMain">Neue LV-Unterposition / Regie</span>
+      <span class="v674BtnSub">manuelle Position ergänzen</span>
+     </button>
+    </div>
+    <div id="projectSourceInfo" class="info v674SourceInfo"></div>
    </div>
+
+   <div class="card v674ProjectCard v674PlanCard">
+    <div class="v674HeadRow">
+     <div class="v674Head">
+      <div class="v674Step">3</div>
+      <div>
+       <h2>Projektpläne</h2>
+       <div class="small">Grundrisse und Pläne zentral für dieses Projekt hinterlegen.</div>
+      </div>
+     </div>
+     <button class="primary noPrint" onclick="openPlanUpload()">+ Plan hinzufügen</button>
+    </div>
+    <div id="projectPlanLibrary" class="projectPlanGrid v674PlanGrid"></div>
+   </div>
+
+   <div class="card v674ProjectCard v674TableCard">
+    <div class="v674Head">
+     <div class="v674Step">4</div>
+     <div>
+      <h2>Importierte LV-Unterpositionen</h2>
+      <div class="small">Übersicht der im Projekt verfügbaren LV-Unterpositionen.</div>
+     </div>
+    </div>
+    <div class="tablewrap">
+     <table>
+      <thead><tr><th>LG</th><th>Pos.</th><th>Leistung</th><th>Menge</th><th>EH</th><th>Lohn/EH</th><th>Sonst./EH</th><th>EH-Preis</th></tr></thead>
+      <tbody id="projectLvBody"></tbody>
+     </table>
+    </div>
+   </div>
+
+   <div class="card v674DangerCard noPrint">
+    <div>
+     <div class="v674DangerTitle">Lokale Projektkopie löschen</div>
+     <div class="small">Entfernt dieses Projekt nur auf diesem Gerät. Diese Aktion sollte bewusst durchgeführt werden.</div>
+    </div>
+    <button class="danger" id="deleteProjectBtn" onclick="deleteCurrentProject()">Projekt lokal löschen</button>
+   </div>
+
   </div>
  </section>
 </main>
