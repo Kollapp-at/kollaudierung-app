@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.44</title>
+<title>Kollaudierung – V6.45</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -1863,6 +1863,18 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 #view-sheet .entryIdBadge{margin-right:2px}
 #view-sheet .v642AssetRow{margin-right:6px}
 
+
+/* ===== V6.45 PLAN-NACHWEIS KONSISTENT + FUSSZEILE FEINSCHLIFF ===== */
+.v643AppCredit{
+  gap:.7mm!important;
+  font-size:4.6pt!important;
+  opacity:.66!important;
+}
+.v643AppCredit img{
+  width:2.7mm!important;
+  height:2.7mm!important;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1887,7 +1899,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
 <header>
  <div class="headerRow">
   <div>
-   <h1>Kollaudierung – V6.44</h1>
+   <h1>Kollaudierung – V6.45</h1>
    <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
   </div>
   <div class="headerTools">
@@ -15772,6 +15784,165 @@ v519FooterHtml=function(pageNo,totalPages){
     <div class="right">${ex.showFileRef?`Dokument: ${esc(v519FileRef())}`:""}</div>
   </div>`;
 };
+</script>
+
+
+<script>
+/* ============================================================
+   V6.45 – PLAN-NACHWEIS: EINE LV-QUELLE FÜR ALLE TEXTE
+   ============================================================ */
+
+function v645ResolvedLvForEvidence(group,cluster){
+  const ann=cluster?.[0]?.ann || group?.items?.[0]?.ann || null;
+
+  /* Die explizite LV-Verknüpfung der Markierung hat immer Vorrang. */
+  let lv=null;
+  try{ lv = ann ? v633EntryForAnnotation(ann) : null; }catch(e){}
+
+  if(!lv && group?.lvEntry)lv=group.lvEntry;
+
+  if(!lv && group?.entry){
+    const g=typeof v612GroupEntries==="function"
+      ? v612GroupEntries(group.entry)
+      : [group.entry];
+    if(ann?.pos)lv=g.find(x=>x.pos===ann.pos)||null;
+  }
+
+  return lv || group?.entry || null;
+}
+
+function v645RepairEvidenceAnnotation(group,cluster,lv){
+  if(!lv)return;
+  (cluster||[]).forEach(item=>{
+    const a=item?.ann;
+    if(!a)return;
+    a.lvEntryId=lv.id||a.lvEntryId||"";
+    a.lvSyncUuid=lv.syncUuid||a.lvSyncUuid||"";
+    a.pos=lv.pos||a.pos||"";
+    a.posText=getPos(lv.pos)?.text||a.posText||"";
+  });
+}
+
+/* Finale Exportfunktion: Titel, Bild-Infobox und Detailblock greifen
+   ausschließlich auf dieselbe aufgelöste LV-Unterposition zu. */
+makePlanEvidenceHtml=async function(sh){
+  const links=annotationsForSheet(sh);
+  if(!links.length)return "";
+
+  const groups=v516GroupLinksByEntryAndPlan(links);
+  const blocks=[];
+
+  for(const group of groups){
+    const clusters=v516ClusterItemsForExport(group.items);
+    const entry=group.entry;
+
+    for(let i=0;i<clusters.length;i++){
+      const cluster=clusters[i];
+      const lv=v645ResolvedLvForEvidence(group,cluster);
+      if(!lv)continue;
+
+      v645RepairEvidenceAnnotation(group,cluster,lv);
+
+      const posCode=lv.pos||"";
+      const pos=getPos(posCode);
+      const posText=pos?.text || cluster?.[0]?.ann?.posText || "";
+      const id=entryDisplayId(entry);
+      const headerText=`ID ${id} · ${posCode}${posText?" · "+posText:""}`;
+
+      const pics=await v516MakeClusterEvidenceImages(group.plan,cluster,headerText);
+      if(!pics)continue;
+
+      const suffix=clusters.length>1?` · Ausschnitt ${i+1}/${clusters.length}`:"";
+
+      blocks.push(`<div class="sheetPlanEvidence">
+        <div class="sheetPlanEvidenceHead">
+          <div>
+            <b>ID ${id} · ${esc(posCode)} · ${esc(posText)}${suffix}</b>
+            <div class="desc">${esc(entry?.lineDesc||"")}</div>
+          </div>
+          <div class="desc">${num(lv.qty)} ${esc(lv.unit||pos?.unit||"")} · ${esc(group.plan.name)}</div>
+        </div>
+
+        <div class="sheetPlanEvidenceGrid">
+          <div>
+            <img src="${pics.detail}">
+            <div class="cap">Detailausschnitt der markierten LV-Unterposition</div>
+          </div>
+          <div>
+            <img src="${pics.overview}">
+            <div class="cap">Lage des Ausschnitts im Gesamtplan</div>
+          </div>
+        </div>
+
+        ${v634EvidenceInfoHtml(entry,lv,group.plan,cluster)}
+      </div>`);
+    }
+  }
+
+  try{persist()}catch(e){}
+  return blocks.join("");
+};
+
+/* Export-Gruppierung ebenfalls anhand der verknüpften LV-Unterposition.
+   Dadurch kann eine veraltete ann.pos nicht mehr die Gruppierung verfälschen. */
+v516GroupLinksByEntryAndPlan=function(links){
+  const map=new Map();
+
+  for(const item of links){
+    const anchor=item.entry || v516EntryForAnnotation(item.ann);
+    if(!anchor)continue;
+
+    const lv=v633EntryForAnnotation(item.ann) || anchor;
+    const pos=lv?.pos || item.ann?.pos || "";
+    const key=`${anchor.id}__${item.plan.id}__${pos}`;
+
+    if(!map.has(key)){
+      map.set(key,{
+        entry:anchor,
+        lvEntry:lv,
+        pos,
+        plan:item.plan,
+        items:[]
+      });
+    }
+
+    map.get(key).items.push({...item,entry:anchor,lvEntry:lv});
+  }
+
+  return [...map.values()].sort((a,b)=>{
+    const aid=Number(entryDisplayId(a.entry))||999999999;
+    const bid=Number(entryDisplayId(b.entry))||999999999;
+    if(aid!==bid)return aid-bid;
+
+    const pc=String(a.pos||"").localeCompare(
+      String(b.pos||""),"de",{numeric:true,sensitivity:"base"}
+    );
+    if(pc!==0)return pc;
+
+    return String(a.plan?.name||"").localeCompare(
+      String(b.plan?.name||""),"de",{numeric:true,sensitivity:"base"}
+    );
+  });
+};
+
+/* Einmalige Reparatur bestehender Markierungen beim Laden. */
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    try{
+      plans().forEach(pl=>{
+        (pl.annotations||[]).forEach(a=>{
+          const lv=v633EntryForAnnotation(a);
+          if(!lv)return;
+          a.lvEntryId=lv.id||a.lvEntryId||"";
+          a.lvSyncUuid=lv.syncUuid||a.lvSyncUuid||"";
+          a.pos=lv.pos||a.pos||"";
+          a.posText=getPos(lv.pos)?.text||a.posText||"";
+        });
+      });
+      persist();
+    }catch(e){console.warn("V6.45 Plan/LV-Reparatur",e)}
+  },0);
+});
 </script>
 
 </body>
