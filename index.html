@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.97</title>
+<title>Kollaudierung – V6.98</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -6021,6 +6021,234 @@ main > section.view,
   }
 }
 
+
+/* ============================================================
+   V6.98 – FEINSCHLIFF LISTE + SCHRITTE 5/6/7
+   ============================================================ */
+
+/* ---------- LV-POSITIONSLISTE: MEHR LUFT ---------- */
+#view-entry .mobilePosResults{
+  gap:8px!important;
+  padding:4px 5px 6px 2px!important;
+}
+
+#view-entry .mobilePosResult,
+#view-entry .mobilePosResult.selected{
+  min-height:68px!important;
+  padding:11px 12px!important;
+  border-radius:10px!important;
+  border:1px solid #d9e3e9!important;
+  background:#fff!important;
+}
+
+#view-entry .mobilePosResult:hover{
+  background:#f6fafc!important;
+  border-color:#b9ceda!important;
+}
+
+#view-entry .mobilePosResult.selected{
+  border-color:#4e8eb3!important;
+  background:linear-gradient(180deg,#edf6fb 0%,#f7fbfd 100%)!important;
+  box-shadow:inset 4px 0 0 #2f739b!important;
+}
+
+#view-entry .mobilePosResult .mprCode{
+  font-size:13.5px!important;
+  line-height:1.2!important;
+  margin-bottom:4px!important;
+  padding-right:105px!important;
+}
+
+#view-entry .mobilePosResult .mprText{
+  display:block!important;
+  font-size:12px!important;
+  line-height:1.38!important;
+  margin-top:2px!important;
+  padding-right:105px!important;
+}
+
+#view-entry .mobilePosResult .mprMeta{
+  display:block!important;
+  margin-top:7px!important;
+  padding-top:5px!important;
+  padding-right:105px!important;
+  border-top:1px solid #eef2f4;
+  font-size:10.5px!important;
+  line-height:1.25!important;
+}
+
+#view-entry .mobilePosResult.selected::after{
+  top:10px!important;
+  right:10px!important;
+  padding:4px 7px!important;
+  font-size:8.5px!important;
+}
+
+/* Liste etwas höher am PC, damit trotz größerer Karten genug Treffer sichtbar bleiben */
+@media(min-width:1101px){
+  #view-entry .mobilePosResults{
+    height:390px!important;
+    max-height:390px!important;
+  }
+}
+@media(min-width:601px) and (max-width:1100px){
+  #view-entry .mobilePosResults{
+    height:420px!important;
+    max-height:420px!important;
+  }
+}
+
+/* ---------- SCHRITT 5 + 6 ---------- */
+#view-entry .v697SupportCard{
+  padding:16px!important;
+  background:#fff!important;
+  border:1px solid #dce5ea!important;
+}
+
+#view-entry .v697SupportGrid{
+  gap:16px!important;
+  align-items:stretch!important;
+}
+
+#view-entry .v697SupportSection{
+  position:relative;
+  padding:14px!important;
+  border:1px solid #dce5ea!important;
+  border-radius:11px!important;
+  background:#fafcfd!important;
+  min-height:190px;
+}
+
+#view-entry .v697PlanSupport{
+  padding-right:14px!important;
+  border-right:1px solid #dce5ea!important;
+  border-left:4px solid #6d8fa4!important;
+}
+
+#view-entry .v697NoteSupport{
+  border-left:4px solid #7d8b97!important;
+}
+
+#view-entry .v697SupportSection .v692SectionTitle{
+  margin:0 0 10px!important;
+  padding-bottom:8px!important;
+  border-bottom:1px solid #e3eaee;
+}
+
+#view-entry .v697SupportSection .entryPlanBox{
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+
+#view-entry .v697SupportSection .v666NoteSection{
+  min-height:0!important;
+  margin:0!important;
+}
+
+#view-entry .v697SupportSection #note{
+  min-height:125px!important;
+}
+
+/* Planverwaltung rechts sauberer */
+#view-entry .v697PlanSupport .grid2{
+  gap:10px!important;
+}
+#view-entry .v697PlanSupport .toolbar{
+  gap:7px!important;
+}
+#view-entry .v697PlanSupport button{
+  min-height:38px!important;
+}
+
+/* ---------- SCHRITT 7 ---------- */
+#view-entry .v697PhotoActionsCard{
+  padding:16px!important;
+  border:1px solid #e4dcc9!important;
+  border-left:4px solid #9c8557!important;
+  background:linear-gradient(180deg,#fffdf8 0%,#fff 100%)!important;
+}
+
+#view-entry .v697PhotoActionsCard > .v692SectionTitle{
+  margin:0 0 10px!important;
+  padding-bottom:8px!important;
+  border-bottom:1px solid #ece4d5;
+}
+
+#view-entry .v697PhotoActionsCard .v637PhotoBox{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:16px;
+  align-items:start;
+  margin:0!important;
+}
+
+#view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar{
+  display:contents!important;
+}
+
+#view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar > div:first-child{
+  min-width:0;
+}
+
+#view-entry .v697PhotoActionsCard .v639PhotoAddActions{
+  display:flex!important;
+  gap:8px!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  flex-wrap:wrap!important;
+}
+
+#view-entry .v697PhotoActionsCard .v639PhotoAddActions .filePickLabel{
+  min-height:40px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0!important;
+}
+
+#view-entry .v697PhotoActionsCard .v637PhotoList{
+  grid-column:1/-1;
+  margin-top:2px!important;
+}
+
+#view-entry .v697PhotoActionsCard > .toolbar{
+  display:flex!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  margin-top:12px!important;
+  padding-top:12px!important;
+}
+
+#view-entry .v697PhotoActionsCard > .toolbar button{
+  min-height:36px!important;
+}
+
+#view-entry .v697PhotoActionsCard #message{
+  margin-top:8px!important;
+}
+
+/* ---------- TABLET / PHONE ---------- */
+@media(max-width:900px){
+  #view-entry .v697SupportSection{
+    min-height:0;
+  }
+
+  #view-entry .v697PhotoActionsCard .v637PhotoBox{
+    grid-template-columns:1fr!important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v639PhotoAddActions{
+    justify-content:flex-start!important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v637PhotoList{
+    grid-column:1;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -6051,7 +6279,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V6.97 <span class="v693BuildStamp">Build 6.97</span></h1>
+     <h1>Kollaudierung – V6.98 <span class="v693BuildStamp">Build 6.98</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -14988,7 +15216,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=6.97",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=6.98",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -24769,7 +24997,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="6.97";
+const KOLLAPP_VERSION="6.98";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
