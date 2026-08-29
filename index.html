@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.53</title>
+<title>Kollaudierung – V6.54</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2096,7 +2096,7 @@ td.wrap{white-space:normal;min-width:220px}td.wide{white-space:normal;min-width:
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.53</h1>
+     <h1>Kollaudierung – V6.54</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -17112,6 +17112,134 @@ v652RenderCanvas=async function(page,index,total){
     throw new Error(`PDF-Seite ${index+1} wurde nicht korrekt gerendert.`);
   }
   return out;
+};
+</script>
+
+
+<script>
+/* ============================================================
+   V6.54 – SINNVOLLE PDF-DATEINAMEN
+   ============================================================ */
+
+let v654CurrentPdfName="";
+
+function v654SafeFilePart(v){
+  return String(v||"")
+    .trim()
+    .replace(/\s+/g,"-")
+    .replace(/[\\/:*?"<>|]+/g,"-")
+    .replace(/-+/g,"-")
+    .replace(/^[._-]+|[._-]+$/g,"");
+}
+
+function v654IsoDate(){
+  const d=new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function v654DetectExportType(pages){
+  const titles=(pages||[]).map(p=>String(p?.title||"").toLowerCase());
+
+  if(titles.length && titles.every(t=>t.includes("fotodokumentation"))){
+    return "Fotodoku";
+  }
+
+  if(titles.length && titles.every(t=>
+      t.includes("plan-nachweis") ||
+      t.includes("planbeilage")
+  )){
+    return "Planbeilage";
+  }
+
+  return "Kollaudierung";
+}
+
+function v654SheetCodesFromPages(pages){
+  const codes=[];
+  const seen=new Set();
+
+  for(const page of (pages||[])){
+    const source=[
+      String(page?.title||""),
+      String(page?.subtitle||""),
+      String(page?.body||"")
+    ].join(" ");
+
+    const rx=/AMBL\s*([0-9A-Za-z._-]+)/gi;
+    let m;
+    while((m=rx.exec(source))){
+      const code="AMBL-"+m[1].replace(/\.$/,"");
+      if(!seen.has(code)){
+        seen.add(code);
+        codes.push(code);
+      }
+    }
+  }
+  return codes;
+}
+
+function v654BuildPdfName(pages){
+  const p=project?.();
+  const type=v654DetectExportType(pages);
+
+  const projectNo=v654SafeFilePart(
+    p?.meta?.number ||
+    p?.meta?.name ||
+    "Projekt"
+  );
+
+  const codes=v654SheetCodesFromPages(pages);
+
+  let sheetPart="";
+  if(codes.length===1){
+    sheetPart=codes[0];
+  }else if(codes.length>1){
+    sheetPart=`${codes.length}-Aufmassblaetter`;
+  }else{
+    try{
+      const sh=activeSheet?.();
+      if(sh?.code)sheetPart=v654SafeFilePart(sh.code.replace(/\s+/g,"-"));
+    }catch(e){}
+  }
+
+  const parts=[
+    type,
+    projectNo,
+    sheetPart,
+    v654IsoDate()
+  ].filter(Boolean);
+
+  return parts.map(v654SafeFilePart).filter(Boolean).join("_")+".pdf";
+}
+
+/* v651ShowReady uses v651FileName() when creating the File object. */
+v651FileName=function(){
+  return v654CurrentPdfName || `Kollaudierung_${v654IsoDate()}.pdf`;
+};
+
+/* Set the file name before every prepared export.
+   This works for the iPhone/iPad direct PDF path and its Share sheet. */
+const _v654PrintPreparedBase=v519PrintPrepared;
+v519PrintPrepared=function(areaId,pages,modeClass){
+  try{
+    v654CurrentPdfName=v654BuildPdfName(pages);
+  }catch(e){
+    v654CurrentPdfName=`Kollaudierung_${v654IsoDate()}.pdf`;
+  }
+  return _v654PrintPreparedBase.apply(this,arguments);
+};
+
+/* Show the resulting name in the iOS ready dialog as confirmation. */
+const _v654ShowReadyBase=v651ShowReady;
+v651ShowReady=function(blob){
+  _v654ShowReadyBase(blob);
+  const sub=document.getElementById("v651PdfSub");
+  if(sub){
+    sub.innerHTML=`Dateiname: <b>${esc(v651FileName())}</b><br>Ohne Safari-URL, Browser-Datum oder zusätzliche Browser-Seitenzahl.`;
+  }
 };
 </script>
 
