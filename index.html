@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.70</title>
+<title>Kollaudierung – V6.71</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -3019,6 +3019,106 @@ main > section.view.active{
  }
 }
 
+
+/* ============================================================
+   V6.71 – VORLAGEN SEPARAT IM REITER AUFMASSBLATT
+   ============================================================ */
+.v671TemplatePanel{
+  margin:0 0 12px;
+  padding:12px;
+  border:1px solid #e4d8ad;
+  border-left:4px solid #b7973f;
+  border-radius:10px;
+  background:#fffbf1;
+}
+.v671TemplateHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:9px;
+}
+.v671TemplateTitle{
+  font-size:14px;
+  font-weight:800;
+  color:#725b1b;
+}
+.v671TemplateCount{
+  min-width:30px;
+  height:30px;
+  padding:0 9px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#efdfa8;
+  color:#6b5518;
+  font-size:12px;
+  font-weight:800;
+}
+.v671TemplateList{
+  display:grid;
+  gap:7px;
+}
+.v671TemplateItem{
+  display:grid;
+  grid-template-columns:70px minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  padding:9px 10px;
+  border:1px solid #e8ddba;
+  border-radius:9px;
+  background:#fff;
+}
+.v671TemplateId{
+  font-weight:800;
+  color:#765f1c;
+}
+.v671TemplateMain{
+  font-weight:700;
+  overflow-wrap:anywhere;
+}
+.v671TemplateSub{
+  margin-top:3px;
+  color:#6d7981;
+  font-size:11px;
+  overflow-wrap:anywhere;
+}
+.v671TemplateActions{
+  display:flex;
+  gap:6px;
+}
+.v671TemplateActions button{
+  min-height:36px!important;
+}
+.v671NormalHeading{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin:2px 0 8px;
+  font-size:13px;
+  font-weight:800;
+  color:#344853;
+}
+.v671NormalHeading::before{
+  content:"";
+  width:4px;
+  height:18px;
+  border-radius:999px;
+  background:#648aa4;
+}
+@media(max-width:700px){
+  .v671TemplateItem{
+    grid-template-columns:54px minmax(0,1fr);
+  }
+  .v671TemplateActions{
+    grid-column:1/-1;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .v671TemplateActions button{width:100%}
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -3046,7 +3146,7 @@ main > section.view.active{
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.70</h1>
+     <h1>Kollaudierung – V6.71</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -3537,6 +3637,19 @@ main > section.view.active{
     <div id="sheetExportProgress" class="exportProgress">Export wird vorbereitet …</div>
    </div>
    <div id="sheetPrintHead" style="margin:8px 0 14px"></div>
+
+   <div id="sheetTemplatePanel" class="v671TemplatePanel noPrint" style="display:none">
+    <div class="v671TemplateHead">
+     <div>
+      <div class="v671TemplateTitle">Vorlagen</div>
+      <div class="small">Erfassungs-IDs mit Menge 0 – vorbereitet, aber noch nicht tatsächlich aufgemessen.</div>
+     </div>
+     <div id="sheetTemplateCount" class="v671TemplateCount">0</div>
+    </div>
+    <div id="sheetTemplateList" class="v671TemplateList"></div>
+   </div>
+
+   <div class="v671NormalHeading">Erfasste Positionen</div>
    <div class="tablewrap">
     <table>
      <thead><tr><th>ID</th><th>Positionsbeschreibung / Anmerkung</th><th>LV-Unterposition</th><th>Leistungsbeschreibung</th><th>Rechenansatz</th><th>Menge</th><th>EH</th><th>Detail</th><th>Status</th><th>Anmerkung</th><th class="noPrint"></th></tr></thead>
@@ -20457,6 +20570,138 @@ window.addEventListener("load",()=>{
       try{v670RenderNoProjectState()}catch(e){}
     }
   },80);
+});
+</script>
+
+
+<script>
+/* ============================================================
+   V6.71 – VORLAGENPANEL + NORMALE AUFMASSTABELLE OHNE VORLAGEN
+   ============================================================ */
+
+function v671SheetTemplateGroups(){
+  const p=project?.();
+  const sh=activeSheet?.();
+  if(!p || !sh)return [];
+
+  const seen=new Set();
+  const out=[];
+
+  for(const e of (p.entries||[])){
+    if(e.sheetId!==sh.id)continue;
+
+    const key=e.multiLvGroup || e.id;
+    if(seen.has(key))continue;
+    seen.add(key);
+
+    const group=typeof v612GroupEntries==="function" ? v612GroupEntries(e) : [e];
+    const isTemplate=group.length>0 && group.every(x=>Number(x.qty||0)===0);
+    if(!isTemplate)continue;
+
+    const anchor=typeof v612AnchorEntry==="function" ? (v612AnchorEntry(e)||e) : e;
+    out.push({key,anchor,group});
+  }
+
+  return out.sort((a,b)=>
+    (Number(a.anchor.displayId)||999999)-
+    (Number(b.anchor.displayId)||999999)
+  );
+}
+
+function v671RenderTemplates(){
+  const panel=document.getElementById("sheetTemplatePanel");
+  const list=document.getElementById("sheetTemplateList");
+  const count=document.getElementById("sheetTemplateCount");
+  if(!panel||!list||!count)return;
+
+  const groups=v671SheetTemplateGroups();
+  count.textContent=String(groups.length);
+
+  if(!groups.length){
+    panel.style.display="none";
+    list.innerHTML="";
+    return;
+  }
+
+  panel.style.display="block";
+  list.innerHTML=groups.map(({anchor,group})=>{
+    const id=entryDisplayId(anchor);
+    const posCodes=group.map(x=>x.pos).filter(Boolean);
+    const planCount=typeof v642PlanMarkerCount==="function" ? v642PlanMarkerCount(anchor) : 0;
+    const photoCount=typeof v642PhotoCount==="function" ? v642PhotoCount(anchor) : 0;
+
+    const assets=[
+      planCount?`${planCount} Planmarkierung${planCount===1?"":"en"}`:"",
+      photoCount?`${photoCount} Bild${photoCount===1?"":"er"}`:""
+    ].filter(Boolean).join(" · ");
+
+    return `<div class="v671TemplateItem">
+      <div class="v671TemplateId">ID ${esc(id)}</div>
+      <div>
+       <div class="v671TemplateMain">${esc(anchor.lineDesc||"Ohne Beschreibung")}</div>
+       <div class="v671TemplateSub">
+        ${posCodes.length?`LV: ${esc(posCodes.join(", "))}`:"Keine LV-Unterposition"} · Menge 0
+        ${assets?` · ${esc(assets)}`:""}
+       </div>
+      </div>
+      <div class="v671TemplateActions">
+       <button class="secondary" onclick="v671EditTemplate('${esc(anchor.id)}')">Bearbeiten</button>
+       <button class="danger" onclick="deleteEntry('${esc(anchor.id)}')">Löschen</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function v671EditTemplate(id){
+  editEntry(id);
+  showView("entry");
+  setTimeout(()=>{
+    document.getElementById("entryCard")?.scrollIntoView?.({behavior:"smooth",block:"start"});
+  },50);
+}
+
+/* Render the standard sheet table with actual measurements only.
+   Zero-quantity template groups are kept in the dedicated panel above. */
+const _v671RenderSheetBase=renderSheet;
+renderSheet=function(){
+  const p=project?.();
+  const sh=activeSheet?.();
+
+  if(!p || !sh){
+    const r=_v671RenderSheetBase.apply(this,arguments);
+    try{v671RenderTemplates()}catch(e){}
+    return r;
+  }
+
+  const original=p.entries;
+  const templateKeys=new Set(v671SheetTemplateGroups().map(x=>x.key));
+
+  try{
+    p.entries=original.filter(e=>!templateKeys.has(e.multiLvGroup||e.id));
+    return _v671RenderSheetBase.apply(this,arguments);
+  }finally{
+    p.entries=original;
+    try{v671RenderTemplates()}catch(e){}
+  }
+};
+
+/* Keep the panel fresh after relevant actions. */
+const _v671FinalizeBase=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const r=_v671FinalizeBase.apply(this,arguments);
+  setTimeout(()=>{try{renderSheet?.()}catch(e){}},0);
+  return r;
+};
+
+const _v671DeleteBase=deleteEntry;
+deleteEntry=function(){
+  const r=_v671DeleteBase.apply(this,arguments);
+  setTimeout(()=>{try{renderSheet?.()}catch(e){}},0);
+  return r;
+};
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>{try{v671RenderTemplates()}catch(e){}},100);
 });
 </script>
 
