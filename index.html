@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.64</title>
+<title>Kollaudierung – V6.65</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2309,7 +2309,7 @@ img,canvas,svg{
    <div class="headerTitleRow">
     <img class="headerAppLogo" src="./icon-180.png" alt="Kollapp Logo">
     <div class="headerTitleText">
-     <h1>Kollaudierung – V6.64</h1>
+     <h1>Kollaudierung – V6.65</h1>
      <div class="headerMiniCredit"><span>Kollapp © Mst. Dominic Höfler</span></div>
     </div>
    </div>
@@ -19344,6 +19344,99 @@ removeLvFromBatch=function(index){
   renderMultiLvDraft();
 
   msg(`LV-Unterposition ${item.pos} entfernt. Änderung wird mit „Erfassung speichern“ übernommen.`);
+};
+</script>
+
+
+<script>
+/* ============================================================
+   V6.65 – ENTFERNTE LV-POSITION DARF NICHT AUTOMATISCH ZURÜCKKOMMEN
+   ============================================================ */
+
+const v665RemovedLvPositions=new Set();
+
+/* Start each edit session clean. */
+const _v665EditBase=editEntry;
+editEntry=function(id){
+  v665RemovedLvPositions.clear();
+  return _v665EditBase.apply(this,arguments);
+};
+
+const _v665CancelBase=cancelEdit;
+cancelEdit=function(){
+  v665RemovedLvPositions.clear();
+  return _v665CancelBase.apply(this,arguments);
+};
+
+/* A deliberately removed LV position is remembered independently of the
+   browser's select state. This is necessary because Safari/Chrome/Samsung
+   may immediately select the first option again when a select is cleared. */
+removeLvFromBatch=function(index){
+  const item=multiLvDraft?.[index];
+  if(!item)return;
+
+  const pos=String(item.pos||"");
+  if(pos)v665RemovedLvPositions.add(pos);
+
+  multiLvDraft.splice(index,1);
+
+  const sel=document.getElementById("posSelect");
+  const search=document.getElementById("posSearch");
+  const calc=document.getElementById("calc");
+
+  if(sel && sel.value===pos){
+    try{sel.selectedIndex=-1}catch(e){}
+    try{sel.value=""}catch(e){}
+  }
+  if(search)search.value="";
+  if(calc)calc.value="";
+
+  try{renderMultiLvDraft?.()}catch(e){}
+  try{previewCalc?.()}catch(e){}
+  try{showPosInfo?.()}catch(e){}
+  try{renderDraftEntrySummary?.()}catch(e){}
+
+  msg(`LV-Unterposition ${pos} entfernt. Sie bleibt beim Speichern entfernt.`);
+};
+
+/* The grouped save asks v610CurrentLvCandidate() one last time.
+   Suppress exactly those positions the user explicitly removed. */
+const _v665CandidateBase=v610CurrentLvCandidate;
+v610CurrentLvCandidate=function(){
+  const c=_v665CandidateBase.apply(this,arguments);
+  if(c?.valid && v612EditingGroupId && v665RemovedLvPositions.has(String(c.pos||""))){
+    return{
+      valid:false,
+      removed:true,
+      pos:c.pos,
+      message:`LV-Unterposition ${c.pos} wurde aus dieser ID entfernt.`
+    };
+  }
+  return c;
+};
+
+/* Explicitly pressing "LV-Unterposition übernehmen/hinzufügen" means the
+   user wants to add it back, so remove the deletion marker first. */
+const _v665AddBase=addCurrentLvToBatch;
+addCurrentLvToBatch=function(){
+  const pos=document.getElementById("posSelect")?.value||"";
+  if(pos)v665RemovedLvPositions.delete(String(pos));
+  return _v665AddBase.apply(this,arguments);
+};
+
+/* Also clear the marker after a completed save/new save. */
+const _v665FinalizeBase=finalizeCurrentEntry;
+finalizeCurrentEntry=function(){
+  const wasEditing=!!v612EditingGroupId;
+  const beforeGroup=v612EditingGroupId||"";
+  const r=_v665FinalizeBase.apply(this,arguments);
+
+  /* Successful grouped save resets v612EditingGroupId.
+     Keep markers only when validation failed and edit mode is still active. */
+  if(!wasEditing || !v612EditingGroupId || v612EditingGroupId!==beforeGroup){
+    v665RemovedLvPositions.clear();
+  }
+  return r;
 };
 </script>
 
