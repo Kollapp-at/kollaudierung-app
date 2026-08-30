@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.34</title>
+<title>Kollaudierung – V7.35</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.34 <span class="v693BuildStamp">Build 7.34</span></h1>
+     <h1>Kollaudierung – V7.35 <span class="v693BuildStamp">Build 7.35</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.34",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.35",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.34";
+const KOLLAPP_VERSION="7.35";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -32415,6 +32415,568 @@ window.addEventListener("load",()=>{
       drawHighlight();
     },600);
   });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.35 – KOLLAPP FACELIFT
+   Reine UI-/CSS-Schicht auf stabiler V7.34-Basis.
+   Keine Geschäfts-, Plan-, Export- oder Speicherlogik geändert.
+   ============================================================ */
+
+:root{
+  --bg:#eef3f7;
+  --card:#ffffff;
+  --text:#17242d;
+  --muted:#667985;
+  --line:#d9e3e9;
+  --lineStrong:#c7d4dc;
+  --head:#172a38;
+  --head2:#213d50;
+  --accent:#176a9d;
+  --accentHover:#115a88;
+  --accentSoft:#eaf4fa;
+  --accentSoft2:#f4f9fc;
+  --ok:#24764e;
+  --warn:#9b6718;
+  --bad:#a63b3b;
+  --shadow:0 7px 24px rgba(37,65,82,.075);
+  --shadowSoft:0 2px 10px rgba(37,65,82,.055);
+  --radius:14px;
+  --radiusSm:10px;
+}
+
+html{background:var(--bg)}
+body{
+  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(23,106,157,.055),transparent 30rem),
+    var(--bg);
+  color:var(--text);
+  letter-spacing:.003em;
+}
+
+/* ---------- Header ---------- */
+header{
+  background:linear-gradient(135deg,var(--head) 0%,var(--head2) 100%)!important;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  box-shadow:0 5px 20px rgba(18,40,54,.18)!important;
+  padding:13px 20px!important;
+}
+.headerRow{gap:16px!important}
+h1{
+  font-size:20px!important;
+  font-weight:760!important;
+  letter-spacing:.01em;
+}
+.sub{
+  color:#c8d7e0!important;
+  font-size:11.5px!important;
+}
+.headerTools{
+  gap:9px!important;
+}
+.headerTools select,
+.headerTools input{
+  background:rgba(255,255,255,.97)!important;
+  border-color:rgba(255,255,255,.28)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.08) inset;
+}
+
+/* ---------- Grundlayout ---------- */
+main{
+  max-width:1320px!important;
+  margin:18px auto 56px!important;
+  padding:0 16px!important;
+}
+.spacer{height:16px!important}
+.hr{
+  background:#e6edf1!important;
+  margin:16px 0!important;
+}
+
+/* ---------- Cards ---------- */
+.card{
+  border:1px solid var(--line)!important;
+  border-radius:var(--radius)!important;
+  padding:17px!important;
+  box-shadow:var(--shadow)!important;
+  background:rgba(255,255,255,.98)!important;
+}
+.card:hover{
+  border-color:#cfdae1!important;
+}
+.info{
+  background:var(--accentSoft2)!important;
+  border:1px solid #cfe1ec!important;
+  border-radius:11px!important;
+  padding:12px 13px!important;
+}
+.notice,.success,.error{
+  border-radius:11px!important;
+  padding:11px 13px!important;
+  line-height:1.45!important;
+}
+
+/* ---------- Überschriften ---------- */
+h2{
+  font-size:15px!important;
+  font-weight:780!important;
+  color:#203846!important;
+  letter-spacing:.005em;
+}
+h3{
+  font-size:13px!important;
+  font-weight:760!important;
+  color:#294554!important;
+}
+.v666Section > h2:first-child,
+.v674SectionHead,
+.v674Title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* ---------- Labels / Inputs ---------- */
+label{
+  color:#5d707c!important;
+  font-size:11.5px!important;
+  font-weight:720!important;
+  margin:10px 0 5px!important;
+}
+input,select,textarea{
+  border:1px solid #c6d3db!important;
+  border-radius:10px!important;
+  padding:10px 11px!important;
+  font-size:13.5px!important;
+  background:#fff!important;
+  color:var(--text)!important;
+  box-shadow:0 1px 2px rgba(26,51,66,.025) inset;
+  transition:border-color .14s ease,box-shadow .14s ease,background .14s ease;
+}
+input:hover,select:hover,textarea:hover{
+  border-color:#aebfca!important;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none!important;
+  border-color:#4b94bd!important;
+  box-shadow:0 0 0 3px rgba(23,106,157,.11)!important;
+}
+input[readonly]{
+  background:#f4f7f9!important;
+  color:#5e707b!important;
+}
+textarea{line-height:1.45}
+
+/* ---------- Buttons ---------- */
+button{
+  border-radius:9px!important;
+  padding:9px 13px!important;
+  min-height:38px;
+  font-size:12.5px!important;
+  font-weight:730!important;
+  transition:transform .08s ease,box-shadow .12s ease,background .12s ease,border-color .12s ease;
+}
+button:hover{box-shadow:0 3px 10px rgba(29,65,86,.10)}
+button:active{transform:translateY(1px)}
+.primary{
+  background:linear-gradient(180deg,#1d75aa,#176a9d)!important;
+  color:#fff!important;
+  box-shadow:0 3px 10px rgba(23,106,157,.18);
+}
+.primary:hover{background:linear-gradient(180deg,#176a9d,#115a88)!important}
+.secondary{
+  background:#edf3f7!important;
+  color:#294452!important;
+  border:1px solid #d4e0e7!important;
+}
+.secondary:hover{
+  background:#e5eef4!important;
+  border-color:#c4d3dc!important;
+}
+.danger{
+  background:#fff0f0!important;
+  color:#9b3434!important;
+  border:1px solid #efcccc!important;
+}
+.okBtn{
+  background:#eaf6ef!important;
+  color:#246a49!important;
+  border:1px solid #cce4d5!important;
+}
+
+/* ---------- Statistik ---------- */
+.stats{
+  gap:10px!important;
+  margin-bottom:14px!important;
+}
+.stat{
+  border:1px solid var(--line)!important;
+  border-radius:12px!important;
+  padding:12px 13px!important;
+  box-shadow:var(--shadowSoft)!important;
+  background:linear-gradient(180deg,#fff,#fbfdfe)!important;
+}
+.stat .k{
+  color:#6e7f89!important;
+  font-size:10.5px!important;
+  letter-spacing:.025em;
+  text-transform:uppercase;
+}
+.stat .v{
+  font-size:18px!important;
+  color:#203844!important;
+  letter-spacing:-.01em;
+}
+
+/* ---------- Hauptnavigation ---------- */
+.tabs.noPrint{
+  gap:7px!important;
+  padding:7px!important;
+  border:1px solid #d7e2e8!important;
+  border-radius:13px!important;
+  background:rgba(247,250,252,.94)!important;
+  box-shadow:0 4px 16px rgba(35,66,84,.07)!important;
+  backdrop-filter:blur(10px);
+}
+.tab{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  min-height:43px!important;
+  border-radius:9px!important;
+  padding:8px 12px!important;
+  background:transparent!important;
+  color:#526a77!important;
+  border:1px solid transparent!important;
+  box-shadow:none!important;
+}
+.tab:hover{
+  background:#edf4f8!important;
+  color:#264c62!important;
+}
+.tab.active{
+  background:#fff!important;
+  color:var(--accent)!important;
+  border-color:#cfe0e9!important;
+  box-shadow:0 3px 10px rgba(30,74,98,.09)!important;
+}
+.v667TabIcon{
+  width:19px!important;
+  height:19px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 19px!important;
+  font-size:0!important;
+}
+.v667TabIcon svg{
+  width:18px;height:18px;
+  display:block;
+  stroke:currentColor;
+}
+
+/* ---------- Tabellen ---------- */
+.tablewrap{
+  border:1px solid var(--line)!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  box-shadow:0 2px 8px rgba(32,63,79,.035)!important;
+}
+table{
+  font-size:12px!important;
+}
+th{
+  background:#f2f6f8!important;
+  color:#526773!important;
+  font-size:10.8px!important;
+  text-transform:none;
+  font-weight:760!important;
+  border-bottom:1px solid #d8e3e9!important;
+}
+th,td{
+  padding:10px 9px!important;
+  border-bottom-color:#e7edf1!important;
+}
+tbody tr:hover td{
+  background:#f9fbfc;
+}
+.lineGroup td{background:#fcfdfe!important}
+.lineStart td{border-top-color:#cbd8df!important}
+
+/* ---------- Badges ---------- */
+.badge,.pill{
+  border-radius:999px!important;
+  font-size:10.5px!important;
+  font-weight:730!important;
+  padding:4px 8px!important;
+}
+.badge.ok{background:#e9f5ed!important}
+.badge.warn{background:#fff4df!important}
+.badge.bad{background:#fdecec!important}
+.badge.manual{background:#f0edfb!important}
+
+/* ---------- Projektmetadaten ---------- */
+.projectMeta{
+  gap:9px!important;
+}
+.metaCell{
+  background:linear-gradient(180deg,#f9fbfc,#f5f8fa)!important;
+  border:1px solid #dce6eb!important;
+  border-radius:10px!important;
+  padding:10px!important;
+}
+.metaCell b{
+  font-size:10.5px!important;
+  color:#72828c!important;
+  text-transform:uppercase;
+  letter-spacing:.025em;
+}
+
+/* ---------- Toolbars ---------- */
+.toolbar{
+  gap:7px!important;
+}
+.toolbar button{
+  min-height:36px;
+}
+
+/* ---------- Positionsauswahl ---------- */
+.mobilePosPicker,
+.mobilePosResults,
+#posInfo{
+  border-radius:11px!important;
+}
+.mobilePosPickerHead{
+  border-bottom-color:#e1e9ed!important;
+}
+.mobilePosResults > div,
+.mobilePosResults [role="button"]{
+  border-radius:10px!important;
+}
+
+/* ---------- Aufmaß / Erfassung ---------- */
+.v666EntryGrid{
+  gap:16px!important;
+}
+.v666Section{
+  position:relative;
+}
+.v666LvSection,
+.v666MeasureSection{
+  min-width:0;
+}
+.calcPreview{
+  background:#f6f9fb!important;
+  border-color:#d4e1e8!important;
+  border-radius:11px!important;
+  padding:12px!important;
+}
+.calcResult{
+  color:#1e4961!important;
+  font-size:18px!important;
+}
+
+/* ---------- Planeditor ---------- */
+.planWorkspace,
+.planEditor,
+.planShell,
+#planEditorCard{
+  border-radius:13px!important;
+}
+.planTools{
+  border-radius:11px!important;
+  border-color:#d4e0e7!important;
+  background:#f7fafc!important;
+  box-shadow:0 2px 8px rgba(32,61,79,.045);
+}
+.planTools button{
+  border-radius:8px!important;
+}
+#planViewport{
+  background:#dfe7ec!important;
+  border-color:#cad7df!important;
+  border-radius:10px!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.5);
+}
+#v731GeometryBar{
+  border-radius:8px!important;
+  background:#f1f7fa!important;
+}
+#v731GeometryBar button.active{
+  box-shadow:0 0 0 2px rgba(240,160,0,.18)!important;
+}
+
+/* ---------- Export / Projekt / Übergabe ---------- */
+#view-export .card,
+#view-project .card,
+#view-sync .card,
+#view-lv .card,
+#view-sheet .card{
+  overflow:hidden;
+}
+.v674TableCard,
+.v682SyncCard,
+.v667ManagedView .card{
+  border-radius:13px!important;
+}
+.dropzone{
+  border-radius:13px!important;
+  border-color:#b9ceda!important;
+  background:#f8fbfd!important;
+}
+.dropzone:hover{
+  border-color:#7cacc7!important;
+  background:#f1f8fb!important;
+}
+
+/* ---------- Modals ---------- */
+.modalBackdrop{
+  background:rgba(19,37,49,.62)!important;
+  backdrop-filter:blur(4px);
+}
+.modal{
+  border-radius:16px!important;
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 24px 80px rgba(0,0,0,.28)!important;
+}
+.modalHead{
+  background:linear-gradient(135deg,var(--head),var(--head2))!important;
+  padding:15px 18px!important;
+}
+.modalBody{padding:19px!important}
+.modalFoot{background:#f8fafb!important}
+
+/* ---------- Scrollbars Desktop/Tablet ---------- */
+@media (pointer:fine){
+  *{scrollbar-width:thin;scrollbar-color:#bccbd4 transparent}
+  *::-webkit-scrollbar{height:8px;width:8px}
+  *::-webkit-scrollbar-thumb{background:#bccbd4;border-radius:999px}
+  *::-webkit-scrollbar-track{background:transparent}
+}
+
+/* ---------- Tablet ---------- */
+@media (min-width:601px) and (max-width:1100px){
+  main{
+    padding:0 12px!important;
+    margin-top:13px!important;
+  }
+
+  .tabs.noPrint{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+    overflow:visible!important;
+  }
+
+  .tab{
+    width:100%!important;
+    min-width:0!important;
+    min-height:48px!important;
+    padding:7px 8px!important;
+    font-size:11.5px!important;
+    white-space:normal!important;
+    line-height:1.15!important;
+  }
+
+  .v667TabIcon{
+    width:20px!important;
+    height:20px!important;
+    flex-basis:20px!important;
+  }
+  .v667TabIcon svg{width:19px;height:19px}
+
+  .card{
+    padding:14px!important;
+    border-radius:12px!important;
+  }
+
+  .stats{
+    grid-template-columns:repeat(3,1fr)!important;
+  }
+}
+
+/* ---------- Phone ---------- */
+@media(max-width:600px){
+  :root{--radius:12px}
+  main{padding:0 9px!important}
+  .card{padding:12px!important}
+  .tabs.noPrint{
+    padding:5px!important;
+    gap:4px!important;
+    border-radius:11px!important;
+  }
+  .tab{
+    gap:6px!important;
+    padding:7px 9px!important;
+    min-height:42px!important;
+  }
+  .v667TabIcon{
+    width:17px!important;height:17px!important;flex-basis:17px!important;
+  }
+  .v667TabIcon svg{width:16px;height:16px}
+}
+
+/* ---------- Print unverändert / keine UI-Dekoration ---------- */
+@media print{
+  body{background:#fff!important}
+  .card,.tablewrap,.stat{box-shadow:none!important}
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.35 – einheitliche Outline-SVG-Icons für Hauptreiter
+   ============================================================ */
+(function(){
+  const icons={
+    "tab-entry":`
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 20h4l10.5-10.5a2.8 2.8 0 0 0-4-4L4 16v4Z" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="m13.5 6.5 4 4" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>`,
+    "tab-sheet":`
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M7 3h8l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M15 3v5h5M9 12h6M9 16h6" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>`,
+    "tab-lv":`
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 6h11M9 12h11M9 18h11" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M4 6h.01M4 12h.01M4 18h.01" stroke-width="3" stroke-linecap="round"/>
+      </svg>`,
+    "tab-export":`
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3v12M7.5 10.5 12 15l4.5-4.5M5 20h14" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+    "tab-sync":`
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M7 7h11m0 0-3-3m3 3-3 3M17 17H6m0 0 3 3m-3-3 3-3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+    "tab-project":`
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3.5 7.5h6l1.7 2H20.5v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V7.5Z" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M3.5 7.5V6a2 2 0 0 1 2-2h4l1.7 2h5.3" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>`
+  };
+
+  function applyTabIcons(){
+    Object.entries(icons).forEach(([id,svg])=>{
+      const tab=document.getElementById(id);
+      const icon=tab?.querySelector(".v667TabIcon");
+      if(icon)icon.innerHTML=svg;
+    });
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",applyTabIcons,{once:true});
+  }else{
+    applyTabIcons();
+  }
 })();
 </script>
 
