@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.64</title>
+<title>Kollaudierung – V7.66</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.64 <span class="v693BuildStamp">Build 7.64</span></h1>
+     <h1>Kollaudierung – V7.66 <span class="v693BuildStamp">Build 7.66</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.64",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.66",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.64";
+const KOLLAPP_VERSION="7.66";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -38668,6 +38668,749 @@ html[data-theme="dark"] #view-sheet .exportProgress{
   html[data-theme="dark"] #view-sheet,
   html[data-theme="dark"] #view-sheet *{
     color-scheme:light!important;
+  }
+}
+</style>
+
+<style id="v765-dark-global-polish">
+/* ============================================================
+   V7.65 – GLOBALER DARK-MODE-CHECK FÜR ALLE REITER
+   Ziel: höhere Lesbarkeit, keine hellen Restflächen,
+   konsistente Buttons und Icons in allen Ansichten.
+   ============================================================ */
+html[data-theme="dark"]{
+  --v765-bg:#071623;
+  --v765-surface:#0d1f2d;
+  --v765-surface-2:#102637;
+  --v765-surface-3:#142c3f;
+  --v765-border:#35536b;
+  --v765-border-soft:#27465d;
+  --v765-text:#eef5fa;
+  --v765-text-soft:#bfd0db;
+  --v765-text-dim:#95adbb;
+  --v765-primary:#3f8fc2;
+  --v765-ok-bg:#173a27;
+  --v765-ok-bd:#326548;
+  --v765-ok-tx:#93d7aa;
+  --v765-warn-bg:#3c3018;
+  --v765-warn-bd:#755d2b;
+  --v765-warn-tx:#efcb7a;
+  --v765-danger-bg:#422325;
+  --v765-danger-bd:#7a4144;
+  --v765-danger-tx:#f2a2a2;
+}
+
+/* Grundlesbarkeit */
+html[data-theme="dark"] #view-entry,
+html[data-theme="dark"] #view-sheet,
+html[data-theme="dark"] #view-lv,
+html[data-theme="dark"] #view-export,
+html[data-theme="dark"] #view-sync,
+html[data-theme="dark"] #view-project{
+  color:var(--v765-text)!important;
+}
+html[data-theme="dark"] #view-entry h2,
+html[data-theme="dark"] #view-sheet h2,
+html[data-theme="dark"] #view-lv h2,
+html[data-theme="dark"] #view-export h2,
+html[data-theme="dark"] #view-sync h2,
+html[data-theme="dark"] #view-project h2,
+html[data-theme="dark"] #view-entry h3,
+html[data-theme="dark"] #view-sheet h3,
+html[data-theme="dark"] #view-lv h3,
+html[data-theme="dark"] #view-export h3,
+html[data-theme="dark"] #view-sync h3,
+html[data-theme="dark"] #view-project h3,
+html[data-theme="dark"] #view-entry .strong,
+html[data-theme="dark"] #view-sheet .strong,
+html[data-theme="dark"] #view-lv .strong,
+html[data-theme="dark"] #view-export .strong,
+html[data-theme="dark"] #view-sync .strong,
+html[data-theme="dark"] #view-project .strong{
+  color:var(--v765-text)!important;
+}
+html[data-theme="dark"] #view-entry .small,
+html[data-theme="dark"] #view-sheet .small,
+html[data-theme="dark"] #view-lv .small,
+html[data-theme="dark"] #view-export .small,
+html[data-theme="dark"] #view-sync .small,
+html[data-theme="dark"] #view-project .small,
+html[data-theme="dark"] #view-entry label,
+html[data-theme="dark"] #view-sheet label,
+html[data-theme="dark"] #view-lv label,
+html[data-theme="dark"] #view-export label,
+html[data-theme="dark"] #view-sync label,
+html[data-theme="dark"] #view-project label,
+html[data-theme="dark"] #view-entry .muted,
+html[data-theme="dark"] #view-sheet .muted,
+html[data-theme="dark"] #view-lv .muted,
+html[data-theme="dark"] #view-export .muted,
+html[data-theme="dark"] #view-sync .muted,
+html[data-theme="dark"] #view-project .muted{
+  color:var(--v765-text-soft)!important;
+}
+
+/* Hauptkarten / Restflächen ohne Weiß */
+html[data-theme="dark"] .v667ManagedView > .v667MainCard,
+html[data-theme="dark"] .v667ManagedView > .v667ActionCard,
+html[data-theme="dark"] #view-entry .card,
+html[data-theme="dark"] #view-sheet .card,
+html[data-theme="dark"] #view-lv .card,
+html[data-theme="dark"] #view-export .card,
+html[data-theme="dark"] #view-sync .card,
+html[data-theme="dark"] #view-project .card,
+html[data-theme="dark"] #view-sync .syncPanel,
+html[data-theme="dark"] #view-sync .v675SyncCard,
+html[data-theme="dark"] #view-project #projectDetails,
+html[data-theme="dark"] #view-project #projectSourceInfo,
+html[data-theme="dark"] #view-export .v630ClientCard,
+html[data-theme="dark"] #view-export .grid2 > div,
+html[data-theme="dark"] #view-sync .grid2 > .syncPanel,
+html[data-theme="dark"] #view-sheet .v621SheetIdToolbar,
+html[data-theme="dark"] #view-sheet .sheetSelectPanel,
+html[data-theme="dark"] #view-sheet .v669SheetSelectCard,
+html[data-theme="dark"] #view-sheet .v669SheetExportCard,
+html[data-theme="dark"] #view-sheet .v671TemplateItem,
+html[data-theme="dark"] #view-sheet .v684TemplatePos,
+html[data-theme="dark"] #view-lv .v674TableCard,
+html[data-theme="dark"] #view-lv .v674ProjectCard,
+html[data-theme="dark"] #view-lv .v737Item,
+html[data-theme="dark"] #view-lv .v737Item.current,
+html[data-theme="dark"] #view-lv .v737Item.planFocus{
+  background:linear-gradient(180deg,var(--v765-surface) 0%, var(--v765-surface-2) 100%)!important;
+  color:var(--v765-text)!important;
+  border-color:var(--v765-border)!important;
+  box-shadow:none!important;
+}
+
+/* bewusst warnfarbige Vorlagenboxen, aber dark-tauglich */
+html[data-theme="dark"] #view-sheet .v671TemplatePanel{
+  background:linear-gradient(180deg,#2b2619 0%, #241f14 100%)!important;
+  color:#f4ead2!important;
+  border-color:#7a6733!important;
+  border-left:3px solid #d6b257!important;
+}
+html[data-theme="dark"] #view-sheet .v671TemplateTitle,
+html[data-theme="dark"] #view-sheet .v671TemplateId,
+html[data-theme="dark"] #view-sheet .v684TemplatePosMeta b{color:#f3d889!important}
+html[data-theme="dark"] #view-sheet .v671TemplateSub,
+html[data-theme="dark"] #view-sheet .v684TemplatePosMeta{color:#d8c7a1!important}
+html[data-theme="dark"] #view-sheet .v671TemplateCount{background:#5d4b1f!important;color:#ffe6a0!important}
+
+/* Infoboxen / Hinweise / Hilfeboxen */
+html[data-theme="dark"] .info,
+html[data-theme="dark"] .autoPlanLinkBox,
+html[data-theme="dark"] .planSelectedBox,
+html[data-theme="dark"] .v742Intro,
+html[data-theme="dark"] .v739Hint,
+html[data-theme="dark"] #v739PlanUsageHint,
+html[data-theme="dark"] #v757CurrentLvHint,
+html[data-theme="dark"] .v739Details,
+html[data-theme="dark"] .dropzone,
+html[data-theme="dark"] .calcPreview,
+html[data-theme="dark"] .entryPlanBox,
+html[data-theme="dark"] .planLinkBox,
+html[data-theme="dark"] .terminologyHint,
+html[data-theme="dark"] .sheetCheckItem,
+html[data-theme="dark"] .v685NoTemplates,
+html[data-theme="dark"] .empty,
+html[data-theme="dark"] .exportProgress{
+  background:var(--v765-surface-3)!important;
+  color:var(--v765-text-soft)!important;
+  border-color:var(--v765-border)!important;
+}
+html[data-theme="dark"] .notice,
+html[data-theme="dark"] .planLineHelp,
+html[data-theme="dark"] .unsavedPlanWarning{
+  background:var(--v765-warn-bg)!important;
+  color:var(--v765-warn-tx)!important;
+  border-color:var(--v765-warn-bd)!important;
+}
+
+/* Eingaben */
+html[data-theme="dark"] #view-entry input,
+html[data-theme="dark"] #view-entry select,
+html[data-theme="dark"] #view-entry textarea,
+html[data-theme="dark"] #view-sheet input,
+html[data-theme="dark"] #view-sheet select,
+html[data-theme="dark"] #view-sheet textarea,
+html[data-theme="dark"] #view-lv input,
+html[data-theme="dark"] #view-lv select,
+html[data-theme="dark"] #view-lv textarea,
+html[data-theme="dark"] #view-export input,
+html[data-theme="dark"] #view-export select,
+html[data-theme="dark"] #view-export textarea,
+html[data-theme="dark"] #view-sync input,
+html[data-theme="dark"] #view-sync select,
+html[data-theme="dark"] #view-sync textarea,
+html[data-theme="dark"] #view-project input,
+html[data-theme="dark"] #view-project select,
+html[data-theme="dark"] #view-project textarea{
+  background:#0e2232!important;
+  color:var(--v765-text)!important;
+  border-color:var(--v765-border)!important;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder{color:var(--v765-text-dim)!important}
+html[data-theme="dark"] input:disabled,
+html[data-theme="dark"] select:disabled,
+html[data-theme="dark"] textarea:disabled,
+html[data-theme="dark"] input[readonly]{
+  background:#152b39!important;
+  color:#9fb5c2!important;
+  border-color:#304757!important;
+}
+
+/* Buttons und Tabs */
+html[data-theme="dark"] .tab,
+html[data-theme="dark"] .secondary,
+html[data-theme="dark"] .filePickLabel,
+html[data-theme="dark"] button.secondary{
+  background:#142a3a!important;
+  color:#edf4f8!important;
+  border-color:var(--v765-border)!important;
+}
+html[data-theme="dark"] .tab.active,
+html[data-theme="dark"] .primary,
+html[data-theme="dark"] button.primary{
+  background:linear-gradient(180deg,#4897cb 0%, #337eaf 100%)!important;
+  color:#fff!important;
+  border-color:#5ba9db!important;
+}
+html[data-theme="dark"] .okBtn,
+html[data-theme="dark"] button.okBtn{
+  background:var(--v765-ok-bg)!important;
+  color:var(--v765-ok-tx)!important;
+  border-color:var(--v765-ok-bd)!important;
+}
+html[data-theme="dark"] .danger,
+html[data-theme="dark"] button.danger{
+  background:var(--v765-danger-bg)!important;
+  color:var(--v765-danger-tx)!important;
+  border-color:var(--v765-danger-bd)!important;
+}
+html[data-theme="dark"] .tab:hover,
+html[data-theme="dark"] .secondary:hover,
+html[data-theme="dark"] .primary:hover,
+html[data-theme="dark"] .okBtn:hover,
+html[data-theme="dark"] .danger:hover{filter:brightness(1.06)}
+
+/* Icons passend einfärben */
+html[data-theme="dark"] .v667TabIcon,
+html[data-theme="dark"] .tab i,
+html[data-theme="dark"] button i,
+html[data-theme="dark"] .tab svg,
+html[data-theme="dark"] button svg,
+html[data-theme="dark"] .secondary svg,
+html[data-theme="dark"] .primary svg,
+html[data-theme="dark"] .okBtn svg,
+html[data-theme="dark"] .danger svg{
+  color:currentColor!important;
+  fill:currentColor!important;
+  stroke:currentColor!important;
+  opacity:.95!important;
+}
+
+/* Tabellen */
+html[data-theme="dark"] #view-entry .tablewrap,
+html[data-theme="dark"] #view-sheet .tablewrap,
+html[data-theme="dark"] #view-lv .tablewrap,
+html[data-theme="dark"] #view-export .tablewrap,
+html[data-theme="dark"] #view-sync .tablewrap,
+html[data-theme="dark"] #view-project .tablewrap{
+  background:#0b1b27!important;
+  border-color:var(--v765-border)!important;
+}
+html[data-theme="dark"] #view-entry table thead th,
+html[data-theme="dark"] #view-sheet table thead th,
+html[data-theme="dark"] #view-lv table thead th,
+html[data-theme="dark"] #view-export table thead th,
+html[data-theme="dark"] #view-sync table thead th,
+html[data-theme="dark"] #view-project table thead th{
+  background:#173145!important;
+  color:var(--v765-text)!important;
+  border-bottom-color:var(--v765-border)!important;
+}
+html[data-theme="dark"] #view-entry table tbody td,
+html[data-theme="dark"] #view-sheet table tbody td,
+html[data-theme="dark"] #view-lv table tbody td,
+html[data-theme="dark"] #view-export table tbody td,
+html[data-theme="dark"] #view-sync table tbody td,
+html[data-theme="dark"] #view-project table tbody td{
+  background:#0f2230!important;
+  color:#dce7ee!important;
+  border-bottom-color:#2a4558!important;
+}
+html[data-theme="dark"] #view-entry table tbody tr:nth-child(even) td,
+html[data-theme="dark"] #view-sheet table tbody tr:nth-child(even) td,
+html[data-theme="dark"] #view-lv table tbody tr:nth-child(even) td,
+html[data-theme="dark"] #view-export table tbody tr:nth-child(even) td,
+html[data-theme="dark"] #view-sync table tbody tr:nth-child(even) td,
+html[data-theme="dark"] #view-project table tbody tr:nth-child(even) td{
+  background:#112634!important;
+}
+html[data-theme="dark"] #view-entry table tbody tr:hover td,
+html[data-theme="dark"] #view-sheet table tbody tr:hover td,
+html[data-theme="dark"] #view-lv table tbody tr:hover td,
+html[data-theme="dark"] #view-export table tbody tr:hover td,
+html[data-theme="dark"] #view-sync table tbody tr:hover td,
+html[data-theme="dark"] #view-project table tbody tr:hover td{
+  background:#173246!important;
+}
+
+/* Metadaten und Stats */
+html[data-theme="dark"] .metaCell,
+html[data-theme="dark"] .projectMeta .metaCell,
+html[data-theme="dark"] .finalizeSummary .fsCell,
+html[data-theme="dark"] .billingTotalsGrid .bt,
+html[data-theme="dark"] .stat{
+  background:linear-gradient(180deg,#0e2131 0%, #13283a 100%)!important;
+  color:var(--v765-text)!important;
+  border-color:var(--v765-border)!important;
+}
+html[data-theme="dark"] .metaCell b,
+html[data-theme="dark"] .stat .k{color:var(--v765-text-dim)!important}
+html[data-theme="dark"] .stat .v{color:#ffffff!important}
+
+/* Badges / Pills */
+html[data-theme="dark"] .badge.ok{background:#1c3c2a!important;color:#88d8a5!important}
+html[data-theme="dark"] .badge.warn{background:#46371a!important;color:#efca78!important}
+html[data-theme="dark"] .badge.bad{background:#492327!important;color:#f1a4a4!important}
+html[data-theme="dark"] .badge.manual{background:#2f2748!important;color:#c7b7ee!important}
+
+/* Sonderflächen im Export */
+html[data-theme="dark"] #view-export .exportLogoPreviewBox,
+html[data-theme="dark"] #view-export .exportBrandPreview{
+  background:#102435!important;
+  border-color:var(--v765-border)!important;
+  color:var(--v765-text)!important;
+}
+
+/* Planseite rechts/links lesbar halten, Plan selbst aber weiß lassen */
+html[data-theme="dark"] .planSide,
+html[data-theme="dark"] .planTools,
+html[data-theme="dark"] #v731GeometryBar{
+  color:var(--v765-text)!important;
+}
+
+/* Date-picker Buttons konsistent */
+html[data-theme="dark"] input[type="file"]::file-selector-button{
+  background:#163247!important;
+  color:#eef5fa!important;
+  border:1px solid var(--v765-border)!important;
+  border-radius:8px!important;
+}
+
+/* Print bleibt hell */
+@media print{
+  html[data-theme="dark"] #view-entry,
+  html[data-theme="dark"] #view-sheet,
+  html[data-theme="dark"] #view-lv,
+  html[data-theme="dark"] #view-export,
+  html[data-theme="dark"] #view-sync,
+  html[data-theme="dark"] #view-project{
+    color-scheme:light!important;
+  }
+}
+</style>
+
+
+<style id="v766-final-dark-audit">
+/* ============================================================
+   V7.66 – FINALER DARK-MODE-AUDIT ALLER REITER
+   Keine Funktionsänderungen.
+   ============================================================ */
+
+html[data-theme="dark"]{
+  --v766-bg:#071623;
+  --v766-card:#0d2030;
+  --v766-card2:#10283a;
+  --v766-card3:#153247;
+  --v766-border:#35566e;
+  --v766-borderSoft:#28475d;
+  --v766-text:#f2f7fb;
+  --v766-soft:#c1d2dd;
+  --v766-muted:#9db3c2;
+  --v766-blue:#4898ca;
+  --v766-green:#83d6a0;
+  --v766-yellow:#efca77;
+  --v766-red:#efa0a0;
+}
+
+/* ---------- Alle sechs Ansichten ---------- */
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+){
+  color:var(--v766-text)!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) :is(h2,h3,.strong,.v674BtnMain,.v675FlowTitle,.v682SyncHeadText){
+  color:var(--v766-text)!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) :is(.small,label,.muted,.v674BtnSub,.v627MasterOnlyNote){
+  color:var(--v766-soft)!important;
+}
+
+/* ---------- Karten und dynamische Unterkarten ---------- */
+html[data-theme="dark"] :is(
+ .v667MainCard,.v667ActionCard,
+ .v623AddLvCard,.v630ClientCard,
+ .v674ProjectCard,.v675SyncCard,.v682SyncCard,
+ .syncPanel,.syncHistory,.syncUserList,.syncUserRow,.syncUserItem,
+ .v675FlowIntro,.v675WorkerIntro,
+ .projectPlanCard,.v740CableCard,
+ .mergeConflict,.mergeSide,
+ .exportLogoPreviewBox,.exportBrandPreview,
+ .emptyProjectStart,
+ .v675LvTools,.v675LvSearch,.v675LvMode,.v675LvExport,
+ .v669SheetSelectCard,.v669SheetExportCard,.v669MultiPanel,
+ .v621SheetIdToolbar,.sheetSelectPanel,
+ .v637PhotoBox,.v666PhotoSection,.v697PhotoActionsCard
+){
+  background:linear-gradient(180deg,var(--v766-card) 0%,var(--v766-card2) 100%)!important;
+  color:var(--v766-text)!important;
+  border-color:var(--v766-border)!important;
+  box-shadow:none!important;
+}
+
+/* Bereiche innerhalb von Karten */
+html[data-theme="dark"] :is(
+ .v682SyncCardHead,.v674Head,.v674HeadRow,
+ .mobilePosPickerHead,.v669MultiHead,
+ .v630ClientToggle,.v675SearchRow,
+ .planEditorHead
+){
+  color:var(--v766-text)!important;
+  border-color:var(--v766-borderSoft)!important;
+}
+
+/* ---------- Eingabefelder ---------- */
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) :is(input,select,textarea){
+  background:#0d2232!important;
+  color:var(--v766-text)!important;
+  border-color:var(--v766-border)!important;
+}
+
+html[data-theme="dark"] :is(input,textarea)::placeholder{
+  color:#91a9b9!important;
+  opacity:1!important;
+}
+
+html[data-theme="dark"] :is(input,select,textarea):focus{
+  border-color:#55a5d4!important;
+  box-shadow:0 0 0 3px rgba(72,152,202,.18)!important;
+}
+
+html[data-theme="dark"] :is(input,select,textarea):disabled,
+html[data-theme="dark"] input[readonly]{
+  background:#162d3c!important;
+  color:#a6bac6!important;
+  opacity:1!important;
+}
+
+/* ---------- Tabellen in allen Reitern ---------- */
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) .tablewrap{
+  background:#091b28!important;
+  border-color:var(--v766-border)!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) table thead th{
+  background:#173247!important;
+  color:#f4f8fb!important;
+  border-color:#3b5d74!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) table tbody td{
+  background:#0e2231!important;
+  color:#dce8ef!important;
+  border-color:#28465a!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) table tbody tr:nth-child(even) td{
+  background:#112838!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) table tbody tr:hover td{
+  background:#18364a!important;
+}
+
+/* ---------- Button-System ---------- */
+html[data-theme="dark"] button,
+html[data-theme="dark"] .filePickLabel{
+  border-radius:9px!important;
+  font-weight:700!important;
+}
+
+html[data-theme="dark"] :is(button.secondary,.secondary,.filePickLabel){
+  background:#142c3d!important;
+  color:#eef5f9!important;
+  border-color:#3d6179!important;
+}
+
+html[data-theme="dark"] :is(button.primary,.primary){
+  background:linear-gradient(180deg,#4c9bcd,#347fad)!important;
+  color:#fff!important;
+  border-color:#62addb!important;
+}
+
+html[data-theme="dark"] :is(button.okBtn,.okBtn){
+  background:#193b29!important;
+  color:var(--v766-green)!important;
+  border-color:#3b7050!important;
+}
+
+html[data-theme="dark"] :is(button.danger,.danger){
+  background:#432428!important;
+  color:var(--v766-red)!important;
+  border-color:#784248!important;
+}
+
+html[data-theme="dark"] :is(button.secondary,.secondary,.primary,.okBtn,.danger):hover{
+  filter:brightness(1.08)!important;
+}
+
+/* Disabled deutlich aber lesbar */
+html[data-theme="dark"] button:disabled{
+  opacity:.52!important;
+  filter:saturate(.6)!important;
+}
+
+/* ---------- Tab-Icons und Button-Icons ---------- */
+.v667TabIcon{
+  display:inline-flex!important;
+  width:19px!important;
+  height:19px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 19px!important;
+  font-family:"Segoe UI Symbol","Arial Unicode MS",sans-serif!important;
+  font-size:16px!important;
+  line-height:1!important;
+}
+
+html[data-theme="dark"] .v667TabIcon{
+  color:#aac0ce!important;
+  opacity:1!important;
+}
+
+html[data-theme="dark"] .tab.active .v667TabIcon{
+  color:#8bd0f4!important;
+}
+
+html[data-theme="dark"] :is(button,.tab) svg{
+  stroke:currentColor!important;
+  fill:none!important;
+  opacity:.95!important;
+}
+
+html[data-theme="dark"] :is(button,.tab) svg [fill]:not([fill="none"]){
+  fill:currentColor!important;
+}
+
+/* ---------- Navigation ---------- */
+html[data-theme="dark"] .tabs.noPrint{
+  background:#0b1d2b!important;
+  border-color:#31516a!important;
+}
+
+html[data-theme="dark"] .tab{
+  background:transparent!important;
+  color:#c0d0da!important;
+  border-color:transparent!important;
+}
+
+html[data-theme="dark"] .tab:hover{
+  background:#142d3e!important;
+  color:#f0f6f9!important;
+}
+
+html[data-theme="dark"] .tab.active{
+  background:#17384d!important;
+  color:#91d4f7!important;
+  border-color:#40708d!important;
+}
+
+/* ---------- LV-Übersicht ---------- */
+html[data-theme="dark"] #view-lv :is(.v675LvTools,.v675LvSearch,.v675LvMode,.v675LvExport){
+  background:#102738!important;
+}
+
+html[data-theme="dark"] #view-lv .v623AddLvCard{
+  border-left:4px solid #54a0ce!important;
+}
+
+/* ---------- Export ---------- */
+html[data-theme="dark"] #view-export :is(.exportLogoPreviewBox,.exportBrandPreview){
+  background:#0e2536!important;
+  color:var(--v766-soft)!important;
+  border-color:#355b73!important;
+}
+
+html[data-theme="dark"] #view-export .exportOption{
+  color:#d6e3ea!important;
+}
+
+html[data-theme="dark"] #view-export input[type="file"]{
+  background:#0e2536!important;
+  color:#c9d8e1!important;
+}
+
+/* ---------- Sync / Übergabe ---------- */
+html[data-theme="dark"] #view-sync .v675FlowIntro{
+  background:#10283a!important;
+  border-color:#365a72!important;
+}
+
+html[data-theme="dark"] #view-sync .v675SyncStep,
+html[data-theme="dark"] #view-project .v674Step,
+html[data-theme="dark"] #view-sheet .v669Step{
+  background:#1b4359!important;
+  color:#a9e0fa!important;
+}
+
+html[data-theme="dark"] #view-sync :is(.syncUserRow,.syncUserItem,.syncHistory){
+  background:#0e2535!important;
+  color:#dce7ed!important;
+}
+
+html[data-theme="dark"] .mergeConflict{
+  background:#112b3c!important;
+}
+
+html[data-theme="dark"] .mergeSide{
+  background:#0d2231!important;
+}
+
+/* ---------- Projekt ---------- */
+html[data-theme="dark"] #view-project .v674ProjectCard{
+  border-left-color:#4e758d!important;
+}
+
+html[data-theme="dark"] #view-project .projectPlanCard{
+  background:#10283a!important;
+}
+
+html[data-theme="dark"] #view-project .v674DangerCard{
+  background:#2d1e22!important;
+  border-color:#6c3a42!important;
+  color:#f3c0c0!important;
+}
+
+/* Kabellisten-Importer */
+html[data-theme="dark"] #view-project #v740CableCard,
+html[data-theme="dark"] #view-project #v740CableCard :is(.info,.tablewrap,.card){
+  background:#10283a!important;
+  color:#e5eef3!important;
+  border-color:#365a72!important;
+}
+
+/* ---------- Aufmaßblatt / Vorlagen ---------- */
+html[data-theme="dark"] #view-sheet .v671TemplatePanel{
+  background:linear-gradient(180deg,#30291a,#282217)!important;
+  border-color:#796538!important;
+  color:#f4e8cb!important;
+}
+
+html[data-theme="dark"] #view-sheet :is(.v671TemplateItem,.v684TemplatePos){
+  background:#172734!important;
+  border-color:#655634!important;
+  color:#eef5f9!important;
+}
+
+/* ---------- Erfassen / Plan / Fotos ---------- */
+html[data-theme="dark"] #view-entry :is(
+ .mobilePosPicker,.mobilePosResults,#posInfo,.multiLvBox,.multiLvItem,
+ .planTools,.planSide,.autoPlanLinkBox,#v737SiblingLvPanel,
+ #entryFinalizeCard,.finalizeSummary .fsCell
+){
+  border-color:#35566e!important;
+}
+
+html[data-theme="dark"] #view-entry :is(.v637PhotoBox,.v666PhotoSection,.photoEmpty){
+  background:#10283a!important;
+  color:#d7e4eb!important;
+}
+
+/* Plan selbst bleibt bewusst weiß */
+html[data-theme="dark"] #planStage,
+html[data-theme="dark"] #planStage img{
+  background:#fff!important;
+}
+
+/* ---------- Modals ---------- */
+html[data-theme="dark"] .modal{
+  background:#0d2030!important;
+  color:var(--v766-text)!important;
+  border-color:#3b5c73!important;
+}
+
+html[data-theme="dark"] .modalHead{
+  background:#10293a!important;
+  border-color:#3a5d74!important;
+}
+
+html[data-theme="dark"] .modalBody,
+html[data-theme="dark"] .modalFoot{
+  background:#0d2030!important;
+  color:#dce8ef!important;
+  border-color:#304e63!important;
+}
+
+/* ---------- Status / Badges ---------- */
+html[data-theme="dark"] .badge.ok{background:#1a3d2a!important;color:#8ed8a8!important}
+html[data-theme="dark"] .badge.warn{background:#473819!important;color:#f0cd79!important}
+html[data-theme="dark"] .badge.bad{background:#492529!important;color:#f0a2a2!important}
+html[data-theme="dark"] .badge.manual{background:#32294b!important;color:#ccbaf2!important}
+
+/* ---------- Keine versehentlichen weißen Utility-Flächen ---------- */
+html[data-theme="dark"] :is(
+ .projectMeta .metaCell,.stat,.billingTotalsGrid .bt,.finalizeSummary .fsCell,
+ .sheetCheckItem,.planItem,.v737Item
+){
+  background:#10283a!important;
+  color:#edf5f9!important;
+  border-color:#35566e!important;
+}
+
+/* ---------- Mobile / Tablet ---------- */
+@media(max-width:600px){
+  .v667TabIcon{
+    width:16px!important;
+    height:16px!important;
+    flex-basis:16px!important;
+    font-size:14px!important;
+  }
+
+  html[data-theme="dark"] button,
+  html[data-theme="dark"] .filePickLabel{
+    border-color:#3b5d74!important;
+  }
+}
+
+/* ---------- Druck/PDF weiterhin hell ---------- */
+@media print{
+  html[data-theme="dark"],
+  html[data-theme="dark"] body{
+    color-scheme:light!important;
+    background:#fff!important;
+    color:#111!important;
   }
 }
 </style>
