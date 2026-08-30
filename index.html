@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.88</title>
+<title>Kollaudierung – V7.89</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.88 <span class="v693BuildStamp">Build 7.88</span></h1>
+     <h1>Kollaudierung – V7.89 <span class="v693BuildStamp">Build 7.89</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16351,7 +16351,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.88",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.89",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26132,7 +26132,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.88";
+const KOLLAPP_VERSION="7.89";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -42822,6 +42822,41 @@ window.v787ScrollTop=function(){
 
   .tabs.noPrint #v787TopBtn .v787TopIcon{
     font-size:13px!important;
+  }
+}
+</style>
+
+
+<style id="v789-wide-desktop-layout">
+/* ============================================================
+   V7.89 – Breitere PC-Ansicht
+   Tablet/Handy bleiben unverändert.
+   ============================================================ */
+@media(min-width:1101px){
+  main{
+    max-width:1600px!important;
+    width:calc(100% - 36px)!important;
+    padding-left:18px!important;
+    padding-right:18px!important;
+  }
+
+  /* Breite Bereiche dürfen den zusätzlichen Platz wirklich nutzen */
+  .entryIntegratedPlan,
+  .planEditorGrid,
+  .tablewrap,
+  #view-sheet,
+  #view-lv,
+  #view-export,
+  #view-sync,
+  #view-project{
+    max-width:none!important;
+  }
+}
+
+/* Sehr große Monitore: etwas mehr Luft am Rand, aber weiterhin breit */
+@media(min-width:1800px){
+  main{
+    max-width:1720px!important;
   }
 }
 </style>
