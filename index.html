@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.57</title>
+<title>Kollaudierung – V7.58</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7375,7 +7375,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.57 <span class="v693BuildStamp">Build 7.57</span></h1>
+     <h1>Kollaudierung – V7.58 <span class="v693BuildStamp">Build 7.58</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16325,7 +16325,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.57",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.58",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26106,7 +26106,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.57";
+const KOLLAPP_VERSION="7.58";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -36753,6 +36753,210 @@ tbody tr:hover td{
   });
 
   window.addEventListener("load",()=>setTimeout(refresh,500));
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.58 – Fix Sprungbutton + Planlayout
+   ============================================================ */
+#v756JumpTopBtn{
+  position:sticky!important;
+  top:10px!important;
+  z-index:8!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-height:44px!important;
+  margin:0 0 10px!important;
+  padding:10px 12px!important;
+  border-radius:10px!important;
+  background:#eef7ef!important;
+  border:1px solid #cfe4d2!important;
+  color:#24643b!important;
+  font-weight:800!important;
+  box-shadow:0 3px 10px rgba(29,91,54,.10)!important;
+  white-space:normal!important;
+}
+#v756JumpTopBtn:hover{background:#e4f2e7!important;transform:none!important}
+#v757CurrentLvHint{
+  margin:-3px 0 10px!important;
+  padding:7px 9px!important;
+  border-radius:8px!important;
+  background:#f7fafc!important;
+  border:1px solid #dce6eb!important;
+  color:#607786!important;
+  font-size:10.5px!important;
+  line-height:1.35!important;
+  overflow-wrap:anywhere!important;
+  word-break:break-word!important;
+}
+.planSide{align-self:start!important;overflow:visible!important}
+.planCanvasCard{overflow:visible!important}
+
+@media(min-width:1101px){
+  .planEditorGrid{
+    grid-template-columns:minmax(0,1fr) minmax(300px,340px)!important;
+    gap:16px!important;
+    align-items:start!important;
+  }
+  .planTools,
+  .planTools .v713SecondRow,
+  .planTools .v715StyleRow,
+  .planTools .v715ActionRow,
+  #v714PlanActions{
+    overflow:visible!important;
+    max-width:100%!important;
+  }
+  .planTools{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:flex-start!important;
+    row-gap:10px!important;
+    column-gap:8px!important;
+  }
+  .planTools > *,
+  .planTools .v713SecondRow > *,
+  .planTools .v715StyleRow > *,
+  .planTools .v715ActionRow > *,
+  #v714PlanActions > *{
+    flex:0 1 auto!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  .planTools .v713SecondRow,
+  .planTools .v715StyleRow,
+  .planTools .v715ActionRow,
+  #v714PlanActions{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    width:100%!important;
+    gap:8px!important;
+  }
+  .planTools .toolBtn,
+  .planTools .secondary,
+  .planTools .okBtn,
+  .planTools .danger,
+  .planTools .touchIconBtn,
+  #toggleOtherIdsBtn,
+  #toggleOtherAmblBtn,
+  #deleteUnsavedPlanBtn{
+    white-space:nowrap!important;
+  }
+}
+@media(max-width:980px){
+  #v756JumpTopBtn{position:static!important;top:auto!important}
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.58 – robuster Sprungbutton + Schnitt vermeiden
+   ============================================================ */
+(function(){
+  const $ = (id)=>document.getElementById(id);
+
+  function v758GetEditTarget(){
+    return $("posSearch")
+      || document.querySelector(".v742PrepareBtn")
+      || document.querySelector("#entryEditorCard")
+      || document.querySelector(".entryEditorGrid")
+      || document.querySelector(".tabs.noPrint")
+      || document.querySelector("main");
+  }
+
+  function v758JumpToEdit(){
+    const target = v758GetEditTarget();
+    if(!target) return;
+    const header = document.querySelector("header.appHeader");
+    const headerHeight = header ? header.getBoundingClientRect().height : 0;
+    const y = Math.max(0, Math.round(target.getBoundingClientRect().top + window.scrollY - headerHeight - 14));
+    try{ window.scrollTo({top:y, behavior:"smooth"}); }
+    catch(e){ window.scrollTo(0,y); }
+    try{ target.focus?.({preventScroll:true}); }catch(e){}
+  }
+  window.v758JumpToEdit = v758JumpToEdit;
+  window.v756JumpToTop = v758JumpToEdit;
+
+  function ensureButtonAndHint(){
+    const side = document.querySelector('.planSide');
+    if(!side) return;
+    const autoBox = side.querySelector('.autoPlanLinkBox');
+    if(!autoBox) return;
+
+    let btn = $('v756JumpTopBtn');
+    if(!btn){
+      btn = document.createElement('button');
+      btn.id = 'v756JumpTopBtn';
+      btn.type = 'button';
+      btn.className = 'secondary';
+      autoBox.insertAdjacentElement('afterend', btn);
+    }
+    btn.innerHTML = '↑ Zur Bearbeitung';
+    btn.title = 'Zur aktuellen Erfassung nach oben springen';
+    btn.onclick = function(ev){ if(ev) ev.preventDefault(); v758JumpToEdit(); return false; };
+
+    let hint = $('v757CurrentLvHint');
+    if(!hint){
+      hint = document.createElement('div');
+      hint.id = 'v757CurrentLvHint';
+      btn.insertAdjacentElement('afterend', hint);
+    }
+
+    let pos = $('planPosSelect')?.value || $('posSelect')?.value || '';
+    let txt = '';
+    try{ txt = pos ? (getPos?.(pos)?.text || '') : ''; }catch(e){}
+    hint.innerHTML = pos ? `<b>Aktive LV:</b> ${esc(pos)}${txt ? ' · ' + esc(txt) : ''}` : '<b>Aktive LV:</b> Keine LV-Unterposition aktiv';
+  }
+
+  function stabilizePlanArea(){
+    const side = document.querySelector('.planSide');
+    if(side){
+      side.style.overflow = 'visible';
+      side.style.minWidth = window.matchMedia('(min-width:1101px)').matches ? '300px' : side.style.minWidth;
+      side.style.maxWidth = window.matchMedia('(min-width:1101px)').matches ? '340px' : side.style.maxWidth;
+    }
+    const actions = $('v714PlanActions');
+    if(actions){
+      actions.style.display = 'flex';
+      actions.style.flexWrap = 'wrap';
+      actions.style.width = '100%';
+      actions.style.maxWidth = '100%';
+      actions.style.gap = '8px';
+      actions.style.marginLeft = window.matchMedia('(min-width:1101px)').matches ? '0' : actions.style.marginLeft;
+    }
+    const tools = document.querySelector('.planTools');
+    if(tools){
+      tools.style.overflow = 'visible';
+      tools.querySelectorAll('button').forEach(b=>{ b.style.maxWidth='100%'; });
+    }
+  }
+
+  function applyV758(){
+    ensureButtonAndHint();
+    stabilizePlanArea();
+  }
+
+  ['renderPlans','showPosInfo','renderSelectedAnnotation','renderAutoPlanLinkSummary','renderMultiLvDraft','openPlan'].forEach(name=>{
+    const fn = window[name];
+    if(typeof fn !== 'function') return;
+    if(fn.__v758wrapped) return;
+
+    if(name === 'openPlan'){
+      const wrapped = async function(){ const r = await fn.apply(this, arguments); setTimeout(applyV758, 20); return r; };
+      wrapped.__v758wrapped = true;
+      window[name] = wrapped;
+    } else {
+      const wrapped = function(){ const r = fn.apply(this, arguments); setTimeout(applyV758, 20); return r; };
+      wrapped.__v758wrapped = true;
+      window[name] = wrapped;
+    }
+  });
+
+  window.addEventListener('load', ()=>setTimeout(applyV758, 300));
+  window.addEventListener('resize', ()=>setTimeout(stabilizePlanArea, 30));
 })();
 </script>
 
