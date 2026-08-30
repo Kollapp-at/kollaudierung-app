@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.78</title>
+<title>Kollaudierung – V7.80</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.78 <span class="v693BuildStamp">Build 7.78</span></h1>
+     <h1>Kollaudierung – V7.80 <span class="v693BuildStamp">Build 7.80</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.78",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.80",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.78";
+const KOLLAPP_VERSION="7.80";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -33641,6 +33641,17 @@ tbody tr:hover td{
     renderPlanAnnotations?.();
   };
 
+  /* V7.80: direkter Zugriff auf den echten closure-internen ID-Zustand. */
+  window.v780ToggleOtherSameSheetIdsCore=function(){
+    showOtherSameSheetIds=!showOtherSameSheetIds;
+    updateOtherIdsButton();
+    renderPlanAnnotations?.();
+    return showOtherSameSheetIds;
+  };
+  window.v780GetOtherSameSheetIdsState=function(){
+    return !!showOtherSameSheetIds;
+  };
+
   function startIdFocus(entry,pos){
     const anchor=anchorForEntry(entry);
     if(!anchor)return;
@@ -41131,6 +41142,302 @@ html:not([data-theme="dark"]) #toggleOtherIdsBtn.v778Off{
   window.addEventListener("load",()=>{
     setTimeout(bindDynamicControls,450);
   });
+})();
+</script>
+
+
+<style id="v779-plan-ui-fix">
+/* ============================================================
+   V7.79 – Planeditor optisch verfeinern
+   - Polylinie nicht mehr weiß
+   - Radierer optisch sauber
+   - Farbfeld zeigt aktuelle Farbe sichtbar
+   ============================================================ */
+
+html[data-theme="dark"] #tool-polyline,
+html[data-theme="dark"] #tool-eraser{
+  background:#142c3d!important;
+  color:#eef5f9!important;
+  border:1px solid #3d6179!important;
+}
+
+html[data-theme="dark"] #tool-polyline.active{
+  background:#2f87bd!important;
+  color:#ffffff!important;
+  border-color:#62b0df!important;
+  box-shadow:0 0 0 2px rgba(85,165,213,.18)!important;
+}
+
+html[data-theme="dark"] #tool-eraser.active{
+  background:#6a2f35!important;
+  color:#ffd0d0!important;
+  border-color:#a86067!important;
+  box-shadow:0 0 0 2px rgba(241,164,164,.15)!important;
+}
+
+html:not([data-theme="dark"]) #tool-polyline{
+  background:#f4f7f9!important;
+  color:#203a4b!important;
+  border:1px solid #d4dfe6!important;
+}
+html:not([data-theme="dark"]) #tool-polyline.active{
+  background:#2f7fb6!important;
+  color:#ffffff!important;
+  border-color:#2f7fb6!important;
+}
+html:not([data-theme="dark"]) #tool-eraser{
+  background:#f4f7f9!important;
+  color:#203a4b!important;
+  border:1px solid #d4dfe6!important;
+}
+html:not([data-theme="dark"]) #tool-eraser.active{
+  background:#ffe7e7!important;
+  color:#9a3434!important;
+  border-color:#dc8e8e!important;
+}
+
+/* Farbauswahl klar sichtbar */
+#planStyleBox{
+  align-items:center!important;
+}
+
+#planStyleBox label[for="planStrokeColor"]{
+  margin-right:2px!important;
+}
+
+#planStrokeColor{
+  -webkit-appearance:none!important;
+  appearance:none!important;
+  width:42px!important;
+  min-width:42px!important;
+  height:38px!important;
+  padding:0!important;
+  border-radius:10px!important;
+  overflow:hidden!important;
+  border:1px solid #3d6179!important;
+  background:transparent!important;
+  cursor:pointer!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)!important;
+}
+
+#planStrokeColor::-webkit-color-swatch-wrapper{
+  padding:0!important;
+}
+#planStrokeColor::-webkit-color-swatch{
+  border:none!important;
+  border-radius:9px!important;
+}
+#planStrokeColor::-moz-color-swatch{
+  border:none!important;
+  border-radius:9px!important;
+}
+
+html[data-theme="dark"] #planStrokeColor{
+  border-color:#4c7188!important;
+  background:#0f2433!important;
+}
+html:not([data-theme="dark"]) #planStrokeColor{
+  border-color:#c8d7e1!important;
+  background:#ffffff!important;
+}
+
+/* damit Löschen/Toggles nicht abgeschnitten wirken */
+#v714PlanActions{
+  gap:10px!important;
+  flex-wrap:wrap!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.79 – Farbe sichtbar halten + Toolstyles nachziehen
+   ============================================================ */
+(function(){
+  const $ = id => document.getElementById(id);
+
+  function applyColorPreview(){
+    const input = $("planStrokeColor");
+    if(!input) return;
+    const val = input.value || "#b83232";
+    input.style.background = val;
+    input.style.boxShadow = "inset 0 0 0 2px rgba(255,255,255,.10)";
+    input.setAttribute("aria-label", "Farbe " + val);
+    input.title = "Farbe der Markierung: " + val;
+  }
+
+  function syncSpecialToolLook(){
+    const poly = $("tool-polyline");
+    const eraser = $("tool-eraser");
+    if(poly) poly.classList.toggle("active", String(window.planTool||"") === "polyline");
+    if(eraser) eraser.classList.toggle("active", String(window.planTool||"") === "eraser");
+  }
+
+  const baseSetStyleFromAnnotation = window.setStyleControlsFromAnnotation;
+  if(typeof baseSetStyleFromAnnotation === "function"){
+    window.setStyleControlsFromAnnotation = function(a){
+      const r = baseSetStyleFromAnnotation.apply(this, arguments);
+      applyColorPreview();
+      return r;
+    };
+  }
+
+  const baseCurrentPlanStyle = window.currentPlanStyle;
+  if(typeof baseCurrentPlanStyle === "function"){
+    window.currentPlanStyle = function(){
+      const r = baseCurrentPlanStyle.apply(this, arguments);
+      applyColorPreview();
+      return r;
+    };
+  }
+
+  const baseSetPlanTool = window.setPlanTool;
+  if(typeof baseSetPlanTool === "function"){
+    window.setPlanTool = function(tool){
+      const r = baseSetPlanTool.apply(this, arguments);
+      syncSpecialToolLook();
+      requestAnimationFrame(syncSpecialToolLook);
+      return r;
+    };
+  }
+
+  function bindColorPreview(){
+    const input = $("planStrokeColor");
+    if(!input || input.dataset.v779Bound === "1") return;
+    input.dataset.v779Bound = "1";
+    ["input","change"].forEach(evt => input.addEventListener(evt, applyColorPreview, {passive:true}));
+    applyColorPreview();
+  }
+
+  function afterPlanRender(){
+    bindColorPreview();
+    syncSpecialToolLook();
+    applyColorPreview();
+  }
+
+  const baseRenderPlan = window.renderPlanAnnotations;
+  if(typeof baseRenderPlan === "function"){
+    window.renderPlanAnnotations = function(){
+      const r = baseRenderPlan.apply(this, arguments);
+      requestAnimationFrame(afterPlanRender);
+      return r;
+    };
+  }
+
+  const baseOpenPlan = window.openPlan;
+  if(typeof baseOpenPlan === "function"){
+    window.openPlan = async function(){
+      const r = await baseOpenPlan.apply(this, arguments);
+      requestAnimationFrame(afterPlanRender);
+      return r;
+    };
+  }
+
+  window.addEventListener("load", function(){
+    setTimeout(afterPlanRender, 250);
+    setTimeout(afterPlanRender, 900);
+  });
+})();
+</script>
+
+
+<style id="v780-plan-toggle-direct-fix">
+/* V7.80 – Sichtbarkeitsschalter direkt am echten Zustand */
+#toggleOtherAmblBtn,#toggleOtherIdsBtn{cursor:pointer!important;user-select:none!important}
+html[data-theme="dark"] #toggleOtherAmblBtn.v780On,
+html[data-theme="dark"] #toggleOtherIdsBtn.v780On{
+  background:#173d27!important;color:#a4e6b9!important;border-color:#4b835d!important;
+}
+html[data-theme="dark"] #toggleOtherAmblBtn.v780Off,
+html[data-theme="dark"] #toggleOtherIdsBtn.v780Off{
+  background:#142c3d!important;color:#c7d5de!important;border-color:#3d6179!important;
+}
+html:not([data-theme="dark"]) #toggleOtherAmblBtn.v780On,
+html:not([data-theme="dark"]) #toggleOtherIdsBtn.v780On{
+  background:#e9f7ed!important;color:#276c40!important;border-color:#bcdcc5!important;
+}
+html:not([data-theme="dark"]) #toggleOtherAmblBtn.v780Off,
+html:not([data-theme="dark"]) #toggleOtherIdsBtn.v780Off{
+  background:#f4f7f9!important;color:#425866!important;border-color:#d3dfe6!important;
+}
+</style>
+<script>
+/* ============================================================
+   V7.80 – Wrapper umgehen: Toggle direkt an State
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function paint(btn,on,label){
+    if(!btn)return;
+    btn.textContent=`${label}: ${on?"EIN":"AUS"}`;
+    btn.classList.toggle("v780On",on);
+    btn.classList.toggle("v780Off",!on);
+    btn.classList.toggle("okBtn",on);
+    btn.classList.toggle("secondary",!on);
+    btn.classList.toggle("off",!on);
+    btn.setAttribute("aria-pressed",on?"true":"false");
+  }
+
+  function refresh(){
+    let ambl=true;
+    try{ ambl=!!v511ShowOtherAmbl; }catch(e){}
+    let ids=true;
+    try{ ids=typeof window.v780GetOtherSameSheetIdsState==="function" ? !!window.v780GetOtherSameSheetIdsState() : true; }catch(e){}
+    paint($("toggleOtherAmblBtn"),ambl,"Andere AMBL");
+    paint($("toggleOtherIdsBtn"),ids,"Andere IDs");
+  }
+
+  window.v780ToggleOtherAmblDirect=function(){
+    try{
+      v511ShowOtherAmbl=!v511ShowOtherAmbl;
+      try{ updateOtherAmblButton?.(); }catch(e){}
+      try{ renderPlanAnnotations?.(); }catch(e){}
+    }catch(e){
+      console.error("Andere AMBL konnte nicht umgeschaltet werden",e);
+    }
+    refresh();
+  };
+
+  window.v780ToggleOtherIdsDirect=function(){
+    try{
+      window.v780ToggleOtherSameSheetIdsCore?.();
+    }catch(e){
+      console.error("Andere IDs konnte nicht umgeschaltet werden",e);
+    }
+    refresh();
+  };
+
+  function bind(){
+    const a=$("toggleOtherAmblBtn");
+    if(a){
+      a.onclick=function(ev){ev?.preventDefault?.();ev?.stopPropagation?.();window.v780ToggleOtherAmblDirect();return false;};
+    }
+    const i=$("toggleOtherIdsBtn");
+    if(i){
+      i.onclick=function(ev){ev?.preventDefault?.();ev?.stopPropagation?.();window.v780ToggleOtherIdsDirect();return false;};
+    }
+    refresh();
+  }
+
+  const oldRender=window.renderPlanAnnotations;
+  if(typeof oldRender==="function"){
+    window.renderPlanAnnotations=function(){
+      const r=oldRender.apply(this,arguments);
+      requestAnimationFrame(bind);
+      return r;
+    };
+  }
+
+  const oldOpen=window.openPlan;
+  if(typeof oldOpen==="function"){
+    window.openPlan=async function(){
+      const r=await oldOpen.apply(this,arguments);
+      requestAnimationFrame(bind);
+      return r;
+    };
+  }
+
+  window.addEventListener("load",()=>{setTimeout(bind,350);setTimeout(bind,1000);});
 })();
 </script>
 
