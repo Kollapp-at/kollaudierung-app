@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.21</title>
+<title>Kollaudierung – V7.22</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.21 <span class="v693BuildStamp">Build 7.21</span></h1>
+     <h1>Kollaudierung – V7.22 <span class="v693BuildStamp">Build 7.22</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.21",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.22",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.21";
+const KOLLAPP_VERSION="7.22";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -29211,6 +29211,272 @@ window.addEventListener("load",()=>{
       renderHandles();
       decorateSelectedBox();
     },260);
+  });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.22 – STABILE PUNKT-/ECKBEARBEITUNG
+   ============================================================ */
+#planOverlay .v722VertexHandle{
+  pointer-events:auto!important;
+  touch-action:none!important;
+  cursor:grab!important;
+}
+#planOverlay .v722VertexHandle:active{
+  cursor:grabbing!important;
+}
+#planOverlay .v722Hit{
+  pointer-events:auto!important;
+  touch-action:none!important;
+  fill:transparent!important;
+  stroke:transparent!important;
+  cursor:grab!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.22 – Geometrie beim Ziehen direkt aktualisieren.
+   Kein kompletter SVG-Neuaufbau während Punkt-/Eck-Drag.
+   ============================================================ */
+(function(){
+  let drag=null;
+  const $=id=>document.getElementById(id);
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+  function selected(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+
+  function norm(p){
+    return {x:clamp(p.x,0,1000),y:clamp(p.y,0,1000)};
+  }
+
+  function cornersOf(a){
+    return [
+      {x:a.x1,y:a.y1},
+      {x:a.x2,y:a.y1},
+      {x:a.x2,y:a.y2},
+      {x:a.x1,y:a.y2}
+    ];
+  }
+
+  function liveShapeNode(a){
+    const g=$("planOverlay")?.querySelector(`g.ann[data-id="${CSS.escape(a.id)}"]`);
+    if(!g)return null;
+    if(a.type==="line")return g.querySelector("polyline");
+    if(a.type==="rect")return g.querySelector("rect");
+    if(a.type==="circle")return g.querySelector("circle");
+    return null;
+  }
+
+  function updateLiveShape(a){
+    const node=liveShapeNode(a);
+    if(!node)return;
+
+    if(a.type==="line"){
+      node.setAttribute("points",(a.points||[]).map(p=>`${planPxX(p.x)},${planPxY(p.y)}`).join(" "));
+    }else if(a.type==="rect"){
+      node.setAttribute("x",planPxX(a.x1));
+      node.setAttribute("y",planPxY(a.y1));
+      node.setAttribute("width",Math.max(0,planPxX(a.x2)-planPxX(a.x1)));
+      node.setAttribute("height",Math.max(0,planPxY(a.y2)-planPxY(a.y1)));
+    }else if(a.type==="circle"){
+      const x1=planPxX(a.x1),y1=planPxY(a.y1),x2=planPxX(a.x2),y2=planPxY(a.y2);
+      node.setAttribute("cx",(x1+x2)/2);
+      node.setAttribute("cy",(y1+y2)/2);
+      node.setAttribute("r",Math.min(Math.abs(x2-x1),Math.abs(y2-y1))/2);
+    }
+  }
+
+  function updateHandlePositions(a){
+    const svg=$("planOverlay");
+    if(!svg)return;
+
+    if(a.type==="line"){
+      (a.points||[]).forEach((p,i)=>{
+        svg.querySelectorAll(`[data-v722-kind="vertex"][data-v722-index="${i}"]`).forEach(n=>{
+          n.setAttribute("cx",planPxX(p.x));
+          n.setAttribute("cy",planPxY(p.y));
+        });
+      });
+    }else if(a.type==="rect"||a.type==="circle"){
+      cornersOf(a).forEach((p,i)=>{
+        svg.querySelectorAll(`[data-v722-kind="corner"][data-v722-index="${i}"]`).forEach(n=>{
+          n.setAttribute("cx",planPxX(p.x));
+          n.setAttribute("cy",planPxY(p.y));
+        });
+      });
+    }
+  }
+
+  function start(ev,a,kind,index){
+    if(planTool!=="select")return;
+    if(ev.pointerType==="mouse" && ev.button!==0)return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    drag={
+      pointerId:ev.pointerId,
+      annId:a.id,
+      kind,
+      index,
+      original:JSON.parse(JSON.stringify(a))
+    };
+
+    try{$("planOverlay")?.setPointerCapture?.(ev.pointerId)}catch(e){}
+  }
+
+  function makeHandle(svg,a,p,kind,index){
+    const coarse=(navigator.maxTouchPoints||0)>0 || window.matchMedia?.("(pointer:coarse)")?.matches;
+    const hitR=coarse?27:18;
+    const visR=coarse?11:8;
+    const attrs={
+      cx:planPxX(p.x),
+      cy:planPxY(p.y),
+      "data-v722-kind":kind,
+      "data-v722-index":String(index)
+    };
+
+    const hit=svgEl("circle",{...attrs,r:hitR,class:"v722Hit"});
+    const vis=svgEl("circle",{...attrs,r:visR,class:"planEditHandle v722VertexHandle"});
+
+    [hit,vis].forEach(n=>{
+      n.addEventListener("pointerdown",ev=>start(ev,a,kind,index),{passive:false});
+      n.addEventListener("click",ev=>{
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+      },{passive:false});
+    });
+
+    svg.append(hit,vis);
+  }
+
+  function renderV722Handles(){
+    const svg=$("planOverlay"),a=selected();
+    if(!svg)return;
+
+    svg.querySelectorAll(".v722Hit,.v722VertexHandle").forEach(n=>n.remove());
+
+    if(!a||planTool!=="select")return;
+
+    if(a.type==="line" && Array.isArray(a.points)){
+      a.points.forEach((p,i)=>makeHandle(svg,a,p,"vertex",i));
+    }else if(a.type==="rect"||a.type==="circle"){
+      cornersOf(a).forEach((p,i)=>makeHandle(svg,a,p,"corner",i));
+    }
+  }
+
+  function applyVertex(a,p,index){
+    if(!Array.isArray(a.points)||index<0||index>=a.points.length)return;
+    a.points[index]=norm(p);
+  }
+
+  function applyCorner(a,p,index,orig){
+    const cs=cornersOf(orig);
+    const opposite=cs[(index+2)%4];
+    p=norm(p);
+
+    if(a.type==="rect"){
+      const b=normalizeRectBounds(opposite,p);
+      a.x1=b.x1;a.y1=b.y1;a.x2=b.x2;a.y2=b.y2;
+    }else if(a.type==="circle"){
+      const b=normalizeCircleBounds(opposite,p);
+      a.x1=b.x1;a.y1=b.y1;a.x2=b.x2;a.y2=b.y2;
+    }
+  }
+
+  function install(){
+    const svg=$("planOverlay");
+    if(!svg||svg.dataset.v722Edit==="1")return;
+    svg.dataset.v722Edit="1";
+
+    /* Capture auf window: bleibt stabil, selbst wenn Safari das Pointer-
+       Target innerhalb des SVG während des Ziehens ändert. */
+    window.addEventListener("pointermove",ev=>{
+      if(!drag||drag.pointerId!==ev.pointerId)return;
+
+      const a=activePlan?.()?.annotations?.find(x=>x.id===drag.annId);
+      if(!a){drag=null;return}
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+
+      const p=planCoords(ev);
+      if(drag.kind==="vertex"){
+        applyVertex(a,p,drag.index);
+      }else if(drag.kind==="corner"){
+        applyCorner(a,p,drag.index,drag.original);
+      }
+
+      /* Live nur Geometrie + Griffe verschieben. Kein renderPlanAnnotations(). */
+      updateLiveShape(a);
+      updateHandlePositions(a);
+    },{capture:true,passive:false});
+
+    const finish=ev=>{
+      if(!drag||drag.pointerId!==ev.pointerId)return;
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+
+      drag=null;
+      persist?.();
+
+      try{
+        const a=selected();
+        if(a && typeof currentAccess==="function" && currentAccess().mode==="worker"){
+          markAnnotationSyncDirty?.(a,true);
+          persist?.();
+        }
+      }catch(e){}
+
+      renderPlanAnnotations?.();
+      renderSelectedAnnotation?.();
+    };
+
+    window.addEventListener("pointerup",finish,{capture:true,passive:false});
+    window.addEventListener("pointercancel",finish,{capture:true,passive:false});
+  }
+
+  const oldRender=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    oldRender.apply(this,arguments);
+    renderV722Handles();
+  };
+
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    drag=null;
+    const r=oldSet.apply(this,arguments);
+    try{renderV722Handles()}catch(e){}
+    return r;
+  };
+
+  const oldSelect=selectPlanAnnotation;
+  selectPlanAnnotation=function(id){
+    const r=oldSelect.apply(this,arguments);
+    setTimeout(renderV722Handles,0);
+    return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    const r=await oldOpen.apply(this,arguments);
+    install();
+    renderV722Handles();
+    return r;
+  };
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      install();
+      renderV722Handles();
+    },300);
   });
 })();
 </script>
