@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.50</title>
+<title>Kollaudierung – V7.52</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.50 <span class="v693BuildStamp">Build 7.50</span></h1>
+     <h1>Kollaudierung – V7.52 <span class="v693BuildStamp">Build 7.52</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16319,7 +16319,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.50",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.52",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26100,7 +26100,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.50";
+const KOLLAPP_VERSION="7.52";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -36149,6 +36149,125 @@ tbody tr:hover td{
       return r;
     };
   }
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.51 – GRÜNER "PLANMARKIERUNG BEARBEITEN"-BUTTON
+   lädt zuerst den vollständigen normalen Bearbeitungszustand.
+   Danach öffnet die bestehende Planbearbeitung wie bisher.
+   ============================================================ */
+(function(){
+  const basePlanEditV751=markEntryOnPlan;
+
+  markEntryOnPlan=function(entryId){
+    const entry=(project()?.entries||[]).find(
+      e=>String(e.id)===String(entryId)
+    )||null;
+
+    /*
+      Exakt denselben Bearbeitungszustand laden wie bei "Bearbeiten":
+      Positionsbeschreibung, komplette LV-Gruppe, aktive LV-Pos.,
+      Rechenansatz, Menge, Status, Detail, Anmerkung, Fotos usw.
+      Die bestehende editEntry()-Kette enthält bereits alle bisherigen
+      Erweiterungen der App und wird deshalb bewusst direkt verwendet.
+    */
+    if(entry && typeof editEntry==="function"){
+      try{
+        editEntry(entry.id);
+      }catch(err){
+        console.warn("V7.51: Bearbeitungszustand konnte nicht vorgeladen werden.",err);
+      }
+    }
+
+    /*
+      Anschließend unverändert die bestehende Planbearbeitung starten.
+      Damit bleiben ID-Fokus, rechte LV-Liste, automatischer Sprung zum
+      Plan und die Auswahl-/Zeichenlogik aus V7.45–V7.50 erhalten.
+    */
+    return basePlanEditV751.apply(this,arguments);
+  };
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.52 – "ÄNDERN" RECHTS NEBEN DEM PLAN:
+   Bearbeitungsdaten laden, aber Ansicht am Plan behalten.
+   ============================================================ */
+(function(){
+  if(typeof window.v737EditLvFromPlan!=="function")return;
+
+  const baseV752PlanLvEdit=window.v737EditLvFromPlan;
+
+  function planAnchor(){
+    return document.getElementById("planStage") ||
+           document.getElementById("planViewport") ||
+           document.querySelector(".planWrap");
+  }
+
+  function capturePlanViewport(){
+    const el=planAnchor();
+    if(!el){
+      return {scrollY:window.scrollY, relative:null};
+    }
+
+    const r=el.getBoundingClientRect();
+
+    /*
+      Abstand des aktuellen Viewports vom Plananfang merken.
+      Dadurch bleibt nicht nur "der Plan sichtbar", sondern möglichst
+      genau derselbe Ausschnitt an derselben Bildschirmposition.
+    */
+    return {
+      scrollY:window.scrollY,
+      relative:window.scrollY - (window.scrollY + r.top)
+    };
+  }
+
+  function restorePlanViewport(state){
+    const el=planAnchor();
+
+    if(el && state.relative!==null){
+      const r=el.getBoundingClientRect();
+      const absTop=window.scrollY + r.top;
+      const target=Math.max(0,absTop + state.relative);
+
+      window.scrollTo({
+        top:target,
+        left:window.scrollX,
+        behavior:"auto"
+      });
+      return;
+    }
+
+    window.scrollTo({
+      top:state.scrollY,
+      left:window.scrollX,
+      behavior:"auto"
+    });
+  }
+
+  window.v737EditLvFromPlan=function(pos){
+    const viewportState=capturePlanViewport();
+
+    const r=baseV752PlanLvEdit.apply(this,arguments);
+
+    /*
+      editEntry/openPlan/showView können in mehreren Schritten scrollen.
+      Deshalb nach jedem bekannten Render-Zeitpunkt die Planposition
+      wiederherstellen – ohne Render-/Observer-Loop.
+    */
+    requestAnimationFrame(()=>restorePlanViewport(viewportState));
+    setTimeout(()=>restorePlanViewport(viewportState),80);
+    setTimeout(()=>restorePlanViewport(viewportState),200);
+    setTimeout(()=>restorePlanViewport(viewportState),360);
+
+    return r;
+  };
 })();
 </script>
 
