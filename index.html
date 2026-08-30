@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.14</title>
+<title>Kollaudierung – V7.15</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.14 <span class="v693BuildStamp">Build 7.13</span></h1>
+     <h1>Kollaudierung – V7.15 <span class="v693BuildStamp">Build 7.15</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.14",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.15",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.14";
+const KOLLAPP_VERSION="7.15";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -27802,6 +27802,266 @@ window.addEventListener("load",()=>{
   openPlan = async function(id){
     await _v714OpenPlan(id);
     initV714();
+  };
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.15 – Planleiste: 3 flache Reihen, keine Überlappung
+   ============================================================ */
+.planTools{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  padding:10px!important;
+  overflow:hidden!important;
+  max-width:100%!important;
+}
+.planToolGroup[data-group="tools"]{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:7px!important;
+  width:100%!important;
+  padding:0 0 8px!important;
+  border-bottom:1px solid #dfe8ee!important;
+}
+.planTools .v715StyleRow,
+.planTools .v715ActionRow{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+.planTools .v715StyleRow{
+  padding-bottom:8px!important;
+  border-bottom:1px solid #e4ebef!important;
+}
+.planTools .v715ActionRow{
+  flex-wrap:wrap!important;
+}
+.planTools .v715StyleRow .planToolGroup,
+.planTools .v715ActionRow .planToolGroup{
+  display:flex!important;
+  align-items:center!important;
+  flex-wrap:wrap!important;
+  gap:7px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+.planTools .v715StyleRow .planToolGroup[data-group="style"]{
+  flex:1 1 auto!important;
+  min-width:0!important;
+}
+.planTools .v715ActionRow .planToolGroup[data-group="edit"],
+.planTools .v715ActionRow .planToolGroup[data-group="zoom"]{
+  flex:0 0 auto!important;
+}
+#v714PlanActions{
+  display:flex!important;
+  align-items:center!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+  margin-left:auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+}
+#v714PlanActions #toggleOtherAmblBtn,
+#v714PlanActions #deleteUnsavedPlanBtn{
+  position:static!important;
+  inset:auto!important;
+  margin:0!important;
+  max-width:100%!important;
+}
+#deleteUnsavedPlanBtn{
+  white-space:normal!important;
+}
+/* Vorschau-Linien dürfen niemals weitere Punkte blockieren */
+#planOverlay > polyline:not(.planFreehandDraft),
+#planOverlay > circle:not(.ann circle),
+#planOverlay > rect:not(.ann rect){
+  pointer-events:none!important;
+}
+/* Aktive Markierungen bleiben auswählbar */
+#planOverlay .ann,
+#planOverlay .ann *{
+  pointer-events:auto;
+}
+@media(min-width:1101px){
+  .planTools .v715ActionRow{
+    flex-wrap:nowrap!important;
+  }
+  #v714PlanActions{
+    flex-wrap:nowrap!important;
+  }
+}
+@media(max-width:1100px){
+  .planToolGroup[data-group="tools"],
+  .planTools .v715StyleRow,
+  .planTools .v715ActionRow{
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    flex-wrap:nowrap!important;
+    scrollbar-width:none!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  .planToolGroup[data-group="tools"]::-webkit-scrollbar,
+  .planTools .v715StyleRow::-webkit-scrollbar,
+  .planTools .v715ActionRow::-webkit-scrollbar{display:none!important;}
+  .planToolGroup[data-group="tools"] > *,
+  .planTools .v715StyleRow > *,
+  .planTools .v715ActionRow > *{flex:0 0 auto!important;}
+  #v714PlanActions{margin-left:0!important;flex-wrap:nowrap!important;}
+}
+</style>
+
+
+<script>
+/* ============================================================
+   V7.15 – robuste Linie / Polylinie auf Maus, Tablet, Pencil, Finger
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+  let v715LastPointerHandledAt=0;
+  let v715PointerStart=null;
+
+  function buildThreeRows(){
+    const bar=document.querySelector('.planTools');
+    if(!bar || bar.dataset.v715Rows==='1') return;
+    const tools=bar.querySelector('.planToolGroup[data-group="tools"]');
+    const style=bar.querySelector('.planToolGroup[data-group="style"]');
+    const edit=bar.querySelector('.planToolGroup[data-group="edit"]');
+    const zoom=bar.querySelector('.planToolGroup[data-group="zoom"]');
+    const actions=$('v714PlanActions');
+    if(!tools) return;
+
+    const styleRow=document.createElement('div');
+    styleRow.className='v715StyleRow';
+    if(style) styleRow.appendChild(style);
+
+    const actionRow=document.createElement('div');
+    actionRow.className='v715ActionRow';
+    if(edit) actionRow.appendChild(edit);
+    if(zoom) actionRow.appendChild(zoom);
+    if(actions) actionRow.appendChild(actions);
+
+    bar.innerHTML='';
+    bar.appendChild(tools);
+    if(styleRow.children.length) bar.appendChild(styleRow);
+    if(actionRow.children.length) bar.appendChild(actionRow);
+    bar.dataset.v715Rows='1';
+  }
+
+  function addPointAtEvent(ev){
+    if(!activePlan() || (planTool!=='line' && planTool!=='polyline')) return false;
+    const pt=planCoords(ev);
+
+    if(planTool==='line'){
+      if(!Array.isArray(planLineDraft) || planLineDraft.length===0){
+        planLineDraft=[pt];
+        planLineHoverNorm=pt;
+        toggleLineButtons();
+        renderPlanAnnotations();
+      }else{
+        const start=planLineDraft[0];
+        /* createLineAnnotationFromPoints is private in V7.14, so finish through draft */
+        planLineDraft=[start,pt];
+        planLineHoverNorm=null;
+        finishPlanLine();
+      }
+      return true;
+    }
+
+    if(!Array.isArray(planLineDraft)) planLineDraft=[];
+    planLineDraft.push(pt);
+    planLineHoverNorm=pt;
+    toggleLineButtons();
+    renderPlanAnnotations();
+    return true;
+  }
+
+  function installPointerDrawing(){
+    const svg=$('planOverlay');
+    if(!svg || svg.dataset.v715Pointer==='1') return;
+    svg.dataset.v715Pointer='1';
+
+    svg.addEventListener('pointerdown',ev=>{
+      if(planTool!=='line' && planTool!=='polyline') return;
+      if(ev.button!==undefined && ev.button!==0) return;
+      v715PointerStart={id:ev.pointerId,x:ev.clientX,y:ev.clientY,type:ev.pointerType};
+    },{capture:true,passive:true});
+
+    svg.addEventListener('pointerup',ev=>{
+      if(planTool!=='line' && planTool!=='polyline') return;
+      if(!v715PointerStart || v715PointerStart.id!==ev.pointerId) return;
+      const moved=Math.hypot(ev.clientX-v715PointerStart.x,ev.clientY-v715PointerStart.y);
+      const pointerType=v715PointerStart.type;
+      v715PointerStart=null;
+
+      /* Maus bleibt über click, Touch/Pen direkt über pointerup. */
+      if(pointerType==='mouse') return;
+      if(moved>12) return; // Wisch-/Pan-Geste nicht als Punkt werten
+
+      ev.preventDefault();
+      ev.stopPropagation();
+      if(addPointAtEvent(ev)) v715LastPointerHandledAt=performance.now();
+    },{capture:true,passive:false});
+
+    svg.addEventListener('pointercancel',()=>{v715PointerStart=null;},{capture:true,passive:true});
+  }
+
+  /* Finale Click-Logik: NICHT mehr auf ev.target===overlay beschränken. */
+  const v715BaseClick=planCanvasClick;
+  planCanvasClick=function(ev){
+    if(!activePlan()) return;
+
+    if(planTool==='line' || planTool==='polyline'){
+      /* Touch/Pen hat gerade bereits pointerup verarbeitet. */
+      if(performance.now()-v715LastPointerHandledAt<500) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      addPointAtEvent(ev);
+      return;
+    }
+
+    return v715BaseClick(ev);
+  };
+
+  /* Doppelklick beendet nur Polylinie; Linie speichert ohnehin nach Punkt 2. */
+  planCanvasDoubleClick=function(ev){
+    if(planTool==='polyline'){
+      ev.preventDefault();
+      ev.stopPropagation();
+      if(Array.isArray(planLineDraft) && planLineDraft.length>=2) finishPlanLine();
+    }
+  };
+
+  /* Beim Wechsel sauber zurücksetzen. */
+  const v715SetTool=setPlanTool;
+  setPlanTool=function(tool){
+    const previous=planTool;
+    if(previous!==tool && (previous==='line'||previous==='polyline')){
+      planLineDraft=[];
+      planLineHoverNorm=null;
+    }
+    v715SetTool(tool);
+    toggleLineButtons();
+  };
+
+  function init(){
+    buildThreeRows();
+    installPointerDrawing();
+    toggleLineButtons();
+  }
+
+  window.addEventListener('load',()=>setTimeout(init,240));
+  const v715OpenPlan=openPlan;
+  openPlan=async function(id){
+    await v715OpenPlan(id);
+    setTimeout(init,0);
   };
 })();
 </script>
