@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.66</title>
+<title>Kollaudierung – V7.67</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.66 <span class="v693BuildStamp">Build 7.66</span></h1>
+     <h1>Kollaudierung – V7.67 <span class="v693BuildStamp">Build 7.67</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.66",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.67",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.66";
+const KOLLAPP_VERSION="7.67";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -39411,6 +39411,185 @@ html[data-theme="dark"] :is(
     color-scheme:light!important;
     background:#fff!important;
     color:#111!important;
+  }
+}
+</style>
+
+
+<style id="v767-last-white-fixes">
+/* ============================================================
+   V7.67 – letzte helle Ausreißer aus den Screenshots
+   ============================================================ */
+
+/* 1) Fotodokumentation komplett dunkel */
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard .v637PhotoBox{
+  background:#0e2535!important;
+  color:#eef5f9!important;
+  border-color:#3b5d74!important;
+}
+
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar{
+  background:transparent!important;
+  border-bottom:1px solid #35566e!important;
+}
+
+html[data-theme="dark"] #view-entry #entryPhotoList,
+html[data-theme="dark"] #view-entry .v637PhotoList{
+  background:#0c2231!important;
+  border:1px dashed #44647a!important;
+  border-radius:10px!important;
+  min-height:46px!important;
+  padding:10px 12px!important;
+}
+
+html[data-theme="dark"] #view-entry #entryPhotoList > .small,
+html[data-theme="dark"] #view-entry .v637PhotoList > .small{
+  display:flex!important;
+  align-items:center!important;
+  min-height:24px!important;
+  margin:0!important;
+  padding:0!important;
+  background:transparent!important;
+  color:#b9ccd7!important;
+  border:0!important;
+}
+
+html[data-theme="dark"] #view-entry .v637PhotoPickLabel{
+  background:#142c3d!important;
+  color:#eef5f9!important;
+  border-color:#3d6179!important;
+}
+
+html[data-theme="dark"] #view-entry .v639CameraBtn{
+  background:linear-gradient(180deg,#4c9bcd,#347fad)!important;
+  color:#fff!important;
+  border-color:#62addb!important;
+}
+
+/* 2) Plankopf über Werkzeugleiste */
+html[data-theme="dark"] #view-entry #planEditorHead{
+  background:#10283a!important;
+  color:#f2f7fb!important;
+  border:1px solid #35566e!important;
+  box-shadow:none!important;
+}
+
+html[data-theme="dark"] #view-entry #activePlanName{
+  color:#f2f7fb!important;
+}
+
+html[data-theme="dark"] #view-entry #activePlanMeta{
+  color:#a9becb!important;
+}
+
+html[data-theme="dark"] #view-entry #planEditorHead label{
+  color:#bcd0dc!important;
+}
+
+html[data-theme="dark"] #view-entry #planPosFilter{
+  background:#0d2232!important;
+  color:#f2f7fb!important;
+  border-color:#3b5d74!important;
+}
+
+/* Planliste ebenfalls kontrastreicher */
+html[data-theme="dark"] #view-entry .planItem{
+  background:#10283a!important;
+  color:#eef5f9!important;
+  border-color:#35566e!important;
+}
+html[data-theme="dark"] #view-entry .planItem.active{
+  background:#17384d!important;
+  border-color:#4b83a3!important;
+}
+html[data-theme="dark"] #view-entry .planItem .pn{color:#f3f7fb!important}
+html[data-theme="dark"] #view-entry .planItem .pm{color:#b5c8d3!important}
+
+/* 3) Übergabe: Berechtigungs- und Warnzeilen */
+html[data-theme="dark"] #view-sync #workerPermissionInfo{
+  background:#10283a!important;
+  color:#dce8ef!important;
+  border:1px solid #35566e!important;
+}
+
+html[data-theme="dark"] #view-sync #workerPermissionInfo b{
+  color:#f2f7fb!important;
+}
+
+html[data-theme="dark"] #view-sync .v739Hint,
+html[data-theme="dark"] #view-sync .info,
+html[data-theme="dark"] #view-sync .notice{
+  background:#10283a!important;
+  color:#c2d3dd!important;
+  border-color:#35566e!important;
+}
+
+html[data-theme="dark"] #view-sync .v739Hint b,
+html[data-theme="dark"] #view-sync .info b{
+  color:#f1f6f9!important;
+}
+
+/* "Nur Arbeitsdatei laden" als echte Warnung, aber dunkel */
+html[data-theme="dark"] #view-sync .v739Hint:has(b:first-child){
+  background:#342b1b!important;
+  color:#efd18a!important;
+  border-color:#705d31!important;
+}
+
+/* 4) ID-Badges / Kreise in Tabellen */
+html[data-theme="dark"] .entryIdBadge,
+html[data-theme="dark"] .v675IdBadge,
+html[data-theme="dark"] #view-sheet .entryIdBadge,
+html[data-theme="dark"] #view-entry .entryIdBadge{
+  background:#1b4359!important;
+  color:#bde7fb!important;
+  border-color:#4a7894!important;
+  box-shadow:none!important;
+}
+
+/* generische runde ID-Zellen, falls alte Builds andere Klasse nutzen */
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv
+) td > :is(.badge,.pill):first-child{
+  border-color:#426c85!important;
+}
+
+/* Zusätzliche helle Inline-Ausreißer in Hauptansichten */
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) [style*="background:#fff"],
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) [style*="background: #fff"],
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) [style*="background:white"],
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) [style*="background: white"]{
+  background:#10283a!important;
+  color:#eef5f9!important;
+}
+
+/* Ausnahme: eigentliche Planfläche muss weiß bleiben */
+html[data-theme="dark"] #planStage,
+html[data-theme="dark"] #planStage *,
+html[data-theme="dark"] #planPrintArea,
+html[data-theme="dark"] #sheetMultiPrintArea{
+  color-scheme:light;
+}
+
+html[data-theme="dark"] #planStage{
+  background:#fff!important;
+}
+
+/* Druck weiterhin hell */
+@media print{
+  html[data-theme="dark"],
+  html[data-theme="dark"] body{
+    background:#fff!important;
+    color:#111!important;
+    color-scheme:light!important;
   }
 }
 </style>
