@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.62</title>
+<title>Kollaudierung – V7.63</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.62 <span class="v693BuildStamp">Build 7.62</span></h1>
+     <h1>Kollaudierung – V7.63 <span class="v693BuildStamp">Build 7.63</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.62",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.63",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.62";
+const KOLLAPP_VERSION="7.63";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -38059,6 +38059,345 @@ html[data-theme="dark"] body #view-entry .v671TemplatePanel{
   html[data-theme="dark"] body #view-entry *,
   html[data-theme="dark"] body .sheetPrintBlock *,
   html[data-theme="dark"] body #planPrintArea *{
+    color-scheme:light!important;
+  }
+}
+</style>
+
+
+<style id="v763-dark-readability">
+/* ============================================================
+   V7.63 – DARK MODE LESBARKEIT / KONTRAST
+   ============================================================ */
+
+html[data-theme="dark"]{
+  --v763-bg:#07131f;
+  --v763-surface:#0e2030;
+  --v763-surface2:#11283a;
+  --v763-surface3:#16344b;
+  --v763-border:#27465f;
+  --v763-border2:#365d78;
+
+  --v763-text:#f3f7fb;
+  --v763-text2:#d7e2ec;
+  --v763-muted:#afc0cf;
+  --v763-faint:#8fa5b7;
+
+  --v763-blue:#4ba3e8;
+  --v763-blue2:#2f84bd;
+  --v763-green:#78d69a;
+  --v763-yellow:#f0c36a;
+  --v763-red:#f08a8a;
+}
+
+/* ---------- Gesamtfläche ---------- */
+html[data-theme="dark"],
+html[data-theme="dark"] body{
+  background:var(--v763-bg)!important;
+  color:var(--v763-text)!important;
+}
+
+html[data-theme="dark"] body{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(75,163,232,.08),transparent 32rem),
+    var(--v763-bg)!important;
+}
+
+/* ---------- Karten klarer abheben ---------- */
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .v666ProjectSection,
+html[data-theme="dark"] .v666LvSection,
+html[data-theme="dark"] .v666MeasureSection,
+html[data-theme="dark"] .v697SupportCard,
+html[data-theme="dark"] .v697SupportSection,
+html[data-theme="dark"] .v697PhotoActionsCard,
+html[data-theme="dark"] .entryIntegratedPlan > .card,
+html[data-theme="dark"] #entryFinalizeCard,
+html[data-theme="dark"] .modal,
+html[data-theme="dark"] .multiLvBox{
+  background:var(--v763-surface)!important;
+  border-color:var(--v763-border)!important;
+  color:var(--v763-text)!important;
+}
+
+/* ---------- Überschriften / Primärtext ---------- */
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] .strong,
+html[data-theme="dark"] .mliText,
+html[data-theme="dark"] .v737Text,
+html[data-theme="dark"] .v737Pos,
+html[data-theme="dark"] .mliQty b,
+html[data-theme="dark"] td b,
+html[data-theme="dark"] th{
+  color:var(--v763-text)!important;
+}
+
+/* Sekundärtext bewusst heller als vorher */
+html[data-theme="dark"] .small,
+html[data-theme="dark"] label,
+html[data-theme="dark"] .muted,
+html[data-theme="dark"] .metaCell b,
+html[data-theme="dark"] .stat .k,
+html[data-theme="dark"] .v737Meta,
+html[data-theme="dark"] .mliCalc,
+html[data-theme="dark"] .mliQty,
+html[data-theme="dark"] .planFileNote,
+html[data-theme="dark"] .pm{
+  color:var(--v763-muted)!important;
+}
+
+/* ---------- Inputs ---------- */
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea{
+  background:var(--v763-surface2)!important;
+  color:var(--v763-text)!important;
+  border:1px solid var(--v763-border2)!important;
+  box-shadow:none!important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder{
+  color:var(--v763-faint)!important;
+  opacity:1!important;
+}
+
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] select:focus,
+html[data-theme="dark"] textarea:focus{
+  border-color:var(--v763-blue)!important;
+  box-shadow:0 0 0 3px rgba(75,163,232,.18)!important;
+}
+
+/* ---------- Projekt-Metadaten / Stat-Kacheln ---------- */
+html[data-theme="dark"] .metaCell,
+html[data-theme="dark"] .stat{
+  background:linear-gradient(180deg,var(--v763-surface2),#0e2232)!important;
+  border-color:var(--v763-border)!important;
+}
+
+html[data-theme="dark"] .stat .v{
+  color:#fff!important;
+}
+
+/* ---------- Tabs ---------- */
+html[data-theme="dark"] .tabs.noPrint{
+  background:#0d1d2a!important;
+  border-color:var(--v763-border)!important;
+}
+
+html[data-theme="dark"] .tab{
+  color:#b4c6d4!important;
+}
+
+html[data-theme="dark"] .tab.active{
+  background:var(--v763-surface3)!important;
+  color:#8ed3ff!important;
+  border-color:#3a6683!important;
+}
+
+/* ---------- Buttons ---------- */
+html[data-theme="dark"] .primary{
+  background:linear-gradient(180deg,var(--v763-blue),var(--v763-blue2))!important;
+  border-color:#5ab1ef!important;
+  color:#fff!important;
+}
+
+html[data-theme="dark"] .secondary{
+  background:#142b3b!important;
+  border-color:#3a5b72!important;
+  color:#e8f1f6!important;
+}
+
+html[data-theme="dark"] .secondary:hover{
+  background:#1a3548!important;
+  border-color:#4f7894!important;
+}
+
+html[data-theme="dark"] .okBtn{
+  background:#173826!important;
+  border-color:#35674a!important;
+  color:var(--v763-green)!important;
+}
+
+html[data-theme="dark"] .danger{
+  background:#3b2024!important;
+  border-color:#6a3840!important;
+  color:var(--v763-red)!important;
+}
+
+/* ---------- Hinweise ---------- */
+html[data-theme="dark"] .info,
+html[data-theme="dark"] .v739Hint,
+html[data-theme="dark"] #v739PlanUsageHint,
+html[data-theme="dark"] .autoPlanLinkBox,
+html[data-theme="dark"] #v757CurrentLvHint,
+html[data-theme="dark"] .calcPreview,
+html[data-theme="dark"] .v742Intro{
+  background:#102637!important;
+  border-color:#31516a!important;
+  color:#c6d6e1!important;
+}
+
+html[data-theme="dark"] .notice,
+html[data-theme="dark"] .unsavedPlanWarning,
+html[data-theme="dark"] .planLineHelp{
+  background:#332b1b!important;
+  color:#f0d08a!important;
+  border-color:#6d5b32!important;
+}
+
+/* ---------- Multi-LV ---------- */
+html[data-theme="dark"] .multiLvItem{
+  background:linear-gradient(180deg,#122a3b,#0f2332)!important;
+  border-color:#31516a!important;
+}
+
+html[data-theme="dark"] .multiLvItem.v753EditingLv{
+  background:linear-gradient(180deg,#173b52,#123044)!important;
+  border-color:#4e9fd1!important;
+}
+
+html[data-theme="dark"] .mliPos{
+  color:#9ed4f1!important;
+}
+
+html[data-theme="dark"] .v753EditingTag{
+  background:#20536d!important;
+  color:#c2ecff!important;
+}
+
+/* ---------- Tabellen ---------- */
+html[data-theme="dark"] .tablewrap{
+  background:#0b1b27!important;
+  border-color:var(--v763-border)!important;
+}
+
+html[data-theme="dark"] th{
+  background:#152b3b!important;
+  border-color:#31516a!important;
+}
+
+html[data-theme="dark"] td{
+  background:#0f2230!important;
+  color:var(--v763-text2)!important;
+  border-color:#263f52!important;
+}
+
+html[data-theme="dark"] tbody tr:hover td{
+  background:#173145!important;
+}
+
+/* ---------- Fotodokumentation: letzte weiße Fläche entfernen ---------- */
+html[data-theme="dark"] .v637PhotoBox,
+html[data-theme="dark"] .v666PhotoSection,
+html[data-theme="dark"] .v697PhotoActionsCard .v637PhotoBox,
+html[data-theme="dark"] .photoBox,
+html[data-theme="dark"] .photoGrid,
+html[data-theme="dark"] .photoPreview,
+html[data-theme="dark"] .photoEmpty,
+html[data-theme="dark"] #photoList,
+html[data-theme="dark"] #photoPreview,
+html[data-theme="dark"] #entryPhotoList{
+  background:var(--v763-surface2)!important;
+  color:var(--v763-text2)!important;
+  border-color:var(--v763-border)!important;
+}
+
+html[data-theme="dark"] .v637PhotoBox > *,
+html[data-theme="dark"] .v666PhotoSection > *{
+  background-color:transparent!important;
+}
+
+html[data-theme="dark"] .v637PhotoBox .toolbar,
+html[data-theme="dark"] .v666PhotoSection .toolbar{
+  border-color:#29485d!important;
+}
+
+html[data-theme="dark"] .v637PhotoBox .small,
+html[data-theme="dark"] .v666PhotoSection .small{
+  color:#b4c5d1!important;
+}
+
+/* Weiße leere Foto-Hinweisboxen */
+html[data-theme="dark"] [class*="photo"] .empty,
+html[data-theme="dark"] [id*="photo"] .empty,
+html[data-theme="dark"] .v637PhotoBox [style*="background"],
+html[data-theme="dark"] .v666PhotoSection [style*="background"]{
+  background:#0f2433!important;
+  color:#b9c9d4!important;
+  border-color:#36546a!important;
+}
+
+/* ---------- Planeditor ---------- */
+html[data-theme="dark"] .planTools{
+  background:#0f2230!important;
+  border-color:#31516a!important;
+}
+
+html[data-theme="dark"] .planTools .toolBtn,
+html[data-theme="dark"] .planTools .secondary,
+html[data-theme="dark"] .planTools .touchIconBtn,
+html[data-theme="dark"] .v661ToolStyle,
+html[data-theme="dark"] .v661ToolText,
+html[data-theme="dark"] #planZoomLabel{
+  background:#132b3b!important;
+  color:#e7f1f6!important;
+  border-color:#3a5b72!important;
+}
+
+html[data-theme="dark"] .planTools .toolBtn.active{
+  background:var(--v763-blue2)!important;
+  border-color:#58aeea!important;
+  color:#fff!important;
+}
+
+html[data-theme="dark"] .planSide{
+  color:var(--v763-text2)!important;
+  border-color:#31516a!important;
+}
+
+/* ---------- ausgewählte LV / Suchergebnisse ---------- */
+html[data-theme="dark"] .mobilePosResults > div,
+html[data-theme="dark"] .mobilePosResults [role="button"],
+html[data-theme="dark"] .v675LvResultBar{
+  background:#102839!important;
+  color:var(--v763-text2)!important;
+  border-color:#31516a!important;
+}
+
+html[data-theme="dark"] .mobilePosResults .selected,
+html[data-theme="dark"] .mobilePosResults [aria-selected="true"]{
+  background:#19415a!important;
+  border-color:#4c9fd0!important;
+}
+
+/* ---------- Linien / Trennungen ---------- */
+html[data-theme="dark"] .hr,
+html[data-theme="dark"] hr{
+  border-color:#2b4a60!important;
+  background:#2b4a60!important;
+}
+
+/* ---------- scrollbar ---------- */
+@media(pointer:fine){
+  html[data-theme="dark"] *{
+    scrollbar-color:#4b697c #0c1b27;
+  }
+}
+
+/* ---------- Druck bleibt hell ---------- */
+@media print{
+  html[data-theme="dark"],
+  html[data-theme="dark"] body,
+  html[data-theme="dark"] .sheetPrintBlock,
+  html[data-theme="dark"] #sheetMultiPrintArea,
+  html[data-theme="dark"] #planPrintArea,
+  html[data-theme="dark"] .printRenderHost{
+    background:#fff!important;
+    color:#111!important;
     color-scheme:light!important;
   }
 }
