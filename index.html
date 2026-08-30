@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.58</title>
+<title>Kollaudierung – V7.59</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7375,7 +7375,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.58 <span class="v693BuildStamp">Build 7.58</span></h1>
+     <h1>Kollaudierung – V7.59 <span class="v693BuildStamp">Build 7.59</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16325,7 +16325,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.58",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.59",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26106,7 +26106,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.58";
+const KOLLAPP_VERSION="7.59";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -36959,6 +36959,148 @@ tbody tr:hover td{
   window.addEventListener('resize', ()=>setTimeout(stabilizePlanArea, 30));
 })();
 </script>
+
+
+<style>
+/* ============================================================
+   V7.59 – Feinschliff Multi-LV-Karten / Buttons schöner
+   ============================================================ */
+.multiLvBox{
+  border-radius:12px!important;
+  padding:12px!important;
+}
+.multiLvList{
+  gap:10px!important;
+}
+.multiLvItem{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 118px!important;
+  gap:6px 14px!important;
+  align-items:start!important;
+  padding:12px 12px!important;
+  border-radius:12px!important;
+  border:1px solid #c7d8e2!important;
+  background:linear-gradient(180deg,#ffffff 0%, #fbfdff 100%)!important;
+  box-shadow:0 2px 8px rgba(26,60,86,.04)!important;
+}
+.multiLvItem .mliText{
+  grid-column:1!important;
+  order:1!important;
+  margin:0!important;
+  font-size:14px!important;
+  line-height:1.28!important;
+  font-weight:800!important;
+  color:#183246!important;
+  overflow-wrap:anywhere!important;
+}
+.multiLvItem .mliPos{
+  grid-column:1!important;
+  order:2!important;
+  margin:0!important;
+  font-size:12px!important;
+  line-height:1.25!important;
+  color:#4f6c7e!important;
+  font-weight:800!important;
+  letter-spacing:.02em!important;
+}
+.multiLvItem .mliCalc,
+.multiLvItem .mliQty{
+  grid-column:1!important;
+  margin:0!important;
+  font-size:11px!important;
+  line-height:1.35!important;
+  color:#6a7e8d!important;
+}
+.multiLvItem .mliCalc{order:3!important;}
+.multiLvItem .mliQty{order:4!important;}
+.multiLvItem .mliQty b{font-size:12px!important;color:#173246!important;}
+.multiLvItem .toolbar{
+  grid-column:2!important;
+  grid-row:1 / span 4!important;
+  order:10!important;
+  align-self:center!important;
+  justify-self:end!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:8px!important;
+  width:118px!important;
+  min-width:118px!important;
+  margin:0!important;
+}
+.multiLvItem .toolbar .secondary,
+.multiLvItem .toolbar .danger,
+.multiLvItem .toolbar .okBtn,
+.multiLvItem .toolbar button{
+  width:100%!important;
+  min-height:40px!important;
+  padding:9px 10px!important;
+  border-radius:10px!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+}
+.multiLvItem .toolbar .danger{
+  background:#fff7f6!important;
+  border-color:#e8c7c1!important;
+  color:#b54b3c!important;
+}
+.multiLvItem .toolbar .secondary{
+  background:#f7fafc!important;
+  border-color:#cfdbe3!important;
+  color:#1d3445!important;
+}
+.multiLvItem.v753EditingLv{
+  border-color:#66a9cf!important;
+  background:linear-gradient(180deg,#f5fbff 0%, #eef7fc 100%)!important;
+  box-shadow:inset 4px 0 0 #2e8fbe, 0 4px 12px rgba(46,143,190,.10)!important;
+}
+.v753EditingTag{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  width:100%!important;
+  min-height:28px!important;
+  padding:6px 8px!important;
+  border-radius:999px!important;
+  background:#dfeffc!important;
+  color:#10618a!important;
+  font-size:11px!important;
+  line-height:1.1!important;
+  font-weight:800!important;
+  box-sizing:border-box!important;
+}
+#multiLvList + .toolbar,
+.multiLvBox > .toolbar:last-child{
+  margin-top:10px!important;
+  padding-top:6px!important;
+}
+@media (max-width:900px){
+  .multiLvItem{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:7px!important;
+  }
+  .multiLvItem .toolbar{
+    grid-column:1!important;
+    grid-row:auto!important;
+    width:100%!important;
+    min-width:0!important;
+    justify-self:stretch!important;
+    align-self:start!important;
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+  }
+  .multiLvItem .toolbar .secondary,
+  .multiLvItem .toolbar .danger,
+  .multiLvItem .toolbar .okBtn,
+  .multiLvItem .toolbar button,
+  .multiLvItem .toolbar .v753EditingTag{
+    flex:1 1 140px!important;
+    width:auto!important;
+  }
+}
+</style>
 
 </body>
 </html>
