@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.98</title>
+<title>Kollaudierung – V7.99</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.98 <span class="v693BuildStamp">Build 7.98</span></h1>
+     <h1>Kollaudierung – V7.99 <span class="v693BuildStamp">Build 7.99</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -26150,7 +26150,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.98";
+const KOLLAPP_VERSION="7.99";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -43619,7 +43619,7 @@ html[data-theme="dark"] .v742PrepareBtn.v795PrepareBtn:disabled{
 
 <style id="v798-tablet-save-diagnostic">
 /* ============================================================
-   V7.98 – Tablet-Speichern: direkter Touchstart-Pfad + Diagnose
+   V7.99 – Tablet-Speichern: direkter Touchstart-Pfad + Diagnose
    ============================================================ */
 #finalSaveEntryBtn,
 .v655QuickSaveBtn{
@@ -43668,7 +43668,7 @@ html[data-theme="dark"] #v798TabletSaveDiag.bad{background:#49242a;color:#ffd1d1
 
 <script>
 /* ============================================================
-   V7.98 – Tablet/iPad Save-Fix
+   V7.99 – Tablet/iPad Save-Fix
    Primär wird bereits auf touchstart/pointerdown gespeichert.
    Damit umgehen wir vollständig Probleme mit verschlucktem pointerup/click.
    Zusätzlich zeigt eine kleine Diagnose direkt unter dem Speicherbereich,
@@ -43767,7 +43767,7 @@ html[data-theme="dark"] #v798TabletSaveDiag.bad{background:#49242a;color:#ffd1d1
           running=false;
         },120);
       }catch(err){
-        console.error("V7.98 Tablet speichern",err);
+        console.error("V7.99 Tablet speichern",err);
         setDiag("✕ Speicherfehler: "+String(err?.message||err),"bad");
         running=false;
       }
@@ -43831,6 +43831,98 @@ html[data-theme="dark"] #v798TabletSaveDiag.bad{background:#49242a;color:#ffd1d1
     return r;
   };
   window.showView=showView;
+})();
+</script>
+
+
+
+<style id="v799-active-sheet-save-fix">
+#v799SheetSaveHint{display:none;margin-top:8px;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:700;line-height:1.4}
+#v799SheetSaveHint.show{display:block;background:#fff8e7;border:1px solid #e7cb84;color:#775514}
+#v799SheetSaveHint.ok{display:block;background:#eef9f2;border:1px solid #a8d5ba;color:#175c37}
+html[data-theme="dark"] #v799SheetSaveHint.show{background:#44371c;border-color:#796a3d;color:#ffe5a5}
+html[data-theme="dark"] #v799SheetSaveHint.ok{background:#173829;border-color:#3c7454;color:#bce9cb}
+</style>
+<script>
+/* ============================================================
+   V7.99 – Aktives Aufmaßblatt vor jedem Speichern synchronisieren
+   Problem auf Tablets: sichtbare Select-Auswahl und project.activeSheetId
+   konnten auseinanderlaufen. Der Speichervorgang sah dann kein aktives Blatt.
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function hintBox(){
+    let b=$("v799SheetSaveHint");
+    if(b)return b;
+    b=document.createElement("div");
+    b.id="v799SheetSaveHint";
+    const host=document.querySelector(".v655QuickSave") || $("entryFinalizeCard") || $("entryCard");
+    host?.appendChild(b);
+    return b;
+  }
+  function hint(text,ok=false){
+    const b=hintBox(); if(!b)return;
+    b.className=ok?"ok":"show";
+    b.textContent=text;
+  }
+
+  function syncActiveSheetForSave(){
+    let p=null;
+    try{p=project?.()}catch(_){ }
+    if(!p)return null;
+    if(!Array.isArray(p.sheets))p.sheets=[];
+
+    /* 1. Bereits gültiges internes Blatt behalten. */
+    let sh=p.sheets.find(s=>s.id===p.activeSheetId)||null;
+    if(sh)return sh;
+
+    /* 2. Sichtbare Auswahl aus beiden Blatt-Selektoren übernehmen. */
+    const candidates=[$("sheetSelect")?.value,$("sheetViewSelect")?.value].filter(Boolean);
+    for(const id of candidates){
+      const found=p.sheets.find(s=>String(s.id)===String(id));
+      if(found){
+        p.activeSheetId=found.id;
+        try{persist?.()}catch(_){ }
+        try{renderSheetSelect?.()}catch(_){ }
+        return found;
+      }
+    }
+
+    /* 3. Gibt es Blätter, aber keines ist aktiv, erstes Blatt automatisch aktivieren. */
+    if(p.sheets.length){
+      p.activeSheetId=p.sheets[0].id;
+      try{persist?.()}catch(_){ }
+      try{renderSheetSelect?.()}catch(_){ }
+      return p.sheets[0];
+    }
+    return null;
+  }
+
+  window.v799SyncActiveSheetForSave=syncActiveSheetForSave;
+
+  /* Finale Speicherfunktion absichern – gilt für Tablet UND Desktop. */
+  const baseFinalizeV799=finalizeCurrentEntry;
+  finalizeCurrentEntry=function(){
+    const sh=syncActiveSheetForSave();
+    if(!sh){
+      hint("⚠ Speichern ist erreichbar, aber in diesem Projekt existiert noch kein Aufmaßblatt. Bitte oben zuerst ein Aufmaßblatt anlegen.");
+      try{v646SetFinalizeMessage?.("Bitte zuerst ein Aufmaßblatt anlegen.",true)}catch(_){ }
+      return false;
+    }
+    hint(`✓ Aktives Aufmaßblatt: ${sh.code||sh.id}` ,true);
+    return baseFinalizeV799.apply(this,arguments);
+  };
+  window.finalizeCurrentEntry=finalizeCurrentEntry;
+
+  /* Tablet-Diagnose soll nicht mehr fälschlich nur „kein Datensatz“ melden,
+     wenn das Blattproblem die eigentliche Ursache war. */
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      const sh=syncActiveSheetForSave();
+      if(sh)hint(`✓ Aufmaßblatt bereit: ${sh.code||sh.id}`,true);
+    },500);
+  });
 })();
 </script>
 
