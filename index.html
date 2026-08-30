@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.41</title>
+<title>Kollaudierung – V7.42</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.41 <span class="v693BuildStamp">Build 7.41</span></h1>
+     <h1>Kollaudierung – V7.42 <span class="v693BuildStamp">Build 7.42</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -7465,10 +7465,8 @@ main > section.view,
 
   <div class="grid2 v666EntryGrid">
    <div class="card v666Section v666LvSection">
-    <h2>1. Aufmaßzeile</h2>
-    <label>Positionsbeschreibung / Anmerkung der Aufmaßzeile</label>
-    <textarea id="lineDesc" class="v688DescField" rows="3" placeholder="Beschreibung der Leistung"></textarea>
-    <div class="small" style="margin-top:6px">Jede gespeicherte Eintragung erhält automatisch eine eindeutige fortlaufende ID. Diese ID verbindet Aufmaß, Planmarkierung und Abrechnung.</div>
+    <h2>1. LV-Unterposition vorbereiten</h2>
+    <div class="v742Intro">Zuerst die benötigten LV-Unterpositionen auswählen und für diese Erfassungs-ID vormerken. Mengen und weitere Daten können danach ergänzt werden.</div>
 
     <label>LV-Unterposition suchen</label>
     <input id="posSearch" placeholder="Positionsnummer oder Text" oninput="filterPositions()">
@@ -7484,11 +7482,31 @@ main > section.view,
     </div>
 
     <div id="posInfo" class="info"><span class="small">LV-Unterposition auswählen.</span></div>
+
+    <div class="multiLvBox v742MultiLvBox" id="multiLvBox">
+     <div class="v742PrepareHead">
+      <div>
+       <b>LV-Unterpositionen dieser Erfassung</b>
+       <div class="small">Ohne Rechenansatz wird die Position mit Menge 0 als Vorlage vorbereitet und kann später fertig ausgefüllt werden.</div>
+      </div>
+      <button type="button" class="primary v742PrepareBtn" onclick="addCurrentLvToBatch()">＋ LV-Unterposition vorbereiten</button>
+     </div>
+     <div id="multiLvList" class="multiLvList">
+      <div class="small">Noch keine LV-Unterposition vorgemerkt.</div>
+     </div>
+    </div>
+
+    <div class="v742DescBlock">
+     <div class="v692SectionTitle"><span>2</span><div><b>Positionsbeschreibung</b><small>Gemeinsame Beschreibung der Erfassungs-ID</small></div></div>
+     <label>Positionsbeschreibung / Anmerkung der Aufmaßzeile</label>
+     <textarea id="lineDesc" class="v688DescField" rows="3" placeholder="Beschreibung der Leistung"></textarea>
+     <div class="small" style="margin-top:6px">Die Erfassungs-ID verbindet alle vorbereiteten LV-Unterpositionen, Planmarkierungen und Nachweise dieser Aufmaßzeile.</div>
+    </div>
    </div>
 
    <div class="card v666Section v666MeasureSection" id="entryCard">
     <h2>2. Menge / Rechenansatz</h2>
-    <div class="v692SectionTitle v705AmountTitle"><span>1</span><div><b>Menge erfassen</b><small>Rechenansatz oder Vorlage</small></div></div>
+    <div class="v692SectionTitle v705AmountTitle"><span>3</span><div><b>Menge erfassen</b><small>Rechenansatz oder Vorlage</small></div></div>
     <label>Rechenansatz</label>
     <input id="calc" placeholder="z. B. 2,50 + 1,20 oder 0 für Vorlage" oninput="previewCalc()">
     <div class="v682TemplateHint">
@@ -7499,21 +7517,7 @@ main > section.view,
      <div class="calcResult" id="calcResult">–</div>
      <div class="small" id="calcHint">+, −, ×, ÷ und Klammern sind möglich.</div>
     </div>
-    <div class="v692SectionTitle v705LvTitle"><span>2</span><div><b>LV-Unterpositionen</b><small>Positionen derselben Erfassungs-ID</small></div></div>
-    <div class="multiLvBox" id="multiLvBox">
-     <div class="toolbar" style="justify-content:space-between;align-items:center">
-      <div>
-       <b>LV-Unterpositionen dieser Erfassung</b>
-       <div class="small">Eine Erfassung kann mehrere LV-Unterpositionen enthalten. Alle gehören zur selben Erfassungs-ID.</div>
-      </div>
-      <button type="button" class="secondary" onclick="addCurrentLvToBatch()">+ LV-Unterposition hinzufügen</button>
-     </div>
-     <div id="multiLvList" class="multiLvList">
-      <div class="small">Noch keine zusätzlichen LV-Unterpositionen vorgemerkt.</div>
-     </div>
-    </div>
-
-    <div class="v692SectionTitle"><span>3</span><div><b>Status & Zuordnung</b><small>Ausführungsstatus und Detailbereich</small></div></div>
+    <div class="v692SectionTitle"><span>4</span><div><b>Status & Zuordnung</b><small>Ausführungsstatus und Detailbereich</small></div></div>
     <div class="grid2 v692StatusGrid">
      <div>
       <label>Status / Grund</label>
@@ -16314,7 +16318,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.41",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.42",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26095,7 +26099,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.41";
+const KOLLAPP_VERSION="7.42";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -34876,6 +34880,214 @@ tbody tr:hover td{
       renderSheetSelect?.();
       if(activeSheet())renderSheet?.();
     },350);
+  });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.42 – LV-Unterposition zuerst vorbereiten
+   ============================================================ */
+.v742Intro{
+  margin:0 0 12px;
+  padding:9px 11px;
+  border:1px solid #d5e4ec;
+  border-radius:9px;
+  background:#f4f9fc;
+  color:#526e7d;
+  font-size:11px;
+  line-height:1.4;
+}
+
+.v742MultiLvBox{
+  margin-top:10px!important;
+  border:1px solid #b9d4e3!important;
+  background:#f8fcfe!important;
+  box-shadow:0 2px 8px rgba(31,83,111,.055);
+}
+
+.v742PrepareHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:9px;
+}
+
+.v742PrepareBtn{
+  flex:0 0 auto;
+  min-height:42px!important;
+  padding:9px 14px!important;
+  box-shadow:0 3px 10px rgba(23,106,157,.16)!important;
+}
+
+.v742DescBlock{
+  margin-top:16px;
+  padding-top:13px;
+  border-top:1px solid #dfe8ed;
+}
+
+.v742PreparedBadge{
+  display:inline-flex;
+  align-items:center;
+  padding:2px 6px;
+  border-radius:999px;
+  background:#fff1d9;
+  color:#8b5d13;
+  font-size:10px;
+  font-weight:800;
+}
+
+@media(max-width:1100px){
+  .v742PrepareHead{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .v742PrepareBtn{
+    width:100%;
+    min-height:46px!important;
+    font-size:12.5px!important;
+  }
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.42 – addCurrentLvToBatch:
+   expliziter Klick darf eine LV-Unterposition auch OHNE Menge
+   vorbereiten. Dann wird sie mit calc=0 / qty=0 vorgemerkt.
+   ============================================================ */
+(function(){
+  function v742Candidate(){
+    const p=getPos(document.getElementById("posSelect")?.value||"");
+    if(!p){
+      return{valid:false,message:"Bitte zuerst eine LV-Unterposition auswählen."};
+    }
+
+    const calcEl=document.getElementById("calc");
+    const raw=calcEl?.value.trim()||"";
+
+    /* Noch keine Menge eingetragen = bewusst vorbereiten. */
+    if(!raw){
+      return{
+        valid:true,
+        prepared:true,
+        pos:p.pos,
+        text:p.text||"",
+        unit:p.unit||"",
+        calc:"0",
+        qty:0
+      };
+    }
+
+    const qty=previewCalc?.();
+    if(qty===null || !Number.isFinite(Number(qty))){
+      return{valid:false,message:"Bitte einen gültigen Rechenansatz eingeben."};
+    }
+
+    return{
+      valid:true,
+      prepared:Number(qty)===0,
+      pos:p.pos,
+      text:p.text||"",
+      unit:p.unit||"",
+      calc:raw||"0",
+      qty:Number(qty)
+    };
+  }
+
+  /*
+    Finaler Override, damit die bisherige Removed-LV-Logik erhalten bleibt,
+    aber qty 0 / leere Menge ausdrücklich zugelassen wird.
+  */
+  addCurrentLvToBatch=function(){
+    const c=v742Candidate();
+    if(!c.valid){msg(c.message,true);return}
+
+    try{
+      if(typeof v665RemovedLvPositions!=="undefined"){
+        v665RemovedLvPositions.delete(String(c.pos||""));
+      }
+    }catch(e){}
+
+    const same=(multiLvDraft||[]).findIndex(x=>String(x.pos)===String(c.pos));
+
+    if(same>=0){
+      const prev=multiLvDraft[same];
+
+      /* Bereits vollständig ausgefüllte Position nicht versehentlich
+         wieder auf 0 zurücksetzen, nur weil oben erneut vorbereitet wird. */
+      if(c.prepared && Number(prev.qty)!==0){
+        msg(`LV-Unterposition ${c.pos} ist bereits mit Menge ${num(prev.qty)} ${esc(prev.unit||"")} enthalten.`);
+        return;
+      }
+
+      multiLvDraft[same]={...prev,...c};
+    }else{
+      multiLvDraft.push(c);
+    }
+
+    renderMultiLvDraft?.();
+
+    msg(
+      c.prepared
+        ? `LV-Unterposition ${c.pos} als Vorlage vorbereitet.`
+        : `LV-Unterposition ${c.pos} übernommen.`
+    );
+
+    /* Nach Vorbereitung Auswahl freigeben, damit schnell weitere
+       LV-Unterpositionen vorgemerkt werden können. */
+    if(document.getElementById("calc"))document.getElementById("calc").value="";
+    if(document.getElementById("posSearch"))document.getElementById("posSearch").value="";
+    if(document.getElementById("posSelect"))document.getElementById("posSelect").value="";
+    filterPositions?.();
+    previewCalc?.();
+  };
+
+  /* Vorbereitete 0-Positionen in der Liste klar kennzeichnen. */
+  const baseRenderMulti=renderMultiLvDraft;
+  renderMultiLvDraft=function(){
+    const r=baseRenderMulti.apply(this,arguments);
+
+    const box=document.getElementById("multiLvList");
+    if(!box)return r;
+
+    const items=[...box.querySelectorAll(".multiLvItem")];
+    items.forEach((el,i)=>{
+      const item=multiLvDraft?.[i];
+      if(!item || Number(item.qty)!==0)return;
+
+      const qty=el.querySelector(".mliQty");
+      if(qty){
+        qty.innerHTML=`<span class="v742PreparedBadge">Vorbereitet · 0 ${esc(item.unit||"")}</span>`;
+      }
+    });
+    return r;
+  };
+
+  /* Die obere Aktion soll beim gewählten LV direkt sichtbar sein. */
+  const baseShowPosInfo=showPosInfo;
+  showPosInfo=function(){
+    const r=baseShowPosInfo.apply(this,arguments);
+
+    const btn=document.querySelector(".v742PrepareBtn");
+    const pos=document.getElementById("posSelect")?.value||"";
+    if(btn){
+      btn.disabled=!pos;
+      btn.textContent=pos
+        ? `＋ ${pos} vorbereiten`
+        : "＋ LV-Unterposition vorbereiten";
+    }
+    return r;
+  };
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      const btn=document.querySelector(".v742PrepareBtn");
+      if(btn)btn.disabled=!(document.getElementById("posSelect")?.value||"");
+      renderMultiLvDraft?.();
+    },400);
   });
 })();
 </script>
