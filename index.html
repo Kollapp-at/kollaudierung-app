@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.13</title>
+<title>Kollaudierung – V7.14</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.13 <span class="v693BuildStamp">Build 7.13</span></h1>
+     <h1>Kollaudierung – V7.14 <span class="v693BuildStamp">Build 7.13</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.13",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.14",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.13";
+const KOLLAPP_VERSION="7.14";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -27216,7 +27216,7 @@ window.addEventListener("load",()=>{
 
 <style>
 /* ============================================================
-   V7.13 – PLANWERKZEUGE WIEDER SCHLANK UND DESKTOP-TAUGLICH
+   V7.14 – PLANWERKZEUGE WIEDER SCHLANK UND DESKTOP-TAUGLICH
    ============================================================ */
 
 /* V7.12-Gruppenkacheln optisch vollständig zurücknehmen */
@@ -27432,7 +27432,7 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V7.13 – V7.12-GRUPPEN IN EINE SAUBERE ZWEIZEILIGE LEISTE
+   V7.14 – V7.12-GRUPPEN IN EINE SAUBERE ZWEIZEILIGE LEISTE
    ============================================================ */
 (function(){
   function v713FlattenToolbar(){
@@ -27461,6 +27461,348 @@ window.addEventListener("load",()=>{
   }
 
   window.addEventListener('load',()=>setTimeout(v713FlattenToolbar,120));
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.14 – Planleiste feiner, Polylinien-Tool, sauberere Platzierung
+   ============================================================ */
+
+/* Toolbar etwas ruhiger */
+.planTools{
+  gap:10px!important;
+}
+.planTools .v713SecondRow{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  width:100%!important;
+}
+
+/* Rechte Aktionsgruppe sauber platzieren */
+#v714PlanActions{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  margin-left:auto!important;
+  flex:0 0 auto!important;
+}
+#v714PlanActions #toggleOtherAmblBtn,
+#v714PlanActions #deleteUnsavedPlanBtn{
+  position:static!important;
+  margin:0!important;
+  min-height:38px!important;
+}
+
+/* Polylinie-Button optisch konsistent */
+#tool-polyline{
+  background:#f4f7f9!important;
+  border:1px solid #d4dfe6!important;
+  color:#203a4b!important;
+}
+#tool-polyline.active{
+  background:#2f7fae!important;
+  border-color:#2f7fae!important;
+  color:#fff!important;
+}
+
+/* Hilfetexte kompakter */
+#planLineHelp,
+#planPolylineHelp,
+#planFreehandHelp{
+  margin:0 0 6px!important;
+  padding:7px 9px!important;
+  border-radius:8px!important;
+  font-size:11px!important;
+  line-height:1.35!important;
+}
+
+/* Finish/Cancel bei Polyline optisch passend */
+#finishLineBtn,
+#cancelLineBtn{
+  min-height:38px!important;
+  white-space:nowrap!important;
+}
+
+/* Tablet: rechte Gruppe im Scrollbereich sauber mitnehmen */
+@media(max-width:1100px){
+  #v714PlanActions{
+    margin-left:0!important;
+    flex:0 0 auto!important;
+  }
+}
+</style>
+
+
+<script>
+/* ============================================================
+   V7.14 – Linie (2 Punkte) + Polylinie + Toolbar-Fixes
+   ============================================================ */
+(function(){
+  function byId(id){ return document.getElementById(id); }
+
+  function ensurePolylineButton(){
+    if(byId('tool-polyline')) return byId('tool-polyline');
+    const lineBtn = byId('tool-line');
+    if(!lineBtn) return null;
+    const btn = document.createElement('button');
+    btn.id = 'tool-polyline';
+    btn.type = 'button';
+    btn.className = 'secondary toolBtn';
+    btn.textContent = '⌁ Polylinie';
+    btn.onclick = function(){ setPlanTool('polyline'); };
+    lineBtn.insertAdjacentElement('afterend', btn);
+    return btn;
+  }
+
+  function ensurePolylineHelp(){
+    let help = byId('planPolylineHelp');
+    if(help) return help;
+    const lineHelp = byId('planLineHelp');
+    if(!lineHelp || !lineHelp.parentNode) return null;
+    help = document.createElement('div');
+    help.id = 'planPolylineHelp';
+    help.className = 'planLineHelp';
+    help.textContent = 'Polylinie: mehrere Punkte mit Klick oder Tipp setzen. Mit Doppelklick oder „Polylinie abschließen“ speichern.';
+    lineHelp.insertAdjacentElement('afterend', help);
+    return help;
+  }
+
+  function placeRightActions(){
+    const secondRow = document.querySelector('.planTools .v713SecondRow') || document.querySelector('.planTools');
+    const other = byId('toggleOtherAmblBtn');
+    const unsaved = byId('deleteUnsavedPlanBtn');
+    if(!secondRow || !other || !unsaved) return;
+
+    let wrap = byId('v714PlanActions');
+    if(!wrap){
+      wrap = document.createElement('div');
+      wrap.id = 'v714PlanActions';
+      wrap.className = 'v714PlanActions';
+    }
+
+    wrap.appendChild(other);
+    wrap.appendChild(unsaved);
+    secondRow.appendChild(wrap);
+  }
+
+  function updatePolylineUi(){
+    const finish = byId('finishLineBtn');
+    const cancel = byId('cancelLineBtn');
+    const lineHelp = byId('planLineHelp');
+    const polyHelp = byId('planPolylineHelp');
+
+    if(lineHelp){
+      lineHelp.textContent = 'Linie: Startpunkt und Endpunkt nacheinander setzen. Nach dem zweiten Klick oder Tipp wird die Linie gespeichert.';
+      lineHelp.classList.toggle('show', planTool === 'line');
+    }
+    if(polyHelp){
+      polyHelp.classList.toggle('show', planTool === 'polyline');
+    }
+    if(finish) finish.textContent = 'Polylinie abschließen';
+    if(cancel) cancel.textContent = 'Zeichnung verwerfen';
+  }
+
+  function createLineAnnotationFromPoints(points, mode){
+    if(!points || points.length < 2) return false;
+    const pl = typeof activePlan === 'function' ? activePlan() : null;
+    const link = typeof currentPlanLink === 'function' ? currentPlanLink() : null;
+    const style = typeof currentPlanStyle === 'function' ? currentPlanStyle() : {color:"#b83232", width:7};
+    if(!pl || !link) return false;
+    if(!link.pos){
+      alert("Bitte zuerst eine LV-Unterposition erfassen.");
+      return false;
+    }
+
+    const ann = {
+      id: uid("ann"),
+      type: "line",
+      mode: mode || (points.length > 2 ? "polyline" : "line"),
+      label: nextAnnLabel("line"),
+      entryId: link.entryId,
+      pos: link.pos,
+      note: link.note,
+      text: "",
+      points: points.slice(),
+      color: style.color,
+      width: style.width,
+      createdAt: new Date().toISOString()
+    };
+
+    pl.annotations.push(ann);
+    if(typeof v633BindAnnotationToSelectedLv === 'function'){
+      try{ v633BindAnnotationToSelectedLv(ann); }catch(e){}
+    }
+    selectedAnnotationId = ann.id;
+    if(typeof persist === 'function') persist();
+    if(typeof populatePlanFilter === 'function') populatePlanFilter();
+    if(typeof renderPlanList === 'function') renderPlanList();
+    if(typeof renderPlanAnnotations === 'function') renderPlanAnnotations();
+    if(typeof renderSelectedAnnotation === 'function') renderSelectedAnnotation();
+    try{ renderDraftEntrySummary(); renderAutoPlanLinkSummary(); }catch(e){}
+    return true;
+  }
+
+  /* Hover-Vorschau auch für Polylinie */
+  function setupV714HoverEvents(){
+    const svg = byId('planOverlay');
+    if(!svg || svg.dataset.v714Hover === '1') return;
+    svg.dataset.v714Hover = '1';
+
+    svg.addEventListener('pointermove', function(ev){
+      if((planTool === 'line' || planTool === 'polyline') && planLineDraft.length){
+        planLineHoverNorm = planCoords(ev);
+        renderPlanAnnotations();
+      }
+    }, {passive:true});
+
+    svg.addEventListener('pointerleave', function(){
+      if((planTool === 'line' || planTool === 'polyline') && planLineHoverNorm){
+        planLineHoverNorm = null;
+        renderPlanAnnotations();
+      }
+    }, {passive:true});
+  }
+
+  /* Buttonlogik für Linie/Polylinie */
+  toggleLineButtons = function(){
+    const finish = byId("finishLineBtn");
+    const cancel = byId("cancelLineBtn");
+    const has = Array.isArray(planLineDraft) && planLineDraft.length > 0;
+
+    if(finish){
+      finish.style.display = (planTool === "polyline" && has) ? "inline-block" : "none";
+    }
+    if(cancel){
+      cancel.style.display = ((planTool === "line" || planTool === "polyline") && has) ? "inline-block" : "inline-block";
+      if(!has) cancel.style.display = "none";
+    }
+    updatePolylineUi();
+  };
+
+  const _v714BaseCancel = cancelPlanLine;
+  cancelPlanLine = function(render=true){
+    planLineDraft = [];
+    planLineHoverNorm = null;
+    _v714BaseCancel(render);
+    updatePolylineUi();
+  };
+
+  /* Neues Werkzeugverhalten */
+  setPlanTool = function(tool){
+    planTool = tool;
+    ["pan","select","point","line","polyline","rect","circle","freehand","text"].forEach(function(t){
+      const el = byId("tool-"+t);
+      if(el) el.classList.toggle("active", t === tool);
+    });
+
+    if(byId("planTextWrap")) byId("planTextWrap").style.display = tool === "text" ? "block" : "none";
+    if(byId("freehandOptions")) byId("freehandOptions").style.display = tool === "freehand" ? "block" : "none";
+
+    const ov = byId("planOverlay");
+    if(ov){
+      ov.classList.toggle("freehandCursor", tool === "freehand");
+      ov.classList.toggle("panCursor", tool === "pan");
+    }
+
+    if(tool !== "line" && tool !== "polyline"){
+      planLineHoverNorm = null;
+      cancelPlanLine(false);
+    }
+    if(tool !== "freehand"){
+      freehandDraftPoints = [];
+      freehandPointerId = null;
+    }
+    if(tool !== "rect" && tool !== "circle"){
+      planShapeDraft = null;
+    }
+
+    updatePolylineUi();
+    if(typeof renderPlanAnnotations === 'function') renderPlanAnnotations();
+  };
+
+  /* Polylinie explizit abschließen */
+  finishPlanLine = function(){
+    if(!planLineDraft || planLineDraft.length < 2){
+      if(planLineDraft && planLineDraft.length){
+        alert("Für eine Polylinie mindestens zwei Punkte setzen.");
+      }
+      return;
+    }
+    const ok = createLineAnnotationFromPoints(planLineDraft, planTool === "polyline" ? "polyline" : "line");
+    if(ok){
+      planLineDraft = [];
+      planLineHoverNorm = null;
+      toggleLineButtons();
+      renderPlanAnnotations();
+    }
+  };
+
+  /* Klickverhalten korrigieren:
+     Linie = 2 Punkte, Polylinie = mehrere Punkte */
+  const _v714BaseCanvasClick = planCanvasClick;
+  planCanvasClick = function(ev){
+    const overlay = byId("planOverlay");
+    if(!activePlan() || ev.target !== overlay) return;
+
+    if(planTool === "line"){
+      const pt = planCoords(ev);
+      if(!Array.isArray(planLineDraft) || planLineDraft.length === 0){
+        planLineDraft = [pt];
+        planLineHoverNorm = pt;
+        toggleLineButtons();
+        renderPlanAnnotations();
+      }else{
+        const start = planLineDraft[0];
+        const ok = createLineAnnotationFromPoints([start, pt], "line");
+        if(ok){
+          planLineDraft = [];
+          planLineHoverNorm = null;
+          toggleLineButtons();
+          renderPlanAnnotations();
+        }
+      }
+      return;
+    }
+
+    if(planTool === "polyline"){
+      const pt = planCoords(ev);
+      if(!Array.isArray(planLineDraft)) planLineDraft = [];
+      planLineDraft.push(pt);
+      toggleLineButtons();
+      renderPlanAnnotations();
+      return;
+    }
+
+    _v714BaseCanvasClick(ev);
+  };
+
+  planCanvasDoubleClick = function(ev){
+    if(planTool === "polyline"){
+      ev.preventDefault();
+      finishPlanLine();
+    }
+  };
+
+  /* Toolleiste beim Start nachjustieren */
+  function initV714(){
+    ensurePolylineButton();
+    ensurePolylineHelp();
+    placeRightActions();
+    setupV714HoverEvents();
+    updatePolylineUi();
+    toggleLineButtons();
+  }
+
+  window.addEventListener('load', function(){ setTimeout(initV714, 140); });
+
+  const _v714OpenPlan = openPlan;
+  openPlan = async function(id){
+    await _v714OpenPlan(id);
+    initV714();
+  };
 })();
 </script>
 
