@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.93</title>
+<title>Kollaudierung – V7.94</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.93 <span class="v693BuildStamp">Build 7.93</span></h1>
+     <h1>Kollaudierung – V7.94 <span class="v693BuildStamp">Build 7.94</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16369,7 +16369,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.93",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.94",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26150,7 +26150,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.93";
+const KOLLAPP_VERSION="7.94";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -43267,6 +43267,186 @@ html[data-theme="dark"] .tabs.noPrint #v787TopBtn{
     return baseRenderAllV793.apply(this,arguments);
   };
   window.renderAll=renderAll;
+})();
+</script>
+
+
+<style id="v794-tablet-save-fix">
+/* ============================================================
+   V7.94 – Touch-Speichern + deutlicher Beschreibungshinweis
+   ============================================================ */
+#finalSaveEntryBtn,
+.v655QuickSaveBtn{
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:rgba(85,165,213,.18);
+  position:relative;
+  z-index:2;
+}
+
+#lineDesc.v794MissingDesc{
+  border:2px solid #d65a5a!important;
+  box-shadow:0 0 0 3px rgba(214,90,90,.14)!important;
+}
+
+#v794DescWarning{
+  display:none;
+  margin:7px 0 0;
+  padding:9px 11px;
+  border-radius:8px;
+  border:1px solid #df9a9a;
+  background:#fff0f0;
+  color:#922d2d;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.35;
+}
+#v794DescWarning.show{display:block}
+
+html[data-theme="dark"] #v794DescWarning{
+  background:#49242a!important;
+  color:#ffd1d1!important;
+  border-color:#92515a!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.94 – Tablet/Touch: Erfassung zuverlässig speichern
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+  let v794LastTouchSave=0;
+  let v794SaveRunning=false;
+
+  function ensureWarningBox(){
+    let box=$("v794DescWarning");
+    if(box)return box;
+
+    const desc=$("lineDesc");
+    if(!desc)return null;
+
+    box=document.createElement("div");
+    box.id="v794DescWarning";
+    box.setAttribute("role","alert");
+    box.textContent="⚠ Bitte zuerst eine Positionsbeschreibung eingeben. Ohne Beschreibung kann die Erfassung nicht gespeichert werden.";
+    desc.insertAdjacentElement("afterend",box);
+    return box;
+  }
+
+  function clearDescWarning(){
+    const desc=$("lineDesc");
+    desc?.classList.remove("v794MissingDesc");
+    ensureWarningBox()?.classList.remove("show");
+  }
+
+  function showDescWarning(){
+    const desc=$("lineDesc");
+    if(!desc)return;
+
+    const box=ensureWarningBox();
+    desc.classList.add("v794MissingDesc");
+    box?.classList.add("show");
+
+    try{
+      v646SetFinalizeMessage?.("Bitte zuerst eine Positionsbeschreibung eingeben.",true);
+    }catch(_){
+      try{msg?.("Bitte zuerst eine Positionsbeschreibung eingeben.",true)}catch(__){}
+    }
+
+    requestAnimationFrame(()=>{
+      try{
+        desc.scrollIntoView({behavior:"smooth",block:"center"});
+      }catch(_){}
+      setTimeout(()=>{
+        try{desc.focus({preventScroll:true})}catch(_){try{desc.focus()}catch(__){}}
+      },250);
+    });
+  }
+
+  function descriptionPresent(){
+    return !!($("lineDesc")?.value||"").trim();
+  }
+
+  /* Finale Speicherfunktion um eine für alle Pfade sichtbare Prüfung ergänzen. */
+  const baseFinalizeV794=finalizeCurrentEntry;
+  finalizeCurrentEntry=function(){
+    if(!descriptionPresent()){
+      showDescWarning();
+      return false;
+    }
+    clearDescWarning();
+    return baseFinalizeV794.apply(this,arguments);
+  };
+  window.finalizeCurrentEntry=finalizeCurrentEntry;
+
+  function runSave(ev){
+    const now=Date.now();
+
+    /* touch/pencil erzeugt danach oft noch click -> nur einmal speichern */
+    if(ev?.type==="click" && now-v794LastTouchSave<900){
+      ev.preventDefault?.();
+      ev.stopPropagation?.();
+      return false;
+    }
+
+    if(ev?.type==="pointerup" && ev.pointerType && ev.pointerType!=="mouse"){
+      v794LastTouchSave=now;
+      ev.preventDefault?.();
+      ev.stopPropagation?.();
+    }
+
+    if(v794SaveRunning)return false;
+    v794SaveRunning=true;
+
+    try{
+      finalizeCurrentEntry();
+    }finally{
+      /* bestehende Speicherfunktion ist synchron; kurze Sperre verhindert Doppeltap */
+      setTimeout(()=>{v794SaveRunning=false},350);
+    }
+    return false;
+  }
+
+  function bindSaveButton(btn){
+    if(!btn || btn.dataset.v794Bound==="1")return;
+    btn.dataset.v794Bound="1";
+
+    /* Alte Inline-Funktion durch einen gemeinsamen robusten Handler ersetzen. */
+    btn.onclick=runSave;
+    btn.addEventListener("pointerup",runSave,{passive:false});
+  }
+
+  function bind(){
+    bindSaveButton($("finalSaveEntryBtn"));
+    document.querySelectorAll(".v655QuickSaveBtn").forEach(bindSaveButton);
+
+    const desc=$("lineDesc");
+    if(desc && desc.dataset.v794DescBound!=="1"){
+      desc.dataset.v794DescBound="1";
+      desc.addEventListener("input",()=>{
+        if(descriptionPresent())clearDescWarning();
+      },{passive:true});
+      desc.addEventListener("change",()=>{
+        if(descriptionPresent())clearDescWarning();
+      },{passive:true});
+    }
+
+    ensureWarningBox();
+  }
+
+  window.addEventListener("load",()=>{
+    setTimeout(bind,150);
+    setTimeout(bind,700);
+  });
+
+  /* Falls Teile des Erfassungsbereichs neu gerendert werden. */
+  const baseShowViewV794=showView;
+  showView=function(name){
+    const r=baseShowViewV794.apply(this,arguments);
+    if(name==="entry")setTimeout(bind,0);
+    return r;
+  };
+  window.showView=showView;
 })();
 </script>
 
