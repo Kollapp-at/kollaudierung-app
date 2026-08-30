@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.60</title>
+<title>Kollaudierung – V7.61</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.60 <span class="v693BuildStamp">Build 7.60</span></h1>
+     <h1>Kollaudierung – V7.61 <span class="v693BuildStamp">Build 7.61</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.60",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.61",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.60";
+const KOLLAPP_VERSION="7.61";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -37317,6 +37317,519 @@ html[data-theme="dark"] .printRenderHost{
  window.addEventListener("load",updateButton);
 })();
 </script>
+
+
+<style id="v761-full-dark-theme">
+/* ============================================================
+   V7.61 – DURCHGÄNGIGER DARK MODE
+   Nur Darstellung. Druck/PDF bleiben hell.
+   ============================================================ */
+
+html[data-theme="dark"]{
+  color-scheme:dark;
+
+  --bg:#0b141e;
+  --card:#13202c;
+  --text:#edf4f8;
+  --muted:#9eb0bd;
+  --line:#2b3c4b;
+  --lineStrong:#3b5162;
+
+  --head:#102330;
+  --head2:#183647;
+
+  --accent:#3c94c8;
+  --accentHover:#52a8d7;
+  --accentSoft:#173448;
+  --accentSoft2:#102a3a;
+
+  --ok:#67c68d;
+  --warn:#e0ad58;
+  --bad:#e27c7c;
+
+  --shadow:0 8px 28px rgba(0,0,0,.26);
+  --shadowSoft:0 3px 12px rgba(0,0,0,.20);
+}
+
+/* ---------- Grundflächen ---------- */
+html[data-theme="dark"],
+html[data-theme="dark"] body{
+  background:#0b141e!important;
+  color:#edf4f8!important;
+}
+
+html[data-theme="dark"] body{
+  background:
+    radial-gradient(circle at 12% 0%,rgba(55,139,190,.09),transparent 34rem),
+    #0b141e!important;
+}
+
+html[data-theme="dark"] main,
+html[data-theme="dark"] .view{
+  color:#edf4f8!important;
+}
+
+/* ---------- Typografie ---------- */
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] .strong,
+html[data-theme="dark"] .mliText,
+html[data-theme="dark"] .v737Text,
+html[data-theme="dark"] .v674Title{
+  color:#edf4f8!important;
+}
+
+html[data-theme="dark"] .small,
+html[data-theme="dark"] label,
+html[data-theme="dark"] .muted,
+html[data-theme="dark"] .pm,
+html[data-theme="dark"] .planFileNote,
+html[data-theme="dark"] .metaCell b,
+html[data-theme="dark"] .stat .k,
+html[data-theme="dark"] .v737Meta{
+  color:#9eb0bd!important;
+}
+
+/* ---------- Hauptkarten / Sektionen ---------- */
+html[data-theme="dark"] .card,
+html[data-theme="dark"] #view-entry .v666ProjectSection,
+html[data-theme="dark"] #view-entry .v666LvSection,
+html[data-theme="dark"] #view-entry .v666MeasureSection,
+html[data-theme="dark"] #view-entry .v697SupportCard,
+html[data-theme="dark"] #view-entry .v697SupportSection,
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard,
+html[data-theme="dark"] #view-entry .entryIntegratedPlan > .card,
+html[data-theme="dark"] #entryFinalizeCard,
+html[data-theme="dark"] .v667ManagedView .card,
+html[data-theme="dark"] .v674ProjectCard,
+html[data-theme="dark"] .v675SyncCard,
+html[data-theme="dark"] .v682SyncCard,
+html[data-theme="dark"] .v674TableCard{
+  background:#13202c!important;
+  color:#edf4f8!important;
+  border-color:#2b3c4b!important;
+  box-shadow:var(--shadowSoft)!important;
+}
+
+/* Unterteilungen / Kopfbereiche in Cards */
+html[data-theme="dark"] #view-entry .entryIntegratedPlan > .card > .toolbar:first-child,
+html[data-theme="dark"] .modalFoot,
+html[data-theme="dark"] .v669SheetTop,
+html[data-theme="dark"] .mobilePosPickerHead{
+  background:#172634!important;
+  border-color:#2b3c4b!important;
+}
+
+/* ---------- Projekt-/Aufmaß-Metadaten ---------- */
+html[data-theme="dark"] .metaCell,
+html[data-theme="dark"] #view-entry .metaCell{
+  background:linear-gradient(180deg,#172633,#14222e)!important;
+  color:#edf4f8!important;
+  border-color:#2d4050!important;
+}
+
+html[data-theme="dark"] .metaCell b{
+  color:#8fa6b5!important;
+}
+
+/* ---------- Statistik ---------- */
+html[data-theme="dark"] .stat{
+  background:linear-gradient(180deg,#162633,#121f2b)!important;
+  color:#edf4f8!important;
+  border-color:#2c4050!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.18)!important;
+}
+
+html[data-theme="dark"] .stat .v{
+  color:#eaf3f7!important;
+}
+
+/* ---------- Navigation ---------- */
+html[data-theme="dark"] .tabs.noPrint{
+  background:rgba(18,31,43,.96)!important;
+  border-color:#2c4050!important;
+  box-shadow:0 5px 18px rgba(0,0,0,.20)!important;
+}
+
+html[data-theme="dark"] .tab{
+  background:transparent!important;
+  color:#9fb3c0!important;
+  border-color:transparent!important;
+}
+
+html[data-theme="dark"] .tab:hover{
+  background:#1b2d3a!important;
+  color:#dbe8ee!important;
+}
+
+html[data-theme="dark"] .tab.active{
+  background:#213645!important;
+  color:#6bc0ee!important;
+  border-color:#38566a!important;
+  box-shadow:0 3px 10px rgba(0,0,0,.18)!important;
+}
+
+/* ---------- Inputs / Dropdowns ---------- */
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea{
+  background:#0f1b25!important;
+  color:#edf4f8!important;
+  border-color:#3a4e5d!important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.18)!important;
+}
+
+html[data-theme="dark"] input:hover,
+html[data-theme="dark"] select:hover,
+html[data-theme="dark"] textarea:hover{
+  border-color:#526b7c!important;
+}
+
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] select:focus,
+html[data-theme="dark"] textarea:focus{
+  border-color:#4b9ac6!important;
+  box-shadow:0 0 0 3px rgba(60,148,200,.17)!important;
+}
+
+html[data-theme="dark"] input[readonly],
+html[data-theme="dark"] input:disabled,
+html[data-theme="dark"] select:disabled,
+html[data-theme="dark"] textarea:disabled{
+  background:#182631!important;
+  color:#8094a2!important;
+  opacity:1!important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder{
+  color:#6f8493!important;
+}
+
+/* ---------- Info-/Hinweisflächen ---------- */
+html[data-theme="dark"] .info,
+html[data-theme="dark"] .autoPlanLinkBox,
+html[data-theme="dark"] .planSelectedBox,
+html[data-theme="dark"] .v742Intro,
+html[data-theme="dark"] .v739Hint,
+html[data-theme="dark"] #v739PlanUsageHint,
+html[data-theme="dark"] #v757CurrentLvHint,
+html[data-theme="dark"] .sheetSelectPanel,
+html[data-theme="dark"] .entryPlanBox,
+html[data-theme="dark"] .calcPreview,
+html[data-theme="dark"] .dropzone,
+html[data-theme="dark"] .v739Details,
+html[data-theme="dark"] .v675LvResultBar{
+  background:#152532!important;
+  color:#b8c9d3!important;
+  border-color:#304554!important;
+}
+
+html[data-theme="dark"] .calcResult{
+  color:#71bee8!important;
+}
+
+html[data-theme="dark"] .notice,
+html[data-theme="dark"] .planLineHelp,
+html[data-theme="dark"] .unsavedPlanWarning{
+  background:#352c1b!important;
+  color:#e7c783!important;
+  border-color:#69572d!important;
+}
+
+/* ---------- Mehrfach-LV ---------- */
+html[data-theme="dark"] .multiLvBox{
+  background:#111f2a!important;
+  border-color:#2f4555!important;
+}
+
+html[data-theme="dark"] .multiLvItem{
+  background:linear-gradient(180deg,#172734,#14222e)!important;
+  border-color:#304555!important;
+  color:#eaf2f6!important;
+  box-shadow:0 2px 9px rgba(0,0,0,.15)!important;
+}
+
+html[data-theme="dark"] .multiLvItem .mliText,
+html[data-theme="dark"] .multiLvItem .mliQty b{
+  color:#edf4f8!important;
+}
+
+html[data-theme="dark"] .multiLvItem .mliPos{
+  color:#8eb6cc!important;
+}
+
+html[data-theme="dark"] .multiLvItem .mliCalc,
+html[data-theme="dark"] .multiLvItem .mliQty{
+  color:#9eb1bd!important;
+}
+
+html[data-theme="dark"] .multiLvItem.v753EditingLv{
+  background:linear-gradient(180deg,#173246,#132a3b)!important;
+  border-color:#438fba!important;
+  box-shadow:inset 4px 0 0 #3c99c7,0 4px 14px rgba(0,0,0,.18)!important;
+}
+
+html[data-theme="dark"] .v753EditingTag{
+  background:#214c65!important;
+  color:#a8dff7!important;
+}
+
+/* ---------- Positionsergebnisse ---------- */
+html[data-theme="dark"] .mobilePosPicker,
+html[data-theme="dark"] .mobilePosResults,
+html[data-theme="dark"] #posInfo{
+  background:#13212c!important;
+  border-color:#2e4352!important;
+}
+
+html[data-theme="dark"] .mobilePosResults > div,
+html[data-theme="dark"] .mobilePosResults [role="button"]{
+  background:#162633!important;
+  color:#e7f0f4!important;
+  border-color:#304655!important;
+}
+
+html[data-theme="dark"] .mobilePosResults > div:hover,
+html[data-theme="dark"] .mobilePosResults [role="button"]:hover{
+  background:#1c3040!important;
+}
+
+html[data-theme="dark"] .mobilePosResults .selected,
+html[data-theme="dark"] .mobilePosResults [aria-selected="true"]{
+  background:#1d3d50!important;
+  border-color:#438fb8!important;
+}
+
+/* ---------- Buttons ---------- */
+html[data-theme="dark"] .secondary{
+  background:#1b2b37!important;
+  color:#dce8ee!important;
+  border-color:#354a59!important;
+}
+
+html[data-theme="dark"] .secondary:hover{
+  background:#243845!important;
+  border-color:#486171!important;
+}
+
+html[data-theme="dark"] .primary{
+  background:linear-gradient(180deg,#3b91c2,#2f7da9)!important;
+  color:#fff!important;
+  border-color:#489cc9!important;
+}
+
+html[data-theme="dark"] .okBtn{
+  background:#183626!important;
+  color:#9ad9af!important;
+  border-color:#305a40!important;
+}
+
+html[data-theme="dark"] .danger{
+  background:#3a2123!important;
+  color:#f0a0a0!important;
+  border-color:#65363a!important;
+}
+
+/* ---------- Tabellen ---------- */
+html[data-theme="dark"] .tablewrap{
+  background:#121f2a!important;
+  border-color:#2d4050!important;
+  box-shadow:none!important;
+}
+
+html[data-theme="dark"] table{
+  color:#dce7ed!important;
+}
+
+html[data-theme="dark"] th{
+  background:#192936!important;
+  color:#aebfca!important;
+  border-color:#304454!important;
+}
+
+html[data-theme="dark"] td{
+  background:#13212c!important;
+  color:#dce7ed!important;
+  border-color:#263946!important;
+}
+
+html[data-theme="dark"] tbody tr:hover td{
+  background:#1a2c39!important;
+}
+
+html[data-theme="dark"] .lineGroup td{
+  background:#111e28!important;
+}
+
+html[data-theme="dark"] .lineStart td{
+  border-top-color:#3c5262!important;
+}
+
+/* ---------- Planeditor ---------- */
+html[data-theme="dark"] .planTools{
+  background:#111f2a!important;
+  border-color:#304554!important;
+  box-shadow:none!important;
+}
+
+html[data-theme="dark"] .planTools .toolBtn,
+html[data-theme="dark"] .planTools .secondary,
+html[data-theme="dark"] .planTools .touchIconBtn,
+html[data-theme="dark"] .v661ToolStyle,
+html[data-theme="dark"] .v661ToolText,
+html[data-theme="dark"] #planZoomLabel{
+  background:#182936!important;
+  color:#e4eef3!important;
+  border-color:#344a59!important;
+}
+
+html[data-theme="dark"] .planTools .toolBtn.active{
+  background:#347fae!important;
+  border-color:#4d9cc8!important;
+  color:#fff!important;
+}
+
+html[data-theme="dark"] .v661ToolStyle input[type="color"]{
+  background:#0f1b25!important;
+}
+
+html[data-theme="dark"] .planViewport,
+html[data-theme="dark"] #planViewport{
+  background:#222d35!important;
+  border-color:#445560!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)!important;
+}
+
+html[data-theme="dark"] .planStage{
+  background:#fff!important;
+}
+
+html[data-theme="dark"] #v731GeometryBar{
+  background:#172936!important;
+  border-color:#344b5b!important;
+}
+
+html[data-theme="dark"] .planSide{
+  border-color:#2e4352!important;
+}
+
+html[data-theme="dark"] .v737Item{
+  background:#162633!important;
+  border-color:#304655!important;
+}
+
+html[data-theme="dark"] .v737Item.current,
+html[data-theme="dark"] .v737Item.planFocus{
+  background:#1a3548!important;
+  border-color:#438daf!important;
+}
+
+html[data-theme="dark"] #v756JumpTopBtn{
+  background:#173827!important;
+  color:#9edbb3!important;
+  border-color:#315e43!important;
+}
+
+/* ---------- Modal ---------- */
+html[data-theme="dark"] .modal{
+  background:#13212c!important;
+  color:#eaf2f6!important;
+  border-color:#344a59!important;
+}
+
+html[data-theme="dark"] .modalBody{
+  background:#13212c!important;
+}
+
+html[data-theme="dark"] .modalHead{
+  background:linear-gradient(135deg,#102330,#193b4e)!important;
+  border-color:#344a59!important;
+}
+
+html[data-theme="dark"] .modalFoot{
+  background:#101c26!important;
+  border-color:#2e4352!important;
+}
+
+/* ---------- Badges ---------- */
+html[data-theme="dark"] .badge,
+html[data-theme="dark"] .pill{
+  border-color:transparent!important;
+}
+
+html[data-theme="dark"] .badge.ok{
+  background:#193b29!important;
+  color:#8fd3a6!important;
+}
+
+html[data-theme="dark"] .badge.warn{
+  background:#3c301a!important;
+  color:#e3bd6d!important;
+}
+
+html[data-theme="dark"] .badge.bad{
+  background:#3b2022!important;
+  color:#e99393!important;
+}
+
+html[data-theme="dark"] .badge.manual{
+  background:#302747!important;
+  color:#c1b6e7!important;
+}
+
+/* ---------- Sonstige Flächen ---------- */
+html[data-theme="dark"] .hr{
+  background:#2e4352!important;
+}
+
+html[data-theme="dark"] .sheetCheckItem,
+html[data-theme="dark"] .projectPlanCard,
+html[data-theme="dark"] .billingTotalsGrid .bt,
+html[data-theme="dark"] .finalizeSummary .fsCell{
+  background:#162633!important;
+  color:#e6eef2!important;
+  border-color:#304554!important;
+}
+
+/* Scrollbars */
+@media (pointer:fine){
+  html[data-theme="dark"] *{
+    scrollbar-color:#405766 transparent;
+  }
+
+  html[data-theme="dark"] *::-webkit-scrollbar-thumb{
+    background:#405766!important;
+  }
+}
+
+/* ---------- Druck / PDF IMMER hell ---------- */
+@media print{
+  html[data-theme="dark"],
+  html[data-theme="dark"] body{
+    background:#fff!important;
+    color:#111!important;
+    color-scheme:light!important;
+  }
+
+  html[data-theme="dark"] .sheetPrintBlock,
+  html[data-theme="dark"] #sheetMultiPrintArea,
+  html[data-theme="dark"] #planPrintArea,
+  html[data-theme="dark"] .printRenderHost,
+  html[data-theme="dark"] .printMeta,
+  html[data-theme="dark"] .printMeta *{
+    background:#fff!important;
+    color:#111!important;
+  }
+}
+
+html[data-theme="dark"] .sheetPrintBlock,
+html[data-theme="dark"] #sheetMultiPrintArea,
+html[data-theme="dark"] #planPrintArea,
+html[data-theme="dark"] .printRenderHost{
+  color-scheme:light!important;
+}
+</style>
 
 </body>
 </html>
