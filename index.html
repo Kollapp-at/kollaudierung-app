@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.76</title>
+<title>Kollaudierung – V7.78</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.76 <span class="v693BuildStamp">Build 7.76</span></h1>
+     <h1>Kollaudierung – V7.78 <span class="v693BuildStamp">Build 7.78</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.76",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.78",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.76";
+const KOLLAPP_VERSION="7.78";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -40725,6 +40725,414 @@ html[data-theme="dark"] :is(
   }
 }
 </style>
+
+
+<script>
+/* ============================================================
+   V7.77 – TABLET / HANDY PDF = GLEICHER DRUCKSTANDARD WIE DESKTOP
+   iPad/iPhone/Android/Samsung verwenden html2canvas + jsPDF.
+   Dieser temporäre Renderer braucht die finalen Druckregeln separat.
+   ============================================================ */
+(function(){
+  const baseCaptureCssV777=v651CaptureCss;
+
+  function v777MobilePrintCss(){
+    return `
+      /* ----- feste Light-Print-Farben ----- */
+      .v651CaptureRoot,
+      .v651CaptureRoot .v519PrintPage,
+      .v651CaptureRoot .v519PageBody{
+        background:#fff!important;
+        color:#111!important;
+        color-scheme:light!important;
+      }
+
+      .v651CaptureRoot .v519PrintPage *{
+        text-shadow:none!important;
+        box-shadow:none!important;
+      }
+
+      .v651CaptureRoot .v519PrintPage :is(
+        div,span,p,small,label,h1,h2,h3,h4,h5,h6,b,strong,
+        table,thead,tbody,tfoot,tr,th,td
+      ){
+        color:#111!important;
+      }
+
+      .v651CaptureRoot .v519PageSub,
+      .v651CaptureRoot .v519PageFooter,
+      .v651CaptureRoot .small,
+      .v651CaptureRoot .muted,
+      .v651CaptureRoot .pm,
+      .v651CaptureRoot .planFileNote{
+        color:#333!important;
+        opacity:1!important;
+      }
+
+      /* ----- Metaboxen ----- */
+      .v651CaptureRoot .printMeta div{
+        background:#fff!important;
+        color:#111!important;
+        border:.25mm solid #aeb9c1!important;
+      }
+
+      /* ========================================================
+         AUFMASS-TABELLE: eindeutiges Liniensystem wie V7.76
+         ======================================================== */
+      .v651CaptureRoot .v520EntryTable{
+        border-collapse:separate!important;
+        border-spacing:0!important;
+        border:0!important;
+        outline:0!important;
+        background:#fff!important;
+      }
+
+      .v651CaptureRoot .v520EntryTable th{
+        background:#eef2f4!important;
+        color:#111!important;
+        border-top:0!important;
+        border-left:0!important;
+        border-right:0!important;
+        border-bottom:2px solid #9aa8b1!important;
+      }
+
+      .v651CaptureRoot .v520EntryTable td{
+        background:#fff!important;
+        color:#111!important;
+        border-left:0!important;
+        border-right:0!important;
+        border-bottom:0!important;
+      }
+
+      .v651CaptureRoot .v520EntryTable tbody tr.v614PrintGroupStart td{
+        border-top:2px solid #aebbc3!important;
+      }
+
+      .v651CaptureRoot .v520EntryTable tbody tr:first-child td{
+        border-top:0!important;
+      }
+
+      .v651CaptureRoot .v520EntryTable tbody tr.v614PrintSub td{
+        border-top:1px solid #d3dbe0!important;
+      }
+
+      .v651CaptureRoot .v520EntryTable tbody tr:last-child td{
+        border-bottom:1px solid #b7c2c9!important;
+      }
+
+      /* ----- Abrechnungstabelle ----- */
+      .v651CaptureRoot .v520BillingTable{
+        border-collapse:separate!important;
+        border-spacing:0!important;
+        border:0!important;
+        background:#fff!important;
+      }
+
+      .v651CaptureRoot .v520BillingTable th{
+        background:#eef2f4!important;
+        color:#111!important;
+        border-left:0!important;
+        border-right:0!important;
+        border-top:0!important;
+        border-bottom:2px solid #9aa8b1!important;
+      }
+
+      .v651CaptureRoot .v520BillingTable td{
+        background:#fff!important;
+        color:#111!important;
+        border-left:0!important;
+        border-right:0!important;
+        border-top:0!important;
+        border-bottom:1px solid #d1d9de!important;
+      }
+
+      /* ----- Kopf/Fuß ----- */
+      .v651CaptureRoot .v519PageHeader{
+        border-bottom:.35mm solid #9aa6ad!important;
+      }
+      .v651CaptureRoot .v519PageFooter{
+        border-top:.25mm solid #b0b9be!important;
+        color:#333!important;
+      }
+
+      /* ----- Plan- und Fotoseiten ----- */
+      .v651CaptureRoot .sheetPlanEvidence,
+      .v651CaptureRoot .v637PhotoEvidence,
+      .v651CaptureRoot .v637PhotoEvidenceFigure,
+      .v651CaptureRoot .v637PhotoEvidenceInfo{
+        background:#fff!important;
+        color:#111!important;
+      }
+      .v651CaptureRoot .v637PhotoEvidenceFigure{
+        border-color:#cfd8df!important;
+      }
+      .v651CaptureRoot .v637PhotoEvidenceFigure figcaption{
+        color:#222!important;
+      }
+    `;
+  }
+
+  v651CaptureCss=function(){
+    return baseCaptureCssV777()+"\n"+v777MobilePrintCss();
+  };
+
+  /* Text nicht mehr nur auf iPhone beziehen, da Android/Samsung denselben Weg nutzt. */
+  const baseBuildPdfV777=v652BuildPdfBlob;
+  v652BuildPdfBlob=async function(pages){
+    const text=document.getElementById("v651PdfText");
+    if(text)text.textContent="PDF wird direkt auf diesem Gerät erstellt …";
+    return baseBuildPdfV777.apply(this,arguments);
+  };
+})();
+</script>
+
+
+<style id="v778-plan-control-states">
+/* ============================================================
+   V7.78 – Planbuttons: eindeutige aktive Zustände
+   ============================================================ */
+
+/* Werkzeug-Grundzustand */
+html[data-theme="dark"] .planTools .toolBtn,
+html[data-theme="dark"] .planTools .touchIconBtn{
+  background:#142c3d!important;
+  color:#eef5f9!important;
+  border-color:#3d6179!important;
+}
+
+/* normales aktives Werkzeug */
+html[data-theme="dark"] .planTools .toolBtn.active{
+  background:#2f87bd!important;
+  color:#fff!important;
+  border-color:#62b0df!important;
+  box-shadow:0 0 0 2px rgba(85,165,213,.18)!important;
+}
+
+/* Hand aktiv bewusst warm */
+html[data-theme="dark"] #tool-pan.active{
+  background:#6a5320!important;
+  color:#ffe29a!important;
+  border-color:#9b7c34!important;
+  box-shadow:0 0 0 2px rgba(241,206,123,.14)!important;
+}
+
+/* Radierer aktiv bewusst rot */
+html[data-theme="dark"] #tool-eraser.active{
+  background:#5a2b30!important;
+  color:#ffc0c0!important;
+  border-color:#95535a!important;
+  box-shadow:0 0 0 2px rgba(241,164,164,.15)!important;
+}
+
+/* Kritzel-Werkzeug ebenfalls klar aktiv */
+html[data-theme="dark"] #tool-scribble.active{
+  background:#2f87bd!important;
+  color:#fff!important;
+  border-color:#62b0df!important;
+}
+
+/* Sichtbarkeits-Toggles */
+html[data-theme="dark"] #toggleOtherAmblBtn,
+html[data-theme="dark"] #toggleOtherIdsBtn{
+  transition:background .12s ease,border-color .12s ease,color .12s ease!important;
+}
+
+html[data-theme="dark"] #toggleOtherAmblBtn.v778On,
+html[data-theme="dark"] #toggleOtherIdsBtn.v778On{
+  background:#173d27!important;
+  color:#9ce1b3!important;
+  border-color:#427956!important;
+  box-shadow:0 0 0 2px rgba(139,215,166,.10)!important;
+}
+
+html[data-theme="dark"] #toggleOtherAmblBtn.v778Off,
+html[data-theme="dark"] #toggleOtherIdsBtn.v778Off{
+  background:#142c3d!important;
+  color:#c3d3dd!important;
+  border-color:#3d6179!important;
+  box-shadow:none!important;
+}
+
+/* Light Mode ebenfalls eindeutig */
+html:not([data-theme="dark"]) .planTools .toolBtn.active{
+  background:#2f7fb6!important;
+  color:#fff!important;
+  border-color:#2f7fb6!important;
+}
+html:not([data-theme="dark"]) #tool-pan.active{
+  background:#fff1c8!important;
+  color:#765914!important;
+  border-color:#d5b65d!important;
+}
+html:not([data-theme="dark"]) #tool-eraser.active{
+  background:#ffe7e7!important;
+  color:#9a3434!important;
+  border-color:#dc8e8e!important;
+}
+html:not([data-theme="dark"]) #toggleOtherAmblBtn.v778On,
+html:not([data-theme="dark"]) #toggleOtherIdsBtn.v778On{
+  background:#e9f7ed!important;
+  color:#276c40!important;
+  border-color:#bcdcc5!important;
+}
+html:not([data-theme="dark"]) #toggleOtherAmblBtn.v778Off,
+html:not([data-theme="dark"]) #toggleOtherIdsBtn.v778Off{
+  background:#f4f7f9!important;
+  color:#425866!important;
+  border-color:#d3dfe6!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.78 – Plansteuerung funktional + visuell synchronisieren
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  const toolNames=[
+    "pan","select","point","line","polyline",
+    "rect","circle","freehand","scribble","text","eraser"
+  ];
+
+  function syncToolButtons(){
+    toolNames.forEach(t=>{
+      const b=$("tool-"+t);
+      if(!b)return;
+      const active=String(planTool||"")===t;
+      b.classList.toggle("active",active);
+      b.setAttribute("aria-pressed",active?"true":"false");
+    });
+  }
+
+  function toggleStateFromButton(btn){
+    if(!btn)return null;
+    const text=String(btn.textContent||"").toUpperCase();
+    if(text.includes(": EIN"))return true;
+    if(text.includes(": AUS"))return false;
+    if(btn.classList.contains("off"))return false;
+    if(btn.classList.contains("okBtn"))return true;
+    return null;
+  }
+
+  function syncVisibilityButton(btn){
+    if(!btn)return;
+    const on=toggleStateFromButton(btn);
+    if(on===null)return;
+
+    btn.classList.toggle("v778On",on);
+    btn.classList.toggle("v778Off",!on);
+    btn.setAttribute("aria-pressed",on?"true":"false");
+
+    /* Alte Klassen konsistent halten. */
+    btn.classList.toggle("okBtn",on);
+    btn.classList.toggle("secondary",!on);
+    btn.classList.toggle("off",!on);
+  }
+
+  function syncVisibilityButtons(){
+    syncVisibilityButton($("toggleOtherAmblBtn"));
+    syncVisibilityButton($("toggleOtherIdsBtn"));
+  }
+
+  function syncAll(){
+    syncToolButtons();
+    syncVisibilityButtons();
+  }
+
+  /* Finale Werkzeugfunktion wrappen. */
+  const baseSetPlanToolV778=window.setPlanTool;
+  if(typeof baseSetPlanToolV778==="function"){
+    window.setPlanTool=function(tool){
+      const r=baseSetPlanToolV778.apply(this,arguments);
+      syncToolButtons();
+      requestAnimationFrame(syncToolButtons);
+      return r;
+    };
+  }
+
+  /* AMBL-Schalter: echte Logik behalten, danach Zustand zuverlässig anzeigen. */
+  const baseToggleAmblV778=window.toggleOtherAmblAnnotations;
+  if(typeof baseToggleAmblV778==="function"){
+    window.toggleOtherAmblAnnotations=function(){
+      const r=baseToggleAmblV778.apply(this,arguments);
+      syncVisibilityButtons();
+      requestAnimationFrame(syncVisibilityButtons);
+      return r;
+    };
+  }
+
+  const baseUpdateAmblV778=window.updateOtherAmblButton;
+  if(typeof baseUpdateAmblV778==="function"){
+    window.updateOtherAmblButton=function(){
+      const r=baseUpdateAmblV778.apply(this,arguments);
+      syncVisibilityButtons();
+      return r;
+    };
+  }
+
+  /* Andere IDs ist dynamisch erzeugt. Bestehende Fokuslogik bleibt unangetastet. */
+  const baseToggleIdsV778=window.toggleOtherSameSheetIds;
+  if(typeof baseToggleIdsV778==="function"){
+    window.toggleOtherSameSheetIds=function(){
+      const r=baseToggleIdsV778.apply(this,arguments);
+      syncVisibilityButtons();
+      requestAnimationFrame(syncVisibilityButtons);
+      return r;
+    };
+  }
+
+  /*
+    Der dynamisch erzeugte Andere-IDs-Button kann noch auf die ältere
+    Funktionsreferenz zeigen. Nach Render/Open deshalb explizit an die
+    finale Funktion anbinden.
+  */
+  function bindDynamicControls(){
+    const ambl=$("toggleOtherAmblBtn");
+    if(ambl){
+      ambl.onclick=function(ev){
+        ev?.preventDefault?.();
+        window.toggleOtherAmblAnnotations?.();
+        return false;
+      };
+    }
+
+    const ids=$("toggleOtherIdsBtn");
+    if(ids && typeof window.toggleOtherSameSheetIds==="function"){
+      ids.onclick=function(ev){
+        ev?.preventDefault?.();
+        window.toggleOtherSameSheetIds();
+        return false;
+      };
+    }
+
+    syncAll();
+  }
+
+  /* Planrender erzeugt/verschiebt Teile der Toolbar – danach nur UI nachziehen. */
+  const baseRenderPlanV778=window.renderPlanAnnotations;
+  if(typeof baseRenderPlanV778==="function"){
+    window.renderPlanAnnotations=function(){
+      const r=baseRenderPlanV778.apply(this,arguments);
+      requestAnimationFrame(bindDynamicControls);
+      return r;
+    };
+  }
+
+  const baseOpenPlanV778=window.openPlan;
+  if(typeof baseOpenPlanV778==="function"){
+    window.openPlan=async function(){
+      const r=await baseOpenPlanV778.apply(this,arguments);
+      requestAnimationFrame(bindDynamicControls);
+      return r;
+    };
+  }
+
+  window.addEventListener("load",()=>{
+    setTimeout(bindDynamicControls,450);
+  });
+})();
+</script>
 
 </body>
 </html>
