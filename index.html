@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.05</title>
+<title>Kollaudierung – V7.07</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7028,6 +7028,220 @@ main > section.view,
   }
 }
 
+
+/* ============================================================
+   V7.06 – FOTO-BUTTONS KONTRAST / EINHEITLICH
+   ============================================================ */
+#view-entry .v639PhotoAddActions{
+  gap:10px!important;
+}
+#view-entry .v639PhotoAddActions .filePickLabel{
+  min-height:40px!important;
+  padding:9px 14px!important;
+  border-radius:10px!important;
+  font-weight:750!important;
+  line-height:1!important;
+  text-decoration:none!important;
+}
+
+/* Bilder auswählen */
+#view-entry .v637PhotoPickLabel{
+  background:#edf2f5!important;
+  border:1px solid #d7e0e6!important;
+  color:#2d404b!important;
+}
+#view-entry .v637PhotoPickLabel:hover{
+  background:#e4ecf1!important;
+  color:#233640!important;
+}
+
+/* Kamera: Weiß auf Blau, damit Text/Symbol eindeutig lesbar sind */
+#view-entry .v639CameraBtn{
+  background:#2f739b!important;
+  border:1px solid #2f739b!important;
+  color:#fff!important;
+  opacity:1!important;
+  -webkit-text-fill-color:#fff!important;
+}
+#view-entry .v639CameraBtn:hover{
+  background:#28698f!important;
+  border-color:#28698f!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+#view-entry .v639CameraBtn:active{
+  background:#235f82!important;
+  border-color:#235f82!important;
+  color:#fff!important;
+  transform:none!important;
+}
+
+
+/* ============================================================
+   V7.07 – SAUBERE DESKTOP-VERSION (Punkte 5, 6, 7)
+   Fokus: Desktop-Aufteilung, saubere Abstände, ruhigere Optik
+   ============================================================ */
+
+@media (min-width: 1101px){
+
+  /* Unterer Eingabebereich insgesamt klarer und luftiger */
+  #view-entry .v697LowerEntry{
+    gap:18px !important;
+    margin-top:16px !important;
+  }
+
+  /* Karten 5 und 6: gleiche Höhe, gleiches Raster */
+  #view-entry .v697SupportGrid{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    gap:18px !important;
+    align-items:stretch !important;
+  }
+
+  #view-entry .v697SupportSection{
+    min-height:206px !important;
+    height:100% !important;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:flex-start !important;
+    padding:14px 16px 16px !important;
+    border-radius:14px !important;
+    background:#ffffff !important;
+  }
+
+  #view-entry .v697PlanSupport .entryPlanBox,
+  #view-entry .v697NoteSupport .v666NoteSection{
+    flex:1 1 auto !important;
+  }
+
+  #view-entry .v697PlanSupport .grid2{
+    gap:16px !important;
+    align-items:end !important;
+  }
+
+  #view-entry .v697PlanSupport .toolbar{
+    display:flex !important;
+    gap:10px !important;
+    flex-wrap:wrap !important;
+    align-items:center !important;
+  }
+
+  #view-entry .v697PlanSupport .toolbar button,
+  #view-entry .v697NoteSupport textarea{
+    border-radius:10px !important;
+  }
+
+  #view-entry .v697NoteSupport textarea{
+    min-height:108px !important;
+  }
+
+  /* Fotodokumentation auf Desktop als ruhige, eigenständige Arbeitskarte */
+  #view-entry .v697PhotoActionsCard{
+    padding:16px 18px 14px !important;
+    border-radius:16px !important;
+    background:linear-gradient(180deg,#fffdfa 0%, #fffefc 100%) !important;
+  }
+
+  #view-entry .v697PhotoActionsCard > .v692SectionTitle{
+    margin-bottom:12px !important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v637PhotoBox{
+    padding:16px 16px 12px !important;
+    border-radius:14px !important;
+    background:#ffffff !important;
+    border:1px solid #eadfce !important;
+    box-shadow:none !important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar{
+    display:flex !important;
+    justify-content:space-between !important;
+    align-items:flex-start !important;
+    gap:20px !important;
+    padding-bottom:14px !important;
+    margin-bottom:12px !important;
+    border-bottom:1px solid #ece3d6 !important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar > div:first-child{
+    flex:1 1 auto !important;
+    min-width:300px !important;
+    max-width:none !important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar > div:first-child label{
+    display:block !important;
+    margin:0 !important;
+    font-size:15px !important;
+    font-weight:800 !important;
+    color:#203342 !important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar > div:first-child .small{
+    margin-top:5px !important;
+    font-size:13px !important;
+    line-height:1.45 !important;
+    color:#60717c !important;
+    max-width:740px !important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v639PhotoAddActions{
+    flex:0 0 auto !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+    gap:10px !important;
+    flex-wrap:nowrap !important;
+    margin-left:auto !important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v639PhotoAddActions .filePickLabel{
+    min-width:150px !important;
+    min-height:42px !important;
+    padding:10px 16px !important;
+    border-radius:10px !important;
+    font-size:13px !important;
+    font-weight:750 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    white-space:nowrap !important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v637PhotoList{
+    margin-top:0 !important;
+    padding-top:0 !important;
+    border-top:0 !important;
+  }
+
+  #view-entry .v697PhotoActionsCard .v637PhotoList > .small{
+    padding:12px 14px !important;
+    border-radius:10px !important;
+    border:1px dashed #d9ccb7 !important;
+    background:#fffdfa !important;
+    font-size:13px !important;
+  }
+
+  #view-entry .v697PhotoActionsCard #message{
+    margin-top:10px !important;
+    font-size:12.5px !important;
+    color:#647682 !important;
+  }
+
+  #view-entry .v697PhotoActionsCard > .small:last-child{
+    margin-top:8px !important;
+    padding-top:8px !important;
+    border-top:1px solid #ece3d6 !important;
+    color:#5b6d79 !important;
+  }
+
+  /* Allgemein etwas sauberere Breiten und gleiche optische Linien */
+  #view-entry .card{
+    overflow:visible !important;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -7058,7 +7272,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.05 <span class="v693BuildStamp">Build 7.05</span></h1>
+     <h1>Kollaudierung – V7.07 <span class="v693BuildStamp">Build 7.07</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -15996,7 +16210,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.05",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.07",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -25777,7 +25991,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.05";
+const KOLLAPP_VERSION="7.07";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
