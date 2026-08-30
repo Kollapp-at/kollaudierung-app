@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.07</title>
+<title>Kollaudierung – V7.08</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7242,6 +7242,39 @@ main > section.view,
   }
 }
 
+
+/* ============================================================
+   V7.08 – VORLAGE IN GEMISCHTEN ERFASSUNGS-IDs SICHTBAR
+   ============================================================ */
+.v708TemplateMini{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-left:7px;
+  padding:2px 7px;
+  border-radius:999px;
+  border:1px solid #dec77f;
+  background:#fff7d8;
+  color:#755b12;
+  font-size:10.5px;
+  font-weight:800;
+  vertical-align:middle;
+}
+.v708TemplateQty{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  padding:2px 0;
+}
+.v708TemplateQtyMain{
+  font-weight:850;
+  color:#856510;
+}
+.v708TemplateQtySub{
+  font-size:10.5px;
+  color:#8a7841;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -7272,7 +7305,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.07 <span class="v693BuildStamp">Build 7.07</span></h1>
+     <h1>Kollaudierung – V7.08 <span class="v693BuildStamp">Build 7.08</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16210,7 +16243,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.07",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.08",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -25991,7 +26024,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.07";
+const KOLLAPP_VERSION="7.08";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -26355,6 +26388,47 @@ window.addEventListener("load",()=>{
     }
   }, true);
 })();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.08 – 0-MENGE = VORLAGE AUCH IN GRUPPENTABELLEN
+   ============================================================ */
+function v708IsTemplateEntry(e){
+  return !!e && Math.abs(Number(e.qty||0))<=1e-12;
+}
+
+/* LV-Unterposition: konkrete 0-Unterposition kennzeichnen. */
+v614RecentLvHtml=function(g){
+  return `<div class="v614LvStack">${g.map(x=>{
+    const p=getPos(x.pos);
+    const badge=v708IsTemplateEntry(x)?'<span class="v708TemplateMini">Vorlage</span>':'';
+    return `<div class="v614LvLine">
+      <div class="v614LvCode">${esc(x.pos)}${badge}</div>
+      <div class="v614LvText">${esc(p?.text||"")}</div>
+    </div>`;
+  }).join("")}</div>`;
+};
+
+/* Menge/Rechenansatz: statt 0 EH eindeutig „Vorlage“ zeigen. */
+v614RecentQtyHtml=function(g){
+  return `<div class="v614QtyStack">${g.map(x=>{
+    if(v708IsTemplateEntry(x)){
+      return `<div class="v614QtyLine v708TemplateQty">
+        <div class="v708TemplateQtyMain">Vorlage</div>
+        <div class="v708TemplateQtySub">Menge 0${x.unit?` ${esc(x.unit)}`:""}${x.calc?` · Rechenansatz ${esc(x.calc)}`:""}</div>
+      </div>`;
+    }
+    return `<div class="v614QtyLine">
+      <div class="v614QtyMain">${num(x.qty)} ${esc(x.unit||"")}</div>
+      <div class="v614QtyCalc">${esc(x.calc||"")}</div>
+    </div>`;
+  }).join("")}</div>`;
+};
+
+/* Bestehende Anzeige sofort neu zeichnen. */
+window.addEventListener('load',()=>setTimeout(()=>{try{renderRecent?.()}catch(e){}},180));
 </script>
 
 </body>
