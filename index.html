@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.52</title>
+<title>Kollaudierung – V7.53</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.52 <span class="v693BuildStamp">Build 7.52</span></h1>
+     <h1>Kollaudierung – V7.53 <span class="v693BuildStamp">Build 7.53</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16319,7 +16319,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.52",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.53",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26100,7 +26100,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.52";
+const KOLLAPP_VERSION="7.53";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -36266,6 +36266,106 @@ tbody tr:hover td{
     setTimeout(()=>restorePlanViewport(viewportState),200);
     setTimeout(()=>restorePlanViewport(viewportState),360);
 
+    return r;
+  };
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.53 – LV-Unterposition bleibt beim Ändern sichtbar
+   ============================================================ */
+.multiLvItem.v753EditingLv{
+  border-color:#62a9cf!important;
+  background:#f2f9fd!important;
+  box-shadow:inset 3px 0 0 #2e8fbe;
+}
+.v753EditingTag{
+  display:inline-flex;
+  align-items:center;
+  padding:2px 6px;
+  border-radius:999px;
+  background:#dceff9;
+  color:#176b95;
+  font-size:10px;
+  font-weight:800;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.53 – "Ändern" entfernt LV-Unterposition NICHT mehr temporär
+   aus multiLvDraft.
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  /*
+    Alte v612LoadLvItem()-Logik:
+      multiLvDraft.splice(index,1)
+    war nur ein technischer Zwischenschritt. Das führt heute dazu,
+    dass die Position beim Bearbeiten wie gelöscht aussieht.
+
+    Neue Logik:
+    - Item bleibt vollständig in multiLvDraft.
+    - Formular erhält eine Kopie der Werte.
+    - finalizeCurrentEntry() ersetzt beim Speichern dieselbe Position
+      ohnehin anhand der Positionsnummer.
+  */
+  v612LoadLvItem=function(index){
+    const item=multiLvDraft?.[index];
+    if(!item)return;
+
+    v612SetFormPosition?.({...item});
+    renderMultiLvDraft?.();
+    msg(`LV-Unterposition ${item.pos} zum Ändern geladen.`);
+  };
+
+  /*
+    Nach jedem normalen Listenrender die aktuell im Formular geladene
+    LV-Unterposition optisch markieren.
+  */
+  const baseRenderV753=renderMultiLvDraft;
+  renderMultiLvDraft=function(){
+    const r=baseRenderV753.apply(this,arguments);
+
+    const current=String($("posSelect")?.value||"");
+    const list=$("multiLvList");
+    if(!list)return r;
+
+    const items=[...list.querySelectorAll(".multiLvItem")];
+    items.forEach((el,i)=>{
+      const item=multiLvDraft?.[i];
+      const active=!!item && current && String(item.pos||"")===current;
+
+      el.classList.toggle("v753EditingLv",active);
+
+      /* vorhandenen Marker nicht doppelt erzeugen */
+      el.querySelector(".v753EditingTag")?.remove();
+
+      if(active){
+        const toolbar=el.querySelector(".toolbar");
+        if(toolbar){
+          const tag=document.createElement("span");
+          tag.className="v753EditingTag";
+          tag.textContent="In Bearbeitung";
+          toolbar.prepend(tag);
+        }
+      }
+    });
+
+    return r;
+  };
+
+  /*
+    Positionswechsel ebenfalls markieren, ohne die bewährte
+    Positionsauswahl-/Scrolllogik anzutasten.
+  */
+  const baseInfoV753=showPosInfo;
+  showPosInfo=function(){
+    const r=baseInfoV753.apply(this,arguments);
+    requestAnimationFrame(()=>renderMultiLvDraft?.());
     return r;
   };
 })();
