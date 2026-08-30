@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.28</title>
+<title>Kollaudierung – V7.29</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.28 <span class="v693BuildStamp">Build 7.28</span></h1>
+     <h1>Kollaudierung – V7.29 <span class="v693BuildStamp">Build 7.29</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.28",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.29",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.28";
+const KOLLAPP_VERSION="7.29";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -31124,6 +31124,184 @@ window.addEventListener("load",()=>{
       hideRightHints();
       renderInline();
     },420);
+  });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.29 – PUNKT-/ECKENAUSWAHL WIEDER SICHTBAR
+   Der V7.25-Editor bleibt nur optisch verborgen.
+   ============================================================ */
+#selectedAnnBox #v725GeometryEditor{
+  display:none!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.29 – kompakte Geometrieauswahl unabhängig von display:none
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function selectedAnn(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+
+  function sourcePanel(){
+    return $('v725GeometryEditor');
+  }
+
+  function inlineBox(){
+    return $('v728GeometryInline');
+  }
+
+  function renderV729Inline(){
+    const box=inlineBox();
+    const a=selectedAnn();
+    const src=sourcePanel();
+
+    if(!box)return;
+
+    if(!a || planTool!=='select' || !src || !['line','rect','circle'].includes(a.type)){
+      box.classList.remove('show');
+      box.innerHTML='';
+      return;
+    }
+
+    /*
+      WICHTIG:
+      src darf optisch display:none sein.
+      Wir lesen ausschließlich die darin erzeugten Buttons aus.
+    */
+    const srcButtons=[...src.querySelectorAll('button[data-v725-kind][data-v725-index]')];
+
+    if(!srcButtons.length){
+      box.classList.remove('show');
+      box.innerHTML='';
+      return;
+    }
+
+    const active=src.querySelector('button.active[data-v725-kind]');
+    const title=a.type==='line'
+      ? ((a.mode==='polyline'||(a.points||[]).length>2)?'Polylinie':'Linie')
+      : (a.type==='circle'?'Kreis':'Rechteck');
+
+    box.classList.add('show');
+    box.innerHTML=`<span class="v728Label">${title}:</span>`;
+
+    srcButtons.forEach(srcBtn=>{
+      const kind=srcBtn.dataset.v725Kind;
+      const idx=Number(srcBtn.dataset.v725Index);
+
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='secondary'+(srcBtn.classList.contains('active')?' active':'');
+      btn.textContent=kind==='vertex'?`P${idx+1}`:`E${idx+1}`;
+      btn.title=srcBtn.textContent.trim();
+
+      btn.addEventListener('click',ev=>{
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        /*
+          V7.25-Button löst weiterhin die bewährte Bearbeitungslogik aus,
+          auch wenn sein Panel unsichtbar ist.
+        */
+        srcBtn.click();
+        setTimeout(renderV729Inline,0);
+      });
+
+      box.appendChild(btn);
+    });
+
+    if(active){
+      const hint=document.createElement('span');
+      hint.className='v728Waiting';
+      hint.textContent='→ neue Position im Plan tippen';
+      box.appendChild(hint);
+    }
+  }
+
+  /*
+    V7.28 setzte am Quellpanel inline display:none.
+    Das entfernen wir dauerhaft. Das CSS oben blendet es weiterhin aus.
+  */
+  function repairSourcePanel(){
+    const src=sourcePanel();
+    if(!src)return;
+    if(src.style.display==='none'){
+      src.style.removeProperty('display');
+    }
+  }
+
+  function refresh(){
+    setTimeout(()=>{
+      repairSourcePanel();
+      renderV729Inline();
+    },0);
+  }
+
+  const oldSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=oldSelected.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldRender=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    const r=oldRender.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    const r=oldSet.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldSelect=selectPlanAnnotation;
+  selectPlanAnnotation=function(id){
+    const r=oldSelect.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    const r=await oldOpen.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  function observe(){
+    const src=sourcePanel();
+    if(!src || src.dataset.v729Watch==='1')return;
+    src.dataset.v729Watch='1';
+
+    const obs=new MutationObserver(()=>{
+      repairSourcePanel();
+      renderV729Inline();
+    });
+    obs.observe(src,{
+      subtree:true,
+      childList:true,
+      attributes:true,
+      attributeFilter:['class','style']
+    });
+  }
+
+  window.addEventListener('load',()=>{
+    setTimeout(()=>{
+      repairSourcePanel();
+      observe();
+      renderV729Inline();
+    },450);
   });
 })();
 </script>
