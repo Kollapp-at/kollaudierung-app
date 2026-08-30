@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.49</title>
+<title>Kollaudierung – V7.50</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.49 <span class="v693BuildStamp">Build 7.49</span></h1>
+     <h1>Kollaudierung – V7.50 <span class="v693BuildStamp">Build 7.50</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16319,7 +16319,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.49",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.50",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26100,7 +26100,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.49";
+const KOLLAPP_VERSION="7.50";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -36009,6 +36009,144 @@ tbody tr:hover td{
     switchProject=function(){
       activePlanLvPos="";
       return baseSwitch.apply(this,arguments);
+    };
+  }
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.50 – "ÄNDERN" IM PLAN LÄDT OBEN DEN VOLLEN BEARBEITUNGSZUSTAND
+   Ziel: exakt derselbe Zustand wie beim normalen "Bearbeiten".
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function findEntryForPlanPos(pos){
+    pos=String(pos||"");
+    if(!pos)return null;
+
+    /* zuerst aktuelle Erfassungs-ID aus Plan-Kontext */
+    const planEntryId=$("planEntrySelect")?.value||"";
+    let base=(project()?.entries||[]).find(e=>String(e.id)===String(planEntryId))||null;
+
+    if(base){
+      try{
+        const group=typeof v612GroupEntries==="function" ? v612GroupEntries(base) : [base];
+        const hit=group.find(e=>String(e.pos||"")===pos);
+        if(hit)return hit;
+      }catch(err){}
+    }
+
+    /* Fallback: aktives Aufmaßblatt */
+    const sh=activeSheet?.();
+    return (project()?.entries||[]).find(e=>
+      (!sh || e.sheetId===sh.id) &&
+      String(e.pos||"")===pos
+    )||null;
+  }
+
+  function loadLikeNormalEdit(entry){
+    if(!entry)return false;
+
+    /*
+      Die App besitzt bereits eine etablierte Bearbeiten-Funktion.
+      Wir verwenden bewusst diese statt einzelne Felder manuell
+      nachzubauen, damit oben exakt derselbe Zustand entsteht.
+    */
+    const candidates=[
+      "editEntry",
+      "editLine",
+      "editMeasurement",
+      "openEntryEditor",
+      "loadEntryForEdit"
+    ];
+
+    for(const name of candidates){
+      const fn=window[name];
+      if(typeof fn==="function"){
+        try{
+          fn(entry.id);
+          return true;
+        }catch(err){
+          try{
+            fn(entry);
+            return true;
+          }catch(err2){}
+        }
+      }
+    }
+
+    /*
+      Fallback für Builds, in denen die Bearbeiten-Schaltfläche inline
+      über eine andere Funktion gebunden ist: den vorhandenen Button
+      der Erfassungs-ID im Aufmaßblatt suchen und auslösen.
+    */
+    const selectors=[
+      `[data-entry-id="${CSS.escape(String(entry.id))}"][data-action="edit"]`,
+      `button[data-entry-id="${CSS.escape(String(entry.id))}"]`,
+      `[onclick*="edit"][onclick*="${String(entry.id).replace(/"/g,'\\"')}"]`
+    ];
+
+    for(const sel of selectors){
+      try{
+        const btn=document.querySelector(sel);
+        if(btn){
+          btn.click();
+          return true;
+        }
+      }catch(err){}
+    }
+
+    return false;
+  }
+
+  function syncSelectedPosAfterEdit(pos){
+    pos=String(pos||"");
+
+    const sel=$("posSelect");
+    if(sel && [...sel.options].some(o=>String(o.value)===pos)){
+      sel.value=pos;
+      try{showPosInfo?.()}catch(err){}
+    }
+
+    const planSel=$("planPosSelect");
+    if(planSel && [...planSel.options].some(o=>String(o.value)===pos)){
+      planSel.value=pos;
+    }
+  }
+
+  /*
+    V7.49 hatte hier nur die obere Plan-Zusammenfassung synchronisiert.
+    V7.50 lädt zusätzlich den echten Bearbeitungszustand der Position.
+  */
+  if(typeof window.v737EditLvFromPlan==="function"){
+    const basePlanLvEdit=window.v737EditLvFromPlan;
+
+    window.v737EditLvFromPlan=function(pos){
+      const entry=findEntryForPlanPos(pos);
+
+      /* zuerst bestehender Planfokus / ID-Fokus */
+      const r=basePlanLvEdit.apply(this,arguments);
+
+      /*
+        Danach exakt denselben Editorzustand wie beim normalen
+        "Bearbeiten" laden. Mehrfaches kurzes Nachziehen ist nötig,
+        weil openPlan/showView einzelne Selects neu rendert.
+      */
+      setTimeout(()=>{
+        if(entry){
+          loadLikeNormalEdit(entry);
+          syncSelectedPosAfterEdit(pos);
+        }
+      },70);
+
+      setTimeout(()=>{
+        syncSelectedPosAfterEdit(pos);
+      },190);
+
+      return r;
     };
   }
 })();
