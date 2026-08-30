@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.12</title>
+<title>Kollaudierung – V7.13</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.12 <span class="v693BuildStamp">Build 7.12</span></h1>
+     <h1>Kollaudierung – V7.13 <span class="v693BuildStamp">Build 7.13</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.12",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.13",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.12";
+const KOLLAPP_VERSION="7.13";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -27210,6 +27210,257 @@ window.addEventListener("load",()=>{
   }
 
   window.addEventListener('load',()=>setTimeout(upgradePlanUi,120));
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.13 – PLANWERKZEUGE WIEDER SCHLANK UND DESKTOP-TAUGLICH
+   ============================================================ */
+
+/* V7.12-Gruppenkacheln optisch vollständig zurücknehmen */
+.planTools{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  padding:10px!important;
+  margin-bottom:8px!important;
+  background:#f7fafc!important;
+  border:1px solid #d7e3ea!important;
+  border-radius:13px!important;
+  overflow:visible!important;
+}
+
+.planToolGroup{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  align-content:center!important;
+  gap:7px!important;
+  min-width:0!important;
+  padding:0!important;
+  margin:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+}
+
+/* Erste Zeile = Zeichenwerkzeuge */
+.planToolGroup[data-group="tools"]{
+  width:100%!important;
+  padding-bottom:8px!important;
+  border-bottom:1px solid #dfe8ee!important;
+}
+
+/* Zweite Ebene = kompakt nebeneinander */
+.planTools .v713SecondRow{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:8px!important;
+  width:100%!important;
+}
+
+.planToolGroup[data-group="style"],
+.planToolGroup[data-group="edit"],
+.planToolGroup[data-group="zoom"],
+.planToolGroup[data-group="view"]{
+  flex:0 0 auto!important;
+  width:auto!important;
+}
+
+/* Keine Gruppenüberschriften mehr */
+.planToolLabel{
+  display:none!important;
+}
+
+/* Werkzeuge kompakt */
+.planTools button{
+  min-height:38px!important;
+  padding:8px 12px!important;
+  border-radius:9px!important;
+  font-size:12.5px!important;
+  font-weight:700!important;
+  box-shadow:none!important;
+  white-space:nowrap!important;
+}
+
+.planTools .toolBtn{
+  background:#f4f7f9!important;
+  border:1px solid #d4dfe6!important;
+  color:#203a4b!important;
+}
+.planTools .toolBtn.active{
+  background:#2f7fae!important;
+  border-color:#2f7fae!important;
+  color:#fff!important;
+}
+
+/* Stilbox wieder klein */
+.v661ToolStyle{
+  min-height:38px!important;
+  padding:4px 7px!important;
+  gap:6px!important;
+  border:1px solid #d4dfe6!important;
+  border-radius:9px!important;
+  background:#fff!important;
+}
+.v661ToolStyle input[type="color"]{
+  width:34px!important;
+  min-width:34px!important;
+  height:30px!important;
+}
+.v661ToolStyle select{
+  min-width:82px!important;
+  height:32px!important;
+  padding:4px 7px!important;
+}
+.v661ToolText{
+  min-height:38px!important;
+  padding:4px 7px!important;
+  border-radius:9px!important;
+}
+
+/* Zoom wieder als echte horizontale Gruppe */
+.planToolGroup[data-group="zoom"]{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+}
+#planZoomLabel{
+  min-width:52px!important;
+  min-height:38px!important;
+  padding:0 8px!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  border:1px solid #d4dfe6!important;
+  font-size:12px!important;
+}
+
+/* Sichtbarkeit rechts etwas dezenter */
+#toggleOtherAmblBtn{
+  min-height:38px!important;
+}
+#deleteUnsavedPlanBtn{
+  min-height:38px!important;
+}
+
+/* Hinweise in eine schlanke Infobox statt mehrere große Boxen */
+.planInfoStack{
+  display:block!important;
+  margin:5px 0 8px!important;
+}
+.planInfoStack .planLineHelp{
+  margin:0 0 6px!important;
+  padding:7px 9px!important;
+  border-radius:8px!important;
+  font-size:11px!important;
+}
+.planInfoStack .planInfoNote{
+  display:inline!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:#607786!important;
+  font-size:11px!important;
+  line-height:1.4!important;
+}
+.planInfoStack .planInfoNote + .planInfoNote::before{
+  content:"  ·  ";
+  color:#9aabb5;
+}
+.mobilePlanHint{
+  margin-top:6px!important;
+}
+
+/* Plankopf kompakter */
+#planEditorHead{
+  padding:9px 11px!important;
+  border-radius:11px!important;
+  margin-bottom:8px!important;
+}
+#activePlanName{
+  font-size:16px!important;
+}
+#planEditorHead select{
+  min-height:38px!important;
+  padding:7px 10px!important;
+}
+
+/* Mehr Fläche für den eigentlichen Plan */
+.planViewport{
+  border-radius:11px!important;
+}
+
+/* Desktop: zweite Zeile sauber auf einer Linie, soweit möglich */
+@media(min-width:1101px){
+  .planTools .v713SecondRow{
+    flex-wrap:nowrap!important;
+  }
+  .planToolGroup[data-group="view"]{
+    margin-left:auto!important;
+  }
+}
+
+/* Tablet: horizontal scrollen statt wieder hoch stapeln */
+@media(max-width:1100px){
+  .planTools{
+    display:block!important;
+    overflow-x:hidden!important;
+  }
+  .planToolGroup[data-group="tools"],
+  .planTools .v713SecondRow{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .planToolGroup[data-group="tools"]::-webkit-scrollbar,
+  .planTools .v713SecondRow::-webkit-scrollbar{
+    display:none;
+  }
+  .planToolGroup[data-group="tools"] > *,
+  .planTools .v713SecondRow > *{
+    flex:0 0 auto!important;
+  }
+}
+</style>
+
+
+<script>
+/* ============================================================
+   V7.13 – V7.12-GRUPPEN IN EINE SAUBERE ZWEIZEILIGE LEISTE
+   ============================================================ */
+(function(){
+  function v713FlattenToolbar(){
+    const bar=document.querySelector('.planTools');
+    if(!bar || bar.dataset.v713Applied==='1') return;
+
+    const tools=bar.querySelector('.planToolGroup[data-group="tools"]');
+    const style=bar.querySelector('.planToolGroup[data-group="style"]');
+    const edit=bar.querySelector('.planToolGroup[data-group="edit"]');
+    const zoom=bar.querySelector('.planToolGroup[data-group="zoom"]');
+    const view=bar.querySelector('.planToolGroup[data-group="view"]');
+
+    if(!tools) return;
+
+    const second=document.createElement('div');
+    second.className='v713SecondRow';
+
+    [style,edit,zoom,view].forEach(g=>{
+      if(g) second.appendChild(g);
+    });
+
+    bar.innerHTML='';
+    bar.appendChild(tools);
+    bar.appendChild(second);
+    bar.dataset.v713Applied='1';
+  }
+
+  window.addEventListener('load',()=>setTimeout(v713FlattenToolbar,120));
 })();
 </script>
 
