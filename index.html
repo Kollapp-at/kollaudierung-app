@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.95</title>
+<title>Kollaudierung – V7.96</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.95 <span class="v693BuildStamp">Build 7.95</span></h1>
+     <h1>Kollaudierung – V7.96 <span class="v693BuildStamp">Build 7.96</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -7816,7 +7816,7 @@ main > section.view,
    </div>
    <div id="unsavedPlanWarning" class="unsavedPlanWarning" style="display:none"></div>
    <div class="toolbar" style="margin-top:12px">
-    <button class="primary" id="finalSaveEntryBtn" onclick="finalizeCurrentEntry()">Erfassung speichern</button>
+    <button type="button" class="primary" id="finalSaveEntryBtn" onclick="finalizeCurrentEntry()">Erfassung speichern</button>
     <button class="secondary" onclick="scrollToEntryTop()">Eingaben prüfen</button>
    </div>
    <div id="finalizeMessage" class="small" style="margin-top:9px"></div>
@@ -16369,7 +16369,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.95",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.96",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26150,7 +26150,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.95";
+const KOLLAPP_VERSION="7.96";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -43613,6 +43613,169 @@ html[data-theme="dark"] .v742PrepareBtn.v795PrepareBtn:disabled{
     setTimeout(renderPrepareButtonV795,200);
     setTimeout(renderPrepareButtonV795,700);
   });
+})();
+</script>
+
+
+<style id="v796-tablet-save-final">
+/* ============================================================
+   V7.96 – Tablet-Speichern: einfacher direkter Touch-Pfad
+   ============================================================ */
+#finalSaveEntryBtn,
+.v655QuickSaveBtn{
+  touch-action:manipulation!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  cursor:pointer!important;
+}
+#finalSaveEntryBtn.v796Tap,
+.v655QuickSaveBtn.v796Tap{
+  transform:scale(.985);
+  filter:brightness(.96);
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.96 – Alten V7.94-Handler umgehen
+   iPad/iPhone: touchend
+   Android/Tablet/Desktop: click fallback
+   ============================================================ */
+(function(){
+  let lastTouchSave=0;
+  let saving=false;
+
+  function descOk(){
+    return !!(document.getElementById("lineDesc")?.value||"").trim();
+  }
+
+  function showMissingDescription(){
+    const desc=document.getElementById("lineDesc");
+    if(!desc)return;
+
+    desc.classList.add("v794MissingDesc");
+    const warning=document.getElementById("v794DescWarning");
+    if(warning)warning.classList.add("show");
+
+    try{
+      v646SetFinalizeMessage(
+        "⚠ Bitte zuerst eine Positionsbeschreibung eingeben. Die Erfassung wurde nicht gespeichert.",
+        true
+      );
+    }catch(_){}
+
+    try{
+      desc.scrollIntoView({behavior:"smooth",block:"center"});
+    }catch(_){}
+
+    setTimeout(()=>{
+      try{desc.focus({preventScroll:true})}
+      catch(_){try{desc.focus()}catch(__){}}
+    },220);
+  }
+
+  function doSave(){
+    if(saving)return false;
+
+    if(!descOk()){
+      showMissingDescription();
+      return false;
+    }
+
+    saving=true;
+    try{
+      /*
+        finale bestehende Speicherlogik verwenden.
+        V7.94-Beschreibungsprüfung bleibt zusätzlich als Sicherheitsnetz aktiv.
+      */
+      finalizeCurrentEntry();
+    }catch(err){
+      console.error("V7.96 Erfassung speichern",err);
+      try{
+        v646SetFinalizeMessage(
+          "Erfassung konnte nicht gespeichert werden: "+String(err?.message||err),
+          true
+        );
+      }catch(_){}
+    }finally{
+      setTimeout(()=>{saving=false},450);
+    }
+    return false;
+  }
+
+  function visualTap(btn){
+    btn.classList.add("v796Tap");
+    setTimeout(()=>btn.classList.remove("v796Tap"),120);
+  }
+
+  function bindButton(oldBtn){
+    if(!oldBtn || oldBtn.dataset.v796Bound==="1")return oldBtn;
+
+    /*
+      Clone entfernt die alten V7.94 pointerup/click Listener zuverlässig.
+      Attribute/Text/Klassen bleiben erhalten.
+    */
+    const btn=oldBtn.cloneNode(true);
+    oldBtn.replaceWith(btn);
+
+    btn.dataset.v794Bound="1";  // verhindert erneutes V7.94-Binding
+    btn.dataset.v796Bound="1";
+    btn.type="button";
+    btn.removeAttribute("onclick");
+    btn.onclick=null;
+
+    btn.addEventListener("touchstart",()=>{
+      visualTap(btn);
+    },{passive:true});
+
+    btn.addEventListener("touchend",(ev)=>{
+      lastTouchSave=Date.now();
+      ev.preventDefault();
+      ev.stopPropagation();
+      visualTap(btn);
+      doSave();
+    },{passive:false});
+
+    btn.addEventListener("click",(ev)=>{
+      /*
+        Nach touchend erzeugt Safari/Chrome oft noch einen synthetischen click.
+        Den innerhalb 1 s ignorieren.
+      */
+      if(Date.now()-lastTouchSave<1000){
+        ev.preventDefault();
+        ev.stopPropagation();
+        return false;
+      }
+      ev.preventDefault();
+      visualTap(btn);
+      doSave();
+      return false;
+    },false);
+
+    return btn;
+  }
+
+  function bindAll(){
+    bindButton(document.getElementById("finalSaveEntryBtn"));
+    document.querySelectorAll(".v655QuickSaveBtn").forEach(bindButton);
+  }
+
+  window.addEventListener("load",()=>{
+    setTimeout(bindAll,250);
+    setTimeout(bindAll,900);
+  });
+
+  /*
+    V7.94 ruft beim Wechsel zu Erfassen sein bind() auf.
+    Unsere Buttons tragen v794Bound=1 und werden daher nicht wieder überschrieben.
+  */
+  const baseShowViewV796=showView;
+  showView=function(name){
+    const r=baseShowViewV796.apply(this,arguments);
+    if(name==="entry")setTimeout(bindAll,20);
+    return r;
+  };
+  window.showView=showView;
 })();
 </script>
 
