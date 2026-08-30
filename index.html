@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.39</title>
+<title>Kollaudierung – V7.40</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.39 <span class="v693BuildStamp">Build 7.39</span></h1>
+     <h1>Kollaudierung – V7.40 <span class="v693BuildStamp">Build 7.40</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.39",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.40",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.39";
+const KOLLAPP_VERSION="7.40";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -34223,6 +34223,416 @@ tbody tr:hover td{
   }else{
     setTimeout(apply,50);
   }
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.40 – AMBL AUS KABELLISTE
+   Gekapseltes Importmodul; bestehende App-Logik bleibt unverändert.
+   ============================================================ */
+.v740CableCard::before{background:#b1843d!important}
+.v740CableCard .v674Step{background:#fff4dd;color:#835d1c}
+.v740CableCard{grid-column:1/-1}
+.v740CableCard .v740Actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.v740CableCard .v740Info{margin-top:9px}
+
+#v740CableModal .modal{max-width:1180px}
+#v740CableModal .v740Stage{margin-top:14px}
+#v740CableModal .v740TopGrid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+#v740CableModal .v740Panel{border:1px solid #d9e4ea;border-radius:11px;background:#f9fbfc;padding:12px}
+#v740CableModal .v740Panel h3{margin:0 0 8px!important}
+#v740CableModal .v740SummaryGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+#v740CableModal .v740SummaryCell{border:1px solid #dfe7eb;border-radius:9px;background:#fff;padding:8px}
+#v740CableModal .v740SummaryCell b{display:block;font-size:15px;color:#27485a;margin-top:2px}
+#v740CableModal .v740SummaryCell span{font-size:9.5px;color:#72848e;text-transform:uppercase;letter-spacing:.03em}
+#v740CableModal .v740MappingList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+#v740CableModal .v740MapItem{border:1px solid #dbe5ea;border-radius:9px;background:#fff;padding:9px;min-width:0}
+#v740CableModal .v740MapSig{font-weight:800;color:#28495b;font-size:11.5px;overflow-wrap:anywhere}
+#v740CableModal .v740MapCount{font-size:10px;color:#73848e;margin:2px 0 6px}
+#v740CableModal .v740MapAuto{font-size:9.5px;color:#2d7654;margin-top:4px}
+#v740CableModal .v740PreviewWrap{max-height:390px;overflow:auto;border:1px solid #d8e3e8;border-radius:10px;background:#fff}
+#v740CableModal table{font-size:10.5px!important}
+#v740CableModal th,#v740CableModal td{padding:7px 6px!important}
+#v740CableModal .v740Status{display:inline-flex;padding:2px 6px;border-radius:999px;font-size:9.5px;font-weight:800}
+#v740CableModal .v740Status.bestand{background:#eef3f6;color:#526a77}
+#v740CableModal .v740Status.entfallen{background:#fdeaea;color:#9e3434}
+#v740CableModal .v740Status.neu{background:#eaf5ee;color:#287049}
+#v740CableModal .v740NoMap{color:#9a5d22;font-weight:750}
+#v740CableModal .v740FootInfo{margin-right:auto;font-size:10.5px;color:#687d88;align-self:center}
+#v740CableModal .v740FileLabel{display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+#v740CableModal .v740ModeGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#v740CableModal .v740CheckLine{display:flex;align-items:flex-start;gap:8px;margin-top:8px;font-size:11px;color:#506773}
+#v740CableModal .v740CheckLine input{width:auto;margin-top:2px}
+#v740CableModal .v740Error{margin-top:8px}
+@media(max-width:900px){
+ #v740CableModal .v740TopGrid,#v740CableModal .v740MappingList,#v740CableModal .v740ModeGrid{grid-template-columns:1fr}
+ #v740CableModal .v740SummaryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.40 – Kabellistenimport -> neue AMBL / Erfassungs-IDs
+   ============================================================ */
+(function(){
+ const $=id=>document.getElementById(id);
+ const V740={fileName:'',profile:'',rows:[],map:{},rules:{},error:'',busy:false};
+
+ function p(){return project?.()||null}
+ function masterAllowed(){try{return currentAccess?.().mode!=='worker'}catch(e){return true}}
+ function txt(v){return String(v??'').replace(/\s+/g,' ').trim()}
+ function nrm(v){return txt(v).toLowerCase().replace(/,/g,'.').replace(/\s+/g,' ').trim()}
+ function safeNum(v){
+   if(typeof v==='number'&&Number.isFinite(v))return v;
+   const s=txt(v).replace(/\s/g,'').replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.');
+   const m=s.match(/-?\d+(?:\.\d+)?/); return m?Number(m[0]):null;
+ }
+ function cableSignature(r){return txt([r.cableType,r.dimension].filter(Boolean).join(' '))||'(ohne Kabelangabe)'}
+ function sourceStatus(r){
+   const s=nrm([r.status,r.remark,r.remark2,r.allText].join(' '));
+   const compact=s.replace(/\s+/g,'');
+   if(compact.includes('entfallen'))return 'entfallen';
+   if(s.includes('bestand'))return 'bestand';
+   return 'neu';
+ }
+ function reasonFor(r){const s=sourceStatus(r);return s==='bestand'?'Bestand / übernommen':s==='entfallen'?'Leistung entfallen':''}
+ function cleanDimension(s){
+   const m=txt(s).replace(/,/g,'.').match(/\b\d+x(?:\d+x)?\d+(?:\.\d+)?\b/i);
+   return m?m[0]:'';
+ }
+ function splitTypeDimension(s){
+   const raw=txt(s); const dim=cleanDimension(raw);
+   let type=raw;
+   if(dim){
+     const variants=[dim,dim.replace('.',',')];
+     variants.forEach(v=>type=type.replace(v,''));
+   }
+   return {cableType:txt(type.replace(/[|;,]+$/,'')),dimension:dim};
+ }
+ function uniqueJoin(items){
+   const out=[]; for(const x of items.map(x=>txt(x)).filter(Boolean)){if(!out.includes(x))out.push(x)}
+   return out.join(' ');
+ }
+
+ function positionOptions(selected){
+   const list=(positions?.()||[]).slice().sort((a,b)=>String(a.pos).localeCompare(String(b.pos),'de',{numeric:true}));
+   return '<option value="">– keine LV-Zuordnung –</option>'+list.map(q=>
+     `<option value="${esc(q.pos)}" ${String(selected||'')===String(q.pos)?'selected':''}>${esc(q.pos)} · ${esc(q.text)}${q.unit?` · ${esc(q.unit)}`:''}</option>`
+   ).join('');
+ }
+ function learnedRules(){return p()?.cableImportRules||{}}
+ function dimensionOfSig(sig){return cleanDimension(sig)}
+ function autoMap(sig){
+   const learned=learnedRules()[sig];
+   if(learned && getPos?.(learned))return {pos:learned,score:999,label:'gespeicherte Zuordnung'};
+   const dim=dimensionOfSig(sig); const ns=nrm(sig);
+   let best=null;
+   for(const q of (positions?.()||[])){
+     const t=nrm(q.text+' '+q.pos); let score=0;
+     if(dim){
+       const nd=dim.toLowerCase();
+       if(t.includes(nd)||t.includes(nd.replace('.',',')))score+=100;
+     }
+     if(/cat\s*7|cat7/i.test(sig) && /cat\s*7|kategorie\s*7/i.test(t))score+=75;
+     if(/cat\s*5|cat5/i.test(sig) && /cat\s*5|kategorie\s*5/i.test(t))score+=75;
+     if(/2x2x0[.,]8/i.test(sig)&&/2x2x0[.,]8/i.test(q.text))score+=55;
+     if(/4x2x0[.,]8/i.test(sig)&&/4x2x0[.,]8/i.test(q.text))score+=55;
+     if(String(q.unit||'').toLowerCase()==='m')score+=8;
+     if(/kabel|leitung/i.test(q.text))score+=6;
+     if(!best||score>best.score)best={pos:q.pos,score,label:'automatisch'};
+   }
+   return best&&best.score>=85?best:{pos:'',score:0,label:''};
+ }
+
+ function ensureCard(){
+   if($('v740CableCard'))return;
+   const grid=document.querySelector('#view-project .v674ProjectGrid'); if(!grid)return;
+   const lv=grid.querySelector('.v674LvCard');
+   const card=document.createElement('div');
+   card.id='v740CableCard'; card.className='card v674ProjectCard v740CableCard';
+   card.innerHTML=`
+    <div class="v674HeadRow">
+     <div class="v674Head"><div class="v674Step">KL</div><div><h2>AMBL aus Kabelliste erstellen</h2><div class="small">Kabelliste einlesen, LV-Zuordnung prüfen und neue Aufmaßblätter vorbereiten.</div></div></div>
+     <button class="primary noPrint" id="v740OpenBtn" onclick="v740OpenCableImport()">Kabelliste importieren</button>
+    </div>
+    <div id="v740CableInfo" class="info v740Info"></div>`;
+   if(lv)lv.insertAdjacentElement('afterend',card); else grid.appendChild(card);
+   renderCard();
+ }
+ function renderCard(){
+   const box=$('v740CableInfo'),btn=$('v740OpenBtn'); if(!box||!btn)return;
+   const pr=p();
+   btn.disabled=!pr||!masterAllowed();
+   if(!pr){box.innerHTML='Bitte zuerst ein Projekt auswählen.';return}
+   if(!masterAllowed()){box.innerHTML='<b>Master-Funktion:</b> Kabellistenimport ist in Arbeitsdateien gesperrt.';return}
+   const inf=pr.cableImportInfo;
+   box.innerHTML=inf
+     ?`Letzter Import: <b>${esc(inf.fileName||'–')}</b> · ${esc(inf.profile||'')} · ${Number(inf.createdSheets||0)} AMBL · ${Number(inf.createdEntries||0)} Erfassungs-ID(s) · ${esc(inf.importedAt||'')}`
+     :'Noch keine Kabelliste für dieses Projekt importiert.';
+ }
+
+ function ensureModal(){
+   if($('v740CableModal'))return;
+   const m=document.createElement('div'); m.id='v740CableModal'; m.className='modalBackdrop';
+   m.innerHTML=`<div class="modal">
+    <div class="modalHead"><h2>AMBL aus Kabelliste erstellen</h2><button class="secondary" onclick="v740CloseCableImport()">Schließen</button></div>
+    <div class="modalBody">
+     <div class="v740TopGrid">
+      <div class="v740Panel">
+       <h3>1 · Kabelliste laden</h3>
+       <div class="small">Unterstützt PDF (Lohr / Kieback & Peter) sowie Excel / CSV mit typischen Kabelspalten.</div>
+       <div class="toolbar" style="margin-top:9px">
+        <label for="v740CableFile" class="primary v740FileLabel" style="margin:0">Datei auswählen</label>
+        <input id="v740CableFile" type="file" accept=".pdf,.xlsx,.xls,.csv,application/pdf,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="v740CableFileChanged(event)">
+        <span id="v740FileName" class="small">Noch keine Datei gewählt.</span>
+       </div>
+       <div id="v740DetectMessage" class="v740Error"></div>
+      </div>
+      <div class="v740Panel">
+       <h3>2 · Erstellen</h3>
+       <div class="v740ModeGrid">
+        <div><label>AMBL-Struktur</label><select id="v740Mode" onchange="v740RenderCableSummary()"><option value="row">1 AMBL je Kabel / Zeile</option><option value="area">1 AMBL je Anlage / Bereich</option></select></div>
+        <div><label>Datum der neuen AMBL</label><input id="v740Date" type="date"></div>
+       </div>
+       <label class="v740CheckLine"><input id="v740CreateUnmapped" type="checkbox" checked> <span>AMBL auch anlegen, wenn noch keine LV-Unterposition zugeordnet ist. Dann bleibt das Blatt als leere Vorlage bestehen.</span></label>
+       <label class="v740CheckLine"><input id="v740IncludeEntfallen" type="checkbox" onchange="v740ToggleEntfallen(this.checked)"> <span>Als „ENTFALLEN“ erkannte Zeilen ebenfalls auswählen.</span></label>
+      </div>
+     </div>
+     <div id="v740Summary" class="v740Stage"></div>
+     <div id="v740Mapping" class="v740Stage"></div>
+     <div id="v740Preview" class="v740Stage"></div>
+    </div>
+    <div class="modalFoot"><span id="v740FootInfo" class="v740FootInfo"></span><button class="secondary" onclick="v740CloseCableImport()">Abbrechen</button><button class="primary" id="v740CreateBtn" onclick="v740CreateAmbl()" disabled>AMBL erstellen</button></div>
+   </div>`;
+   document.body.appendChild(m);
+ }
+
+ window.v740OpenCableImport=function(){
+   if(!p()){alert('Bitte zuerst ein Projekt auswählen.');return}
+   if(!masterAllowed()){alert('Der Kabellistenimport ist nur im Masterprojekt verfügbar.');return}
+   ensureModal(); V740.fileName='';V740.profile='';V740.rows=[];V740.map={};V740.error='';V740.busy=false;
+   $('v740CableFile').value=''; $('v740FileName').textContent='Noch keine Datei gewählt.';
+   $('v740DetectMessage').innerHTML=''; $('v740Summary').innerHTML=''; $('v740Mapping').innerHTML=''; $('v740Preview').innerHTML='';
+   $('v740Date').value=new Date().toISOString().slice(0,10); $('v740CreateBtn').disabled=true; $('v740FootInfo').textContent='';
+   $('v740CableModal').classList.add('open');
+ }
+ window.v740CloseCableImport=function(){if(V740.busy)return; $('v740CableModal')?.classList.remove('open')}
+
+ async function pdfItems(file){
+   const data=new Uint8Array(await file.arrayBuffer()); const doc=await pdfjsLib.getDocument({data}).promise; const pages=[];
+   for(let pn=1;pn<=doc.numPages;pn++){
+     const page=await doc.getPage(pn),vp=page.getViewport({scale:1}),tc=await page.getTextContent();
+     const items=(tc.items||[]).map(i=>({str:txt(i.str),x:Number(i.transform?.[4]||0),y:Number(i.transform?.[5]||0),w:Number(i.width||0)})).filter(i=>i.str);
+     pages.push({page:pn,width:vp.width,height:vp.height,items,text:items.map(i=>i.str).join(' ')});
+   }
+   return pages;
+ }
+ function bandForKey(keys,key){
+   const ys=keys.map(k=>k.y).sort((a,b)=>a-b); const y=key.y; const ix=ys.findIndex(v=>Math.abs(v-y)<.01);
+   const prev=ix>0?ys[ix-1]:y-(ix+1<ys.length?Math.abs(ys[ix+1]-y):20);
+   const next=ix+1<ys.length?ys[ix+1]:y+(ix>0?Math.abs(y-ys[ix-1]):20);
+   return {lo:(prev+y)/2,hi:(y+next)/2};
+ }
+ function itemsInBand(page,keys,key){const b=bandForKey(keys,key);return page.items.filter(i=>i.y>=b.lo&&i.y<=b.hi).slice().sort((a,b)=>a.x-b.x)}
+ function cellByRatio(items,width,a,b){return uniqueJoin(items.filter(i=>i.x/width>=a&&i.x/width<b).map(i=>i.str))}
+
+ function parseKieback(pages){
+   const rows=[];
+   for(const pg of pages){
+     const keys=pg.items.filter(i=>/^W\d{3,4}$/i.test(i.str)); if(!keys.length)continue;
+     for(const key of keys){
+       const it=itemsInBand(pg,keys,key),W=pg.width;
+       const description=cellByRatio(it,W,.075,.19);
+       const area=cellByRatio(it,W,.19,.21);
+       const fabrikat=cellByRatio(it,W,.21,.37);
+       const power=cellByRatio(it,W,.37,.385);
+       const voltage=cellByRatio(it,W,.385,.42);
+       const from=cellByRatio(it,W,.415,.46);
+       const to=cellByRatio(it,W,.46,.59);
+       const cableType=cellByRatio(it,W,.59,.65);
+       const dimension=cleanDimension(cellByRatio(it,W,.65,.70));
+       const remark=cellByRatio(it,W,.73,.995);
+       if(!description&&!cableType)continue;
+       rows.push({sourceId:key.str,description,area,fabrikat,power,voltage,from,to,cableType,dimension,remark,remark2:'',length:null,allText:it.map(x=>x.str).join(' '),sourcePage:pg.page});
+     }
+   }
+   return rows;
+ }
+ function parseLohr(pages){
+   const rows=[];
+   for(const pg of pages){
+     const W=pg.width;
+     const cableKeys=pg.items.filter(i=>i.x/W>=.075&&i.x/W<.18&&/^[A-Z]\d{2}\/\S+/i.test(i.str));
+     /* Auf Seite 4 sind die letzten drei Kabel als "Modbus" + Nummer in
+        zwei getrennten Textobjekten geschrieben. Diese ebenfalls als Key. */
+     const modbusKeys=pg.items.filter(i=>i.x/W>=.085&&i.x/W<.12&&/^Modbus$/i.test(i.str)).map(i=>{
+       const nr=pg.items.find(n=>n.x/W>=.12&&n.x/W<.16&&/^\d+$/.test(n.str)&&Math.abs(n.y-i.y)<2.5);
+       return nr?{...i,str:`Modbus ${nr.str}`} : null;
+     }).filter(Boolean);
+     const keys=[...cableKeys,...modbusKeys].sort((a,b)=>a.y-b.y);
+     if(!keys.length)continue;
+     for(const key of keys){
+       const it=itemsInBand(pg,keys,key);
+       const designation=key.str;
+       const from=cellByRatio(it,W,.18,.31);
+       const to=cellByRatio(it,W,.31,.46);
+       const typeDim=cellByRatio(it,W,.46,.52); const td=splitTypeDimension(typeDim);
+       const power=cellByRatio(it,W,.52,.575),voltage=cellByRatio(it,W,.575,.62);
+       const current=cellByRatio(it,W,.62,.665),fabrikat=cellByRatio(it,W,.665,.765);
+       const remark=cellByRatio(it,W,.765,.90),remark2=cellByRatio(it,W,.90,.955),lfd=cellByRatio(it,W,.955,1.0);
+       if(!designation)continue;
+       const area=(designation.match(/^([A-Z]\d{2})\//i)||[])[1]||'Bestandspumpen';
+       const len=/^\d+(?:[.,]\d+)?$/.test(txt(remark2))?safeNum(remark2):null;
+       rows.push({sourceId:lfd||designation,description:designation,area,from,to,cableType:td.cableType,dimension:td.dimension,power,voltage,current,fabrikat,remark,remark2,length:len,allText:it.map(x=>x.str).join(' '),sourcePage:pg.page});
+     }
+   }
+   return rows;
+ }
+ async function parsePdf(file){
+   const pages=await pdfItems(file); const all=nrm(pages.map(p=>p.text).join(' '));
+   if(all.includes('kieback')||all.includes('kabel-liste'))return {profile:'Kieback & Peter',rows:parseKieback(pages)};
+   if(all.includes('vorabkabelliste')||all.includes('lohr'))return {profile:'Lohr Vorabkabelliste',rows:parseLohr(pages)};
+   const k=parseKieback(pages); if(k.length)return {profile:'PDF · Kabel-Nr.-Erkennung',rows:k};
+   const l=parseLohr(pages); if(l.length)return {profile:'PDF · Kabelbezeichnungs-Erkennung',rows:l};
+   throw new Error('Die PDF enthält Text, aber keine unterstützte Kabellistenstruktur. Bitte Excel/CSV verwenden oder die Liste als neues Profil ergänzen.');
+ }
+
+ function headerScore(row){
+   const s=nrm((row||[]).join(' | ')); let sc=0;
+   ['kabel','verbraucher','gerätebezeichnung','von punkt','von feld','quelle','nach punkt','ziel','kabeltype','kabelquerschnitt','kabel nr','kabellänge','anlage'].forEach(k=>{if(s.includes(k))sc++});
+   return sc;
+ }
+ function headerMap(row){
+   const out={}; (row||[]).forEach((v,i)=>{
+     const h=nrm(v);
+     if(!h)return;
+     if(out.description==null&&(/verbraucher|gerätebezeich|kabelbezeich/.test(h)))out.description=i;
+     if(out.cableNo==null&&(/kabel.?nr|lfd.?nr/.test(h)))out.cableNo=i;
+     if(out.from==null&&(/von punkt|von feld|quelle/.test(h)))out.from=i;
+     if(out.to==null&&(/nach punkt|nach orts|ziel/.test(h)))out.to=i;
+     if(out.cableType==null&&(/kabeltype|kabeltyp/.test(h)))out.cableType=i;
+     if(out.dimension==null&&(/dimension|querschnitt/.test(h)))out.dimension=i;
+     if(out.length==null&&(/kabellänge|kabellaenge|länge|laenge/.test(h)))out.length=i;
+     if(out.area==null&&(/anlage|bereich|gewerk/.test(h)))out.area=i;
+     if(out.remark==null&&(/bemerkung|hinweis/.test(h)))out.remark=i;
+     if(out.voltage==null&&(/spannung/.test(h)))out.voltage=i;
+     if(out.power==null&&(/leistung/.test(h)))out.power=i;
+   }); return out;
+ }
+ async function parseSpreadsheet(file){
+   const data=await file.arrayBuffer(); const wb=XLSX.read(data,{type:'array'}); let best=null;
+   for(const sn of wb.SheetNames){
+     const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:'',raw:false});
+     for(let r=0;r<Math.min(rows.length,40);r++){const sc=headerScore(rows[r]);if(!best||sc>best.score)best={sheet:sn,row:r,score:sc,rows,map:headerMap(rows[r])}}
+   }
+   if(!best||best.score<2)throw new Error('Keine typische Kabellisten-Kopfzeile erkannt.');
+   const out=[]; const m=best.map;
+   for(let r=best.row+1;r<best.rows.length;r++){
+     const row=best.rows[r]||[]; const get=k=>m[k]==null?'':txt(row[m[k]]);
+     const description=get('description'),cableNo=get('cableNo'),from=get('from'),to=get('to'),rawType=get('cableType'),rawDim=get('dimension');
+     if(!description&&!cableNo&&!from&&!to&&!rawType&&!rawDim)continue;
+     const td=splitTypeDimension([rawType,rawDim].filter(Boolean).join(' '));
+     const remark=get('remark');
+     out.push({sourceId:cableNo||String(r+1),description,area:get('area'),from,to,cableType:td.cableType,dimension:td.dimension,length:safeNum(get('length')),remark,remark2:'',voltage:get('voltage'),power:get('power'),allText:row.join(' '),sourcePage:best.sheet});
+   }
+   return {profile:`Excel/CSV · ${best.sheet}`,rows:out};
+ }
+
+ function normalizeRows(rows){
+   const seen=new Set(),out=[];
+   for(const raw of rows){
+     const r={...raw}; r.sourceId=txt(r.sourceId)||String(out.length+1); r.description=txt(r.description); r.area=txt(r.area)||'Kabelliste'; r.from=txt(r.from); r.to=txt(r.to); r.cableType=txt(r.cableType); r.dimension=cleanDimension(r.dimension||r.cableType); r.remark=txt(r.remark); r.remark2=txt(r.remark2); r.status=sourceStatus(r); r.selected=r.status!=='entfallen';
+     const key=[r.sourceId,r.description,r.from,r.to,r.cableType,r.dimension].map(nrm).join('|'); if(seen.has(key))continue;seen.add(key);out.push(r);
+   }
+   return out;
+ }
+ function buildMappings(){
+   V740.map={}; const sigs=[...new Set(V740.rows.map(cableSignature))];
+   sigs.forEach(sig=>{V740.map[sig]=autoMap(sig).pos||''});
+ }
+
+ window.v740CableFileChanged=async function(ev){
+   const file=ev.target.files?.[0]; if(!file)return;
+   V740.busy=true; V740.fileName=file.name; $('v740FileName').textContent=file.name; $('v740DetectMessage').innerHTML='<div class="info">Kabelliste wird gelesen …</div>'; $('v740CreateBtn').disabled=true;
+   try{
+     const low=file.name.toLowerCase(); const parsed=low.endsWith('.pdf')?await parsePdf(file):await parseSpreadsheet(file);
+     V740.profile=parsed.profile;V740.rows=normalizeRows(parsed.rows);buildMappings();
+     if(!V740.rows.length)throw new Error('Keine Kabelzeilen erkannt.');
+     $('v740DetectMessage').innerHTML=`<div class="success"><b>${esc(V740.profile)}</b> erkannt · ${V740.rows.length} Kabelzeilen gelesen.</div>`;
+     v740RenderAll();
+   }catch(err){V740.rows=[];$('v740DetectMessage').innerHTML=`<div class="error">${esc(err?.message||String(err))}</div>`;v740RenderAll()}
+   finally{V740.busy=false}
+ }
+
+ window.v740RenderCableSummary=function(){renderSummary();renderFoot()}
+ function renderSummary(){
+   const box=$('v740Summary');if(!box)return; if(!V740.rows.length){box.innerHTML='';return}
+   const selected=V740.rows.filter(r=>r.selected).length,entf=V740.rows.filter(r=>r.status==='entfallen').length,bestand=V740.rows.filter(r=>r.status==='bestand').length,sigs=new Set(V740.rows.map(cableSignature)).size;
+   const mode=$('v740Mode')?.value||'row'; const ambl=mode==='row'?selected:new Set(V740.rows.filter(r=>r.selected).map(r=>r.area||'Kabelliste')).size;
+   box.innerHTML=`<div class="v740SummaryGrid"><div class="v740SummaryCell"><span>erkannt</span><b>${V740.rows.length}</b></div><div class="v740SummaryCell"><span>ausgewählt</span><b>${selected}</b></div><div class="v740SummaryCell"><span>Kabelarten</span><b>${sigs}</b></div><div class="v740SummaryCell"><span>neue AMBL</span><b>${ambl}</b></div></div><div class="small" style="margin-top:6px">${bestand} Bestand · ${entf} entfallen erkannt</div>`;
+ }
+ function renderMappings(){
+   const box=$('v740Mapping'); if(!box)return; if(!V740.rows.length){box.innerHTML='';return}
+   const counts=new Map();V740.rows.forEach(r=>{const s=cableSignature(r);counts.set(s,(counts.get(s)||0)+1)});
+   box.innerHTML=`<div class="v740Panel"><h3>3 · Kabelart → LV-Unterposition</h3><div class="small">Die Zuordnung gilt für alle Zeilen derselben Kabelart und kann vor dem Erstellen geändert werden.</div><div class="v740MappingList">${[...counts.entries()].map(([sig,count])=>{const a=autoMap(sig),sel=V740.map[sig]||'';return `<div class="v740MapItem"><div class="v740MapSig">${esc(sig)}</div><div class="v740MapCount">${count} Zeile(n)</div><select onchange="v740MappingChanged('${encodeURIComponent(sig)}',this.value)">${positionOptions(sel)}</select>${a.pos&&sel===a.pos?`<div class="v740MapAuto">✓ ${esc(a.label)}</div>`:''}</div>`}).join('')}</div></div>`;
+ }
+ window.v740MappingChanged=function(enc,val){const sig=decodeURIComponent(enc);V740.map[sig]=val;renderPreview();renderFoot()}
+ function rowLabel(r){return txt(r.sourceId)||txt(r.description)||'Zeile'}
+ function descLabel(r){return txt(r.description)||[r.from,r.to].filter(Boolean).join(' → ')||'Kabelliste'}
+ function renderPreview(){
+   const box=$('v740Preview');if(!box)return;if(!V740.rows.length){box.innerHTML='';return}
+   box.innerHTML=`<div class="v740Panel"><div class="v674HeadRow"><div><h3>4 · Vorschau</h3><div class="small">Nur markierte Zeilen werden übernommen. „ENTFALLEN“ ist standardmäßig abgewählt.</div></div><div class="toolbar"><button class="secondary" onclick="v740SelectAll(true)">Alle</button><button class="secondary" onclick="v740SelectAll(false)">Keine</button></div></div><div class="v740PreviewWrap"><table><thead><tr><th>✓</th><th>Quelle</th><th>Beschreibung</th><th>Von → Nach</th><th>Kabel</th><th>Status</th><th>Menge</th><th>LV</th></tr></thead><tbody>${V740.rows.map((r,i)=>{const sig=cableSignature(r),mp=V740.map[sig]||'',q=mp?getPos?.(mp):null,qty=Number.isFinite(Number(r.length))&&Number(r.length)>0?Number(r.length):0;return `<tr><td><input type="checkbox" style="width:auto" ${r.selected?'checked':''} onchange="v740RowCheck(${i},this.checked)"></td><td><b>${esc(rowLabel(r))}</b><div class="small">${esc(r.area||'')}</div></td><td class="wrap">${esc(descLabel(r))}</td><td class="wrap">${esc([r.from,r.to].filter(Boolean).join(' → ')||'–')}</td><td>${esc(sig)}</td><td><span class="v740Status ${r.status}">${esc(r.status==='bestand'?'Bestand':r.status==='entfallen'?'Entfallen':'Neu')}</span></td><td>${qty?`${num(qty)} m`:'0 · Vorlage'}</td><td>${q?`${esc(mp)}<div class="small">${esc(q.text)}</div>`:'<span class="v740NoMap">offen</span>'}</td></tr>`}).join('')}</tbody></table></div></div>`;
+ }
+ window.v740RowCheck=function(i,v){if(V740.rows[i])V740.rows[i].selected=!!v;renderSummary();renderFoot()}
+ window.v740SelectAll=function(v){V740.rows.forEach(r=>r.selected=!!v&&(r.status!=='entfallen'||$('v740IncludeEntfallen')?.checked));v740RenderAll()}
+ window.v740ToggleEntfallen=function(v){V740.rows.forEach(r=>{if(r.status==='entfallen')r.selected=!!v});v740RenderAll()}
+ function renderFoot(){const selected=V740.rows.filter(r=>r.selected);const unmapped=selected.filter(r=>!V740.map[cableSignature(r)]).length;const allow=$('v740CreateUnmapped')?.checked!==false;const btn=$('v740CreateBtn');if(btn)btn.disabled=!selected.length||(!allow&&unmapped>0)||V740.busy;$('v740FootInfo').textContent=selected.length?`${selected.length} Zeile(n) ausgewählt · ${unmapped} ohne LV-Zuordnung`:''}
+ window.v740RenderAll=function(){renderSummary();renderMappings();renderPreview();renderFoot()}
+
+ function maxSheetSubNo(){let max=0;(p()?.sheets||[]).forEach(s=>{const m=String(s.code||'').match(/AMBL\s*1\.(\d+)/i);if(m)max=Math.max(max,Number(m[1]))});return max}
+ function makeSheet(code,area,topArea,note,src,date){return {id:uid('sheet'),code,trade:p()?.meta?.trade||'',date,topArea:txt(topArea),area:txt(area)||'Kabelliste',note:txt(note),sourceTemplate:false,sourceCableImport:src}}
+ function makeEntry(sheet,r,pos,lineNo){
+   const q=getPos?.(pos),qty=Number.isFinite(Number(r.length))&&Number(r.length)>0?Number(r.length):0; const now=new Date().toISOString();
+   const e={id:uid('e'),sheetId:sheet.id,lineDesc:[r.sourceId,descLabel(r)].filter(Boolean).join(' · '),lineNo,pos,calc:String(qty),qty,unit:q?.unit||'m',detail:[r.from,r.to].filter(Boolean).join(' → '),reason:reasonFor(r),note:txt([r.remark,r.remark2].filter(Boolean).join(' · ')),planId:'',updated:now,sourceCableImport:{fileName:V740.fileName,profile:V740.profile,sourceId:r.sourceId,area:r.area,from:r.from,to:r.to,cableType:r.cableType,dimension:r.dimension,sourcePage:r.sourcePage}};
+   if(!e.syncUuid)e.syncUuid='entry_'+cryptoSafeId();e.syncRevision=1;e.syncUpdatedAt=now;e.syncUpdatedBy='MASTER';e.syncUpdatedByName='Master';e.syncDirty=false;return e;
+ }
+
+ window.v740CreateAmbl=function(){
+   const pr=p();if(!pr||!masterAllowed())return;
+   const selected=V740.rows.filter(r=>r.selected);if(!selected.length){alert('Bitte mindestens eine Zeile auswählen.');return}
+   const createUnmapped=$('v740CreateUnmapped')?.checked!==false; const mode=$('v740Mode')?.value||'row'; const date=$('v740Date')?.value||new Date().toISOString().slice(0,10);
+   const unresolved=selected.filter(r=>!V740.map[cableSignature(r)]); if(unresolved.length&&!createUnmapped){alert(`${unresolved.length} ausgewählte Zeile(n) haben noch keine LV-Zuordnung.`);return}
+   if(!confirm(`${selected.length} Kabelzeile(n) übernehmen und neue Aufmaßblätter anlegen?\n\nBestehende Aufmaßblätter und Erfassungen werden nicht verändert.`))return;
+   V740.busy=true;renderFoot();
+   try{
+     let next=maxSheetSubNo()+1,createdSheets=[],createdEntries=[];
+     const groups=mode==='row'?selected.map((r,i)=>({key:`row_${i}`,area:r.area||'Kabelliste',rows:[r]})):[...selected.reduce((m,r)=>{const k=r.area||'Kabelliste';if(!m.has(k))m.set(k,[]);m.get(k).push(r);return m},new Map()).entries()].map(([key,rows])=>({key,area:key,rows}));
+     for(const g of groups){
+       const first=g.rows[0]; const code='AMBL 1.'+String(next++).padStart(2,'0');
+       const area=mode==='row'?[first.sourceId,descLabel(first)].filter(Boolean).join(' · ').slice(0,120):g.area;
+       const note=`Aus Kabelliste importiert: ${V740.fileName} · ${V740.profile}`;
+       const sh=makeSheet(code,area,mode==='row'?(first.area||'Kabelliste'):'Kabellistenimport',note,{fileName:V740.fileName,profile:V740.profile,groupMode:mode},date);pr.sheets.push(sh);createdSheets.push(sh);
+       let ln=1;
+       for(const r of g.rows){
+         const pos=V740.map[cableSignature(r)]||''; if(!pos)continue;
+         const e=makeEntry(sh,r,pos,ln++);pr.entries.push(e);assignEntryDisplayId?.(e);createdEntries.push(e);
+       }
+     }
+     pr.cableImportRules=pr.cableImportRules||{};Object.entries(V740.map).forEach(([sig,pos])=>{if(pos)pr.cableImportRules[sig]=pos});
+     pr.cableImportInfo={fileName:V740.fileName,profile:V740.profile,rows:selected.length,createdSheets:createdSheets.length,createdEntries:createdEntries.length,importedAt:new Date().toLocaleString('de-AT')};
+     if(createdSheets[0])pr.activeSheetId=createdSheets[0].id;
+     v656RefreshTemplateFlags?.();ensureEntryDisplayIds?.();persist?.();renderSheetSelect?.();renderAll?.();renderProjectAdmin?.();renderCard();
+     $('v740CableModal').classList.remove('open');
+     const blankSheets=createdSheets.filter(sh=>!createdEntries.some(e=>e.sheetId===sh.id)).length;
+     alert(`${createdSheets.length} Aufmaßblatt/-blätter erstellt.\n${createdEntries.length} Erfassungs-ID(s) mit LV-Unterposition angelegt.${blankSheets?`\n${blankSheets} AMBL ohne LV-Zuordnung als leere Vorlage angelegt.`:''}`);
+   }catch(err){alert('Import konnte nicht abgeschlossen werden: '+(err?.message||String(err)))}finally{V740.busy=false;renderFoot()}
+ }
+
+ const oldRenderProjectAdmin=renderProjectAdmin;
+ renderProjectAdmin=function(){const r=oldRenderProjectAdmin.apply(this,arguments);setTimeout(()=>{ensureCard();renderCard()},0);return r}
+ window.addEventListener('load',()=>setTimeout(()=>{ensureCard();ensureModal();renderCard()},800));
 })();
 </script>
 
