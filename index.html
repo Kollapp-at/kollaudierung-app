@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.55</title>
+<title>Kollaudierung – V7.57</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7375,7 +7375,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.55 <span class="v693BuildStamp">Build 7.55</span></h1>
+     <h1>Kollaudierung – V7.57 <span class="v693BuildStamp">Build 7.57</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16325,7 +16325,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.55",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.57",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26106,7 +26106,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.55";
+const KOLLAPP_VERSION="7.57";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -36485,6 +36485,274 @@ tbody tr:hover td{
 
   ["createPlanAnnotation","finishPlanLine","finishFreehand","finishShapeDraft"]
     .forEach(wrapDrawingFunction);
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.56 – Planbereich: sauberere Anordnung + Sprung nach oben
+   ============================================================ */
+@media (min-width: 1101px){
+  .planEditorGrid{
+    grid-template-columns:minmax(0,1fr) 320px!important;
+    align-items:start!important;
+    gap:14px!important;
+  }
+  .planCanvasCard{min-width:0!important;}
+  .planSide{
+    min-width:300px!important;
+    max-width:320px!important;
+  }
+  .planTools{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:flex-start!important;
+    gap:10px!important;
+  }
+  .planTools .v713SecondRow{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:10px!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  .planTools .v713SecondRow > *,
+  .planTools .planToolGroup,
+  .planTools #v714PlanActions > *{
+    flex:0 0 auto!important;
+  }
+  #v714PlanActions{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:8px!important;
+    margin-left:auto!important;
+    justify-content:flex-start!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+}
+#v739PlanUsageHint{
+  display:block!important;
+  width:100%!important;
+  clear:both!important;
+  margin:8px 0 6px!important;
+}
+.planInfoStack{
+  margin:4px 0 8px!important;
+}
+.planSide #freehandOptions{
+  margin-top:10px!important;
+}
+#v756JumpTopBtn{
+  width:100%;
+  margin-top:8px;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.56 – Sprungbutton + Planbereich-Anordnung
+   ============================================================ */
+(function(){
+  function $(id){ return document.getElementById(id); }
+
+  function v756JumpToTop(){
+    try{ scrollToEntryTop(); }catch(err){}
+  }
+  window.v756JumpToTop = v756JumpToTop;
+
+  function ensureJumpButton(){
+    const side = document.querySelector('.planSide');
+    if(!side) return;
+    const autoBox = side.querySelector('.autoPlanLinkBox');
+    if(!autoBox) return;
+    let btn = $('v756JumpTopBtn');
+    if(btn) return;
+    btn = document.createElement('button');
+    btn.id = 'v756JumpTopBtn';
+    btn.type = 'button';
+    btn.className = 'secondary';
+    btn.textContent = 'Bearbeitung oben öffnen';
+    btn.onclick = v756JumpToTop;
+    autoBox.insertAdjacentElement('afterend', btn);
+  }
+
+  function stabilizePlanToolbar(){
+    const bar = document.querySelector('.planTools');
+    if(!bar) return;
+    bar.style.alignItems = 'flex-start';
+    const second = bar.querySelector('.v713SecondRow');
+    if(second){
+      second.style.width = '100%';
+      second.style.minWidth = '0';
+      second.style.flexWrap = window.matchMedia('(min-width:1101px)').matches ? 'wrap' : second.style.flexWrap;
+    }
+    const hint = $('v739PlanUsageHint');
+    if(hint){
+      hint.style.width = '100%';
+      hint.style.clear = 'both';
+    }
+  }
+
+  function applyV756(){
+    ensureJumpButton();
+    stabilizePlanToolbar();
+  }
+
+  const oldRenderPlans = window.renderPlans;
+  if(typeof oldRenderPlans === 'function'){
+    window.renderPlans = function(){
+      const r = oldRenderPlans.apply(this, arguments);
+      setTimeout(applyV756, 30);
+      return r;
+    };
+  }
+
+  window.addEventListener('load', function(){ setTimeout(applyV756, 250); });
+  window.addEventListener('resize', function(){ setTimeout(stabilizePlanToolbar, 10); });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.57 – FEINSCHLIFF PLANBEDIENUNG
+   ============================================================ */
+#v756JumpTopBtn{
+  position:sticky!important;
+  top:10px!important;
+  z-index:6!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-height:42px!important;
+  margin:0 0 10px!important;
+  padding:8px 11px!important;
+  border-radius:10px!important;
+  background:#eef7ef!important;
+  border:1px solid #cfe4d2!important;
+  color:#24643b!important;
+  font-weight:800!important;
+  box-shadow:0 3px 10px rgba(29,91,54,.10)!important;
+}
+
+#v756JumpTopBtn:hover{
+  background:#e4f2e7!important;
+  transform:none!important;
+}
+
+#v757CurrentLvHint{
+  margin:-3px 0 10px!important;
+  padding:6px 8px!important;
+  border-radius:8px!important;
+  background:#f7fafc!important;
+  border:1px solid #dce6eb!important;
+  color:#607786!important;
+  font-size:10.5px!important;
+  line-height:1.35!important;
+}
+
+.planSide{
+  align-self:start!important;
+}
+
+@media(min-width:1101px){
+  .planTools .v713SecondRow{
+    justify-content:flex-start!important;
+  }
+  .planToolGroup[data-group="zoom"]{
+    order:10!important;
+  }
+  #v714PlanActions{
+    order:20!important;
+    margin-left:auto!important;
+  }
+}
+
+@media(max-width:980px){
+  #v756JumpTopBtn{
+    position:static!important;
+    top:auto!important;
+  }
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.57 – aktueller LV-Kontext am Sprungbutton
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function currentLvLabel(){
+    const pos =
+      $("planPosSelect")?.value ||
+      $("posSelect")?.value ||
+      "";
+
+    if(!pos)return "Keine LV-Unterposition aktiv";
+
+    let text="";
+    try{text=getPos?.(pos)?.text||""}catch(e){}
+
+    return text ? `${pos} · ${text}` : pos;
+  }
+
+  function ensureLvHint(){
+    const btn=$("v756JumpTopBtn");
+    if(!btn)return null;
+
+    let hint=$("v757CurrentLvHint");
+    if(!hint){
+      hint=document.createElement("div");
+      hint.id="v757CurrentLvHint";
+      btn.insertAdjacentElement("afterend",hint);
+    }
+    return hint;
+  }
+
+  function refresh(){
+    const btn=$("v756JumpTopBtn");
+    const hint=ensureLvHint();
+    if(btn){
+      btn.innerHTML="↑ Zur Bearbeitung";
+      btn.title="Zur aktuellen Erfassung nach oben springen";
+    }
+    if(hint){
+      hint.innerHTML=`<b>Aktive LV:</b> ${esc(currentLvLabel())}`;
+    }
+  }
+
+  [
+    "showPosInfo",
+    "renderSelectedAnnotation",
+    "renderAutoPlanLinkSummary",
+    "renderMultiLvDraft",
+    "openPlan"
+  ].forEach(name=>{
+    const fn=window[name];
+    if(typeof fn!=="function")return;
+
+    if(name==="openPlan"){
+      window[name]=async function(){
+        const r=await fn.apply(this,arguments);
+        setTimeout(refresh,0);
+        return r;
+      };
+    }else{
+      window[name]=function(){
+        const r=fn.apply(this,arguments);
+        setTimeout(refresh,0);
+        return r;
+      };
+    }
+  });
+
+  window.addEventListener("load",()=>setTimeout(refresh,500));
 })();
 </script>
 
