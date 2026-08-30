@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.67</title>
+<title>Kollaudierung – V7.69</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.67 <span class="v693BuildStamp">Build 7.67</span></h1>
+     <h1>Kollaudierung – V7.69 <span class="v693BuildStamp">Build 7.69</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.67",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.69",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.67";
+const KOLLAPP_VERSION="7.69";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -39590,6 +39590,418 @@ html[data-theme="dark"] #planStage{
     background:#fff!important;
     color:#111!important;
     color-scheme:light!important;
+  }
+}
+</style>
+
+<style id="v768-readability-fixes">
+/* V7.68 – Dark-Mode Lesbarkeit nachschärfen */
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard > .v692SectionTitle b{
+  color:#f5fbff!important;
+}
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard > .v692SectionTitle small{
+  color:#bcd0dc!important;
+}
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar > div:first-child label{
+  color:#eef7fd!important;
+  font-weight:800!important;
+}
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar > div:first-child .small{
+  color:#c6d7e2!important;
+  opacity:1!important;
+}
+html[data-theme="dark"] #view-entry #entryPhotoList,
+html[data-theme="dark"] #view-entry .v637PhotoList{
+  background:#10283a!important;
+  border-color:#4d6c81!important;
+}
+html[data-theme="dark"] #view-entry #entryPhotoList > .small,
+html[data-theme="dark"] #view-entry .v637PhotoList > .small{
+  color:#f2f7fb!important;
+  font-size:14px!important;
+}
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard #message,
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard > .small{
+  color:#d4e2ea!important;
+}
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard > .small b,
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard #message b{
+  color:#f4f9fc!important;
+}
+/* auch andere oft genutzte kleine Hilfstexte etwas heller */
+html[data-theme="dark"] #view-entry .small,
+html[data-theme="dark"] #view-sheet .small,
+html[data-theme="dark"] #view-lv .small,
+html[data-theme="dark"] #view-export .small,
+html[data-theme="dark"] #view-sync .small,
+html[data-theme="dark"] #view-project .small{
+  color:#bfd0db;
+}
+</style>
+
+
+<style id="v769-final-readability-audit">
+/* ============================================================
+   V7.69 – FINALER LESBARKEITS-CHECK DARK MODE
+   Alle 6 Reiter, dynamische Inhalte, Buttons und Icons.
+   ============================================================ */
+
+html[data-theme="dark"]{
+  --v769-bg:#071521;
+  --v769-card:#0d2130;
+  --v769-card2:#10283a;
+  --v769-card3:#153247;
+  --v769-border:#385b73;
+  --v769-border2:#496f87;
+  --v769-text:#f5f9fc;
+  --v769-soft:#d0dde5;
+  --v769-muted:#abc0cd;
+  --v769-faint:#91a9b8;
+  --v769-blue:#55a5d5;
+  --v769-green:#8bd7a6;
+  --v769-yellow:#f1ce7b;
+  --v769-red:#f1a4a4;
+}
+
+/* ---------- Grundlesbarkeit in allen Reitern ---------- */
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+){
+  color:var(--v769-text)!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) :is(h1,h2,h3,h4,.strong,.v674Title,.v675FlowTitle,.v682SyncHeadText,.v669BtnMain){
+  color:var(--v769-text)!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) :is(.small,.muted,label,.v669BtnSub,.v674BtnSub,.v737Meta,.planFileNote){
+  color:var(--v769-soft)!important;
+  opacity:1!important;
+}
+
+/* wichtige Hilfetexte mindestens auf muted-Kontrast */
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) :is(.hint,.help,.sub,.description,.v627MasterOnlyNote){
+  color:var(--v769-muted)!important;
+  opacity:1!important;
+}
+
+/* ---------- Karten / Panels / dynamische Listen ---------- */
+html[data-theme="dark"] :is(
+ .card,.v667MainCard,.v667ActionCard,
+ .v623AddLvCard,.v630ClientCard,.v674ProjectCard,.v675SyncCard,.v682SyncCard,
+ .syncPanel,.syncHistory,.syncUserList,.syncUserRow,.syncUserItem,
+ .projectPlanCard,.v740CableCard,.mergeConflict,.mergeSide,
+ .exportLogoPreviewBox,.exportBrandPreview,.emptyProjectStart,
+ .v675LvTools,.v675LvSearch,.v675LvMode,.v675LvExport,
+ .v669SheetSelectCard,.v669SheetExportCard,.v669MultiPanel,
+ .v621SheetIdToolbar,.sheetSelectPanel,.v637PhotoBox,.v666PhotoSection,
+ .v697PhotoActionsCard,.planItem,.v737Item,.multiLvBox,.multiLvItem
+){
+  border-color:var(--v769-border)!important;
+}
+
+/* ---------- Inputs ---------- */
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) :is(input,select,textarea){
+  background:#0d2232!important;
+  color:var(--v769-text)!important;
+  border-color:var(--v769-border)!important;
+  box-shadow:none!important;
+}
+
+html[data-theme="dark"] :is(input,textarea)::placeholder{
+  color:var(--v769-faint)!important;
+  opacity:1!important;
+}
+
+html[data-theme="dark"] :is(input,select,textarea):focus{
+  border-color:var(--v769-blue)!important;
+  box-shadow:0 0 0 3px rgba(85,165,213,.20)!important;
+}
+
+html[data-theme="dark"] :is(input,select,textarea):disabled,
+html[data-theme="dark"] input[readonly]{
+  background:#172e3d!important;
+  color:#afc1cc!important;
+  border-color:#365165!important;
+  opacity:1!important;
+}
+
+/* ---------- Buttons ---------- */
+html[data-theme="dark"] button,
+html[data-theme="dark"] .filePickLabel{
+  font-weight:750!important;
+  letter-spacing:0!important;
+}
+
+html[data-theme="dark"] :is(button.secondary,.secondary,.filePickLabel){
+  background:#142d3e!important;
+  color:#f0f6f9!important;
+  border-color:#466a81!important;
+}
+
+html[data-theme="dark"] :is(button.primary,.primary){
+  background:linear-gradient(180deg,#54a4d5,#397fad)!important;
+  color:#fff!important;
+  border-color:#68b2df!important;
+}
+
+html[data-theme="dark"] :is(button.okBtn,.okBtn){
+  background:#1a3c2a!important;
+  color:var(--v769-green)!important;
+  border-color:#427554!important;
+}
+
+html[data-theme="dark"] :is(button.danger,.danger){
+  background:#442529!important;
+  color:var(--v769-red)!important;
+  border-color:#7d474d!important;
+}
+
+html[data-theme="dark"] button:disabled{
+  background:#20323e!important;
+  color:#9eb0bb!important;
+  border-color:#3b5261!important;
+  opacity:.72!important;
+}
+
+/* ---------- Icons ---------- */
+html[data-theme="dark"] :is(.v667TabIcon,button i,.tab i){
+  color:currentColor!important;
+  opacity:1!important;
+}
+
+html[data-theme="dark"] :is(button,.tab) svg{
+  stroke:currentColor!important;
+  opacity:1!important;
+}
+
+html[data-theme="dark"] :is(button,.tab) svg [fill]:not([fill="none"]){
+  fill:currentColor!important;
+}
+
+/* ---------- Tabs ---------- */
+html[data-theme="dark"] .tabs.noPrint{
+  background:#0b1e2c!important;
+  border-color:#34566d!important;
+}
+
+html[data-theme="dark"] .tab{
+  color:#c6d5de!important;
+}
+
+html[data-theme="dark"] .tab:hover{
+  background:#173246!important;
+  color:#fff!important;
+}
+
+html[data-theme="dark"] .tab.active{
+  background:#1a3b50!important;
+  color:#9bd9fa!important;
+  border-color:#4d7e9b!important;
+}
+
+/* ---------- Info- / Hinweisboxen ---------- */
+html[data-theme="dark"] :is(
+ .info,.autoPlanLinkBox,.planSelectedBox,.v742Intro,.v739Hint,
+ #v739PlanUsageHint,#v757CurrentLvHint,.v739Details,.dropzone,
+ .calcPreview,.entryPlanBox,.planLinkBox,.terminologyHint,
+ .sheetCheckItem,.v685NoTemplates,.empty,.exportProgress
+){
+  background:#112a3b!important;
+  color:#d4e2ea!important;
+  border-color:#3d6077!important;
+}
+
+html[data-theme="dark"] :is(
+ .info,.autoPlanLinkBox,.planSelectedBox,.v742Intro,.v739Hint,
+ #v739PlanUsageHint,#v757CurrentLvHint,.v739Details,.dropzone,
+ .calcPreview,.entryPlanBox,.planLinkBox,.terminologyHint
+) b{
+  color:#f3f8fb!important;
+}
+
+/* Warnungen bewusst warm, aber gut lesbar */
+html[data-theme="dark"] :is(.notice,.planLineHelp,.unsavedPlanWarning){
+  background:#382f1c!important;
+  color:var(--v769-yellow)!important;
+  border-color:#786331!important;
+}
+
+/* ---------- Tabellen ---------- */
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) .tablewrap{
+  background:#091b28!important;
+  border-color:#35586f!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) table thead th{
+  background:#18354a!important;
+  color:#f6fafc!important;
+  border-color:#46687d!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) table tbody td{
+  background:#0f2433!important;
+  color:#e2ebf0!important;
+  border-color:#2d4c61!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) table tbody tr:nth-child(even) td{
+  background:#122a3a!important;
+}
+
+html[data-theme="dark"] :is(
+ #view-entry,#view-sheet,#view-lv,#view-export,#view-sync,#view-project
+) table tbody tr:hover td{
+  background:#193a50!important;
+}
+
+/* ---------- Erfassen ---------- */
+html[data-theme="dark"] #view-entry .v692SectionTitle b{
+  color:#f5f9fc!important;
+}
+html[data-theme="dark"] #view-entry .v692SectionTitle small{
+  color:#bcd0dc!important;
+}
+html[data-theme="dark"] #view-entry .mobilePosResults :is(.mpt,.mpp,.mpm){
+  color:#e4edf2!important;
+}
+html[data-theme="dark"] #view-entry .mobilePosResults .selected{
+  background:#19415a!important;
+  border-color:#58a2ce!important;
+}
+html[data-theme="dark"] #view-entry .mliText,
+html[data-theme="dark"] #view-entry .mliQty b{
+  color:#f4f8fb!important;
+}
+html[data-theme="dark"] #view-entry .mliCalc,
+html[data-theme="dark"] #view-entry .mliQty{
+  color:#c1d2dc!important;
+}
+
+/* Fotodoku */
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar > div:first-child label{
+  color:#f5f9fc!important;
+}
+html[data-theme="dark"] #view-entry .v697PhotoActionsCard .v637PhotoBox > .toolbar > div:first-child .small{
+  color:#cedce4!important;
+}
+html[data-theme="dark"] #view-entry #entryPhotoList > .small{
+  color:#f1f6f9!important;
+}
+
+/* Planbedienung */
+html[data-theme="dark"] #view-entry #planEditorHead{
+  background:#112b3c!important;
+  color:#f4f9fc!important;
+  border-color:#3f6178!important;
+}
+html[data-theme="dark"] #view-entry #activePlanMeta{
+  color:#bdd0db!important;
+}
+html[data-theme="dark"] #view-entry .planItem .pn{
+  color:#f5f9fc!important;
+}
+html[data-theme="dark"] #view-entry .planItem .pm{
+  color:#c2d4de!important;
+}
+
+/* ---------- Aufmaßblatt ---------- */
+html[data-theme="dark"] #view-sheet .v671TemplatePanel{
+  background:linear-gradient(180deg,#312919,#292216)!important;
+  border-color:#806a36!important;
+}
+html[data-theme="dark"] #view-sheet .v671TemplateTitle{
+  color:#f3d98a!important;
+}
+html[data-theme="dark"] #view-sheet .v671TemplateSub,
+html[data-theme="dark"] #view-sheet .v684TemplatePosMeta{
+  color:#ddcca6!important;
+}
+html[data-theme="dark"] #view-sheet .v671TemplateItem,
+html[data-theme="dark"] #view-sheet .v684TemplatePos{
+  background:#172a36!important;
+  color:#f0f5f8!important;
+}
+
+/* ---------- LV-Übersicht ---------- */
+html[data-theme="dark"] #view-lv .v675LvLegend,
+html[data-theme="dark"] #view-lv .v675LvResultHint{
+  color:#c4d5df!important;
+}
+html[data-theme="dark"] #view-lv .v675LvResultBar{
+  background:#112a3b!important;
+  border-color:#3b5e75!important;
+}
+
+/* ---------- Export ---------- */
+html[data-theme="dark"] #view-export .exportOption,
+html[data-theme="dark"] #view-export .v630ClientCard .small{
+  color:#cbdbe4!important;
+}
+html[data-theme="dark"] #view-export .exportLogoPreviewBox,
+html[data-theme="dark"] #view-export .exportBrandPreview{
+  background:#10283a!important;
+  color:#e1ebf0!important;
+}
+
+/* ---------- Übergabe ---------- */
+html[data-theme="dark"] #view-sync :is(.syncUserRow,.syncUserItem,.syncHistory){
+  color:#e1ebf0!important;
+}
+html[data-theme="dark"] #view-sync #workerPermissionInfo{
+  background:#112a3b!important;
+  color:#e0eaf0!important;
+}
+html[data-theme="dark"] #view-sync #workerPermissionInfo b{
+  color:#f5f9fc!important;
+}
+
+/* ---------- Projekt ---------- */
+html[data-theme="dark"] #view-project .projectPlanCard{
+  color:#e9f1f5!important;
+}
+html[data-theme="dark"] #view-project .v674DangerCard{
+  background:#312125!important;
+  color:#efc0c0!important;
+  border-color:#704047!important;
+}
+html[data-theme="dark"] #view-project #v740CableCard{
+  color:#e7eff3!important;
+}
+
+/* ---------- Badges ---------- */
+html[data-theme="dark"] .badge.ok{background:#1b3f2b!important;color:#95ddb0!important}
+html[data-theme="dark"] .badge.warn{background:#473819!important;color:#f1ce7b!important}
+html[data-theme="dark"] .badge.bad{background:#49262a!important;color:#f2a7a7!important}
+html[data-theme="dark"] .badge.manual{background:#342b4e!important;color:#d0bef4!important}
+
+/* ---------- Print/Plan bleiben bewusst hell ---------- */
+html[data-theme="dark"] #planStage{
+  background:#fff!important;
+}
+
+@media print{
+  html[data-theme="dark"],
+  html[data-theme="dark"] body{
+    color-scheme:light!important;
+    background:#fff!important;
+    color:#111!important;
   }
 }
 </style>
