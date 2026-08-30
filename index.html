@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.48</title>
+<title>Kollaudierung – V7.49</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.48 <span class="v693BuildStamp">Build 7.48</span></h1>
+     <h1>Kollaudierung – V7.49 <span class="v693BuildStamp">Build 7.49</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16319,7 +16319,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.48",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.49",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26100,7 +26100,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.48";
+const KOLLAPP_VERSION="7.49";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -35852,6 +35852,166 @@ tbody tr:hover td{
 /* V7.48 – Hotfix:
    V7.47 referenzierte nicht vorhandene sheetChanged/projectChanged.
    Korrigiert auf selectSheet/switchProject. */
+</script>
+
+
+<script>
+/* ============================================================
+   V7.49 – LV-"ÄNDERN" RECHTS SYNCHRONISIERT DIE ANZEIGE OBEN
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+  let activePlanLvPos="";
+
+  function currentPlanGroup(){
+    const id=$("planEntrySelect")?.value||"";
+    if(!id)return [];
+    const e=(project()?.entries||[]).find(x=>String(x.id)===String(id));
+    if(!e)return [];
+    try{
+      return typeof v612GroupEntries==="function" ? v612GroupEntries(e) : [e];
+    }catch(err){
+      return [e];
+    }
+  }
+
+  function selectedLvEntry(){
+    if(!activePlanLvPos)return null;
+    return currentPlanGroup().find(
+      e=>String(e.pos||"")===String(activePlanLvPos)
+    )||null;
+  }
+
+  function syncPlanPositionControls(pos){
+    pos=String(pos||"");
+    if(!pos)return;
+
+    activePlanLvPos=pos;
+
+    /* Technisches Plan-LV-Select ebenfalls auf die geklickte Pos setzen. */
+    const ps=$("planPosSelect");
+    if(ps){
+      if(![...ps.options].some(o=>String(o.value)===pos)){
+        const p=getPos?.(pos);
+        if(p){
+          const o=document.createElement("option");
+          o.value=pos;
+          o.textContent=`${p.pos} · ${p.text||""}`;
+          ps.appendChild(o);
+        }
+      }
+      ps.value=pos;
+    }
+
+    /*
+      Das normale LV-Select ebenfalls synchron halten, sofern die Position
+      dort vorhanden ist. Keine Filter-/Scroll-Neuberechnung erzwingen.
+    */
+    const sel=$("posSelect");
+    if(sel && [...sel.options].some(o=>String(o.value)===pos)){
+      sel.value=pos;
+    }
+
+    renderAutoPlanLinkSummary?.();
+  }
+
+  /*
+    Finale sichtbare Anzeige "Automatisch verknüpft mit":
+    Bei gezieltem Klick auf eine LV-Unterposition diese statt nur der
+    Gruppen-ID anzeigen.
+  */
+  const baseAutoSummary=renderAutoPlanLinkSummary;
+  renderAutoPlanLinkSummary=function(){
+    const chosen=selectedLvEntry();
+
+    if(!chosen){
+      return baseAutoSummary.apply(this,arguments);
+    }
+
+    const title=$("autoPlanLinkSummary");
+    const meta=$("autoPlanLinkMeta");
+    if(!title||!meta)return;
+
+    const p=getPos?.(chosen.pos);
+    const anchor=currentPlanGroup()[0]||chosen;
+    const sh=(project()?.sheets||[]).find(s=>s.id===chosen.sheetId);
+    const pl=activePlan?.();
+    const displayId=typeof entryDisplayId==="function"
+      ? entryDisplayId(anchor)
+      : (anchor.displayId||chosen.displayId||"");
+
+    title.textContent=`ID ${displayId} · ${chosen.pos} · ${p?.text||""}`;
+
+    const details=[];
+    if(sh?.code)details.push(sh.code);
+    if(chosen.lineDesc)details.push(chosen.lineDesc);
+
+    const qtyLine=[];
+    if(Number.isFinite(Number(chosen.qty))){
+      qtyLine.push(`${num(Number(chosen.qty))} ${chosen.unit||p?.unit||""}`.trim());
+    }
+    if(chosen.calc)qtyLine.push(`Ansatz: ${chosen.calc}`);
+    if(Number(chosen.qty)===0)qtyLine.push("Vorlage");
+    if(pl?.name)qtyLine.push(`Plan: ${pl.name}`);
+
+    meta.innerHTML=
+      `${details.map(esc).join(" · ")}`+
+      `${qtyLine.length?`<br>${qtyLine.map(esc).join(" · ")}`:""}`;
+  };
+
+  /*
+    Bestehende V7.37/V7.38/V7.47-Funktion vollständig behalten und nur
+    unmittelbar davor/danach die sichtbare aktive LV-Unterposition setzen.
+  */
+  if(typeof window.v737EditLvFromPlan==="function"){
+    const baseEdit=window.v737EditLvFromPlan;
+    window.v737EditLvFromPlan=function(pos){
+      syncPlanPositionControls(pos);
+
+      const r=baseEdit.apply(this,arguments);
+
+      /* openPlan() füllt die versteckten Selects neu; danach erneut setzen. */
+      setTimeout(()=>syncPlanPositionControls(pos),60);
+      setTimeout(()=>syncPlanPositionControls(pos),180);
+      return r;
+    };
+  }
+
+  /*
+    Bei einem neuen Einstieg über den grünen Button startet die Anzeige
+    wieder mit der LV-Position des geklickten Eintrags.
+  */
+  const baseMark=markEntryOnPlan;
+  markEntryOnPlan=function(entryId){
+    const e=(project()?.entries||[]).find(x=>String(x.id)===String(entryId))||null;
+    activePlanLvPos=e?.pos||"";
+
+    const r=baseMark.apply(this,arguments);
+
+    if(activePlanLvPos){
+      setTimeout(()=>syncPlanPositionControls(activePlanLvPos),100);
+      setTimeout(()=>syncPlanPositionControls(activePlanLvPos),220);
+    }
+    return r;
+  };
+
+  /* Bei Projekt-/AMBL-Wechsel keine alte LV-Anzeige stehen lassen. */
+  if(typeof selectSheet==="function"){
+    const baseSelect=selectSheet;
+    selectSheet=function(){
+      activePlanLvPos="";
+      return baseSelect.apply(this,arguments);
+    };
+  }
+
+  if(typeof switchProject==="function"){
+    const baseSwitch=switchProject;
+    switchProject=function(){
+      activePlanLvPos="";
+      return baseSwitch.apply(this,arguments);
+    };
+  }
+})();
 </script>
 
 </body>
