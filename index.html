@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.00</title>
+<title>Kollaudierung – V7.01</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -6477,6 +6477,67 @@ main > section.view,
   }
 }
 
+
+/* ============================================================
+   V7.01 – POSITIONSTREFFER ALS ECHTE KARTEN, NICHT ALS BUTTONS
+   ============================================================ */
+#view-entry .mobilePosResult{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  appearance:none!important;
+  -webkit-appearance:none!important;
+}
+
+#view-entry .mobilePosResult .mprCode,
+#view-entry .mobilePosResult .mprText,
+#view-entry .mobilePosResult .mprMeta{
+  position:static!important;
+  float:none!important;
+  width:auto!important;
+  max-width:none!important;
+  height:auto!important;
+  min-height:0!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  text-overflow:clip!important;
+}
+
+#view-entry .mobilePosResult .mprCode{
+  display:block!important;
+  padding-right:110px!important;
+}
+
+#view-entry .mobilePosResult .mprText{
+  display:block!important;
+  padding-right:0!important;
+}
+
+#view-entry .mobilePosResult .mprMeta{
+  display:block!important;
+  padding:6px 0 0!important;
+}
+
+#view-entry .mobilePosResult.selected .mprCode{
+  padding-right:110px!important;
+}
+
+#view-entry .mobilePosResult:focus-visible{
+  outline:2px solid rgba(47,115,155,.38)!important;
+  outline-offset:2px!important;
+}
+
+/* Genug Abstand zwischen echten Karten. */
+#view-entry .mobilePosResults{
+  gap:9px!important;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -6507,7 +6568,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.00 <span class="v693BuildStamp">Build 7.00</span></h1>
+     <h1>Kollaudierung – V7.01 <span class="v693BuildStamp">Build 7.01</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -15444,7 +15505,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.00",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.01",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -25225,7 +25286,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.00";
+const KOLLAPP_VERSION="7.01";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -25400,14 +25461,18 @@ renderMobilePositionResults=function(options={}){
       Number.isFinite(Number(p.lv_qty)) ? `LV-Menge ${num(p.lv_qty)}` : ""
     ].filter(Boolean).join(" · ");
 
-    return `<button type="button"
+    return `<div
       class="mobilePosResult ${String(p.pos)===String(selected)?"selected":""}"
       data-pos="${esc(p.pos)}"
-      onclick="selectMobilePosition('${String(p.pos).replace(/'/g,"\\'")}')">
+      role="button"
+      tabindex="0"
+      aria-pressed="${String(p.pos)===String(selected)?"true":"false"}"
+      onclick="selectMobilePosition('${String(p.pos).replace(/'/g,"\\'")}')"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectMobilePosition('${String(p.pos).replace(/'/g,"\\'")}')}">
       <span class="mprCode">${esc(p.pos)}</span>
       <span class="mprText">${esc(p.text)}</span>
       ${meta?`<span class="mprMeta">${esc(meta)}</span>`:""}
-    </button>`;
+    </div>`;
   }).join("");
 
   if(preserveScroll){
