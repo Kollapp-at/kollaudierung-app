@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.90</title>
+<title>Kollaudierung – V7.91</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.90 <span class="v693BuildStamp">Build 7.90</span></h1>
+     <h1>Kollaudierung – V7.91 <span class="v693BuildStamp">Build 7.91</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16351,7 +16351,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.90",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.91",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26132,7 +26132,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.90";
+const KOLLAPP_VERSION="7.91";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -42935,6 +42935,220 @@ html[data-theme="dark"] .tabs.noPrint #v787TopBtn{
   }
 }
 </style>
+
+
+<style id="v791-mobile-pdf-dialog-fix">
+/* ============================================================
+   V7.91 – Mobile PDF Dialog immer gut lesbar
+   ============================================================ */
+#v651PdfOverlay .v651PdfDialog{
+  background:#ffffff!important;
+  color:#172a38!important;
+  color-scheme:light!important;
+  border:1px solid #d6e0e6!important;
+}
+
+#v651PdfOverlay .v651PdfDialog h2{
+  color:#172a38!important;
+}
+
+#v651PdfOverlay #v651PdfText{
+  color:#334b5a!important;
+  font-weight:600!important;
+}
+
+#v651PdfOverlay #v651PdfSub{
+  color:#6a7d89!important;
+  opacity:1!important;
+}
+
+#v651PdfOverlay #v651PdfSub b,
+#v651PdfOverlay #v651PdfSub strong{
+  color:#425c6d!important;
+}
+
+#v651PdfOverlay .v651PdfProgress{
+  background:#dfe8ed!important;
+}
+
+#v651PdfOverlay .v651PdfProgress > div{
+  background:#3f9dca!important;
+}
+
+/* Buttons behalten ihre eigene Funktion/Farbe */
+#v651PdfOverlay .v651PdfReadyActions button{
+  opacity:1!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.91 – Mobiler PDF-Capture vollständig Light
+   Abrechnung / Gesamtabrechnung dürfen NIE Dark-Mode übernehmen.
+   ============================================================ */
+(function(){
+  const baseCaptureCssV791=v651CaptureCss;
+
+  function v791MobileBillingLightCss(){
+    return `
+      /* ---------- kompletter Capture-Kontext ---------- */
+      .v651CaptureRoot{
+        background:#fff!important;
+        color:#111!important;
+        color-scheme:light!important;
+      }
+
+      .v651CaptureRoot .v519PrintPage,
+      .v651CaptureRoot .v519PageBody,
+      .v651CaptureRoot .v519BillingPage,
+      .v651CaptureRoot .finalBillingSummary,
+      .v651CaptureRoot .billingSummary{
+        background:#fff!important;
+        color:#111!important;
+      }
+
+      .v651CaptureRoot .v519SectionTitle,
+      .v651CaptureRoot .v519SectionSub,
+      .v651CaptureRoot .v519GrandTotal,
+      .v651CaptureRoot .grandTotal,
+      .v651CaptureRoot .billingSummary h1,
+      .v651CaptureRoot .billingSummary h2,
+      .v651CaptureRoot .finalBillingSummary h1,
+      .v651CaptureRoot .finalBillingSummary h2{
+        color:#111!important;
+      }
+
+      .v651CaptureRoot .v519SectionSub{
+        color:#444!important;
+      }
+
+      /* ---------- Abrechnungs-Summenbox ---------- */
+      .v651CaptureRoot .billingTotalsBox{
+        background:#f7fafc!important;
+        color:#111!important;
+        border:2px solid #9eb6c7!important;
+        box-shadow:none!important;
+      }
+
+      .v651CaptureRoot .billingTotalsGrid{
+        background:transparent!important;
+      }
+
+      .v651CaptureRoot .billingTotalsGrid .bt{
+        background:#fff!important;
+        color:#111!important;
+        border:1px solid #c6d3db!important;
+        box-shadow:none!important;
+      }
+
+      .v651CaptureRoot .billingTotalsGrid .bt b{
+        color:#3d515e!important;
+        opacity:1!important;
+      }
+
+      .v651CaptureRoot .billingTotalsGrid .bt span{
+        color:#111!important;
+      }
+
+      /* ---------- JEDE Tabelle auf Abrechnungsseiten hell ---------- */
+      .v651CaptureRoot .v519BillingPage table,
+      .v651CaptureRoot .billingSummary table,
+      .v651CaptureRoot .finalBillingSummary table{
+        background:#fff!important;
+        color:#111!important;
+        border-collapse:separate!important;
+        border-spacing:0!important;
+        border:0!important;
+        box-shadow:none!important;
+      }
+
+      .v651CaptureRoot .v519BillingPage thead,
+      .v651CaptureRoot .billingSummary thead,
+      .v651CaptureRoot .finalBillingSummary thead{
+        background:#eef2f4!important;
+        color:#111!important;
+      }
+
+      .v651CaptureRoot .v519BillingPage th,
+      .v651CaptureRoot .billingSummary th,
+      .v651CaptureRoot .finalBillingSummary th{
+        background:#eef2f4!important;
+        color:#111!important;
+        border-left:0!important;
+        border-right:0!important;
+        border-top:0!important;
+        border-bottom:2px solid #9aa8b1!important;
+      }
+
+      .v651CaptureRoot .v519BillingPage tbody,
+      .v651CaptureRoot .billingSummary tbody,
+      .v651CaptureRoot .finalBillingSummary tbody,
+      .v651CaptureRoot .v519BillingPage tr,
+      .v651CaptureRoot .billingSummary tr,
+      .v651CaptureRoot .finalBillingSummary tr{
+        background:#fff!important;
+        color:#111!important;
+      }
+
+      .v651CaptureRoot .v519BillingPage td,
+      .v651CaptureRoot .billingSummary td,
+      .v651CaptureRoot .finalBillingSummary td{
+        background:#fff!important;
+        color:#111!important;
+        border-left:0!important;
+        border-right:0!important;
+        border-top:0!important;
+        border-bottom:1px solid #d1d9de!important;
+      }
+
+      .v651CaptureRoot .v519BillingPage tfoot,
+      .v651CaptureRoot .billingSummary tfoot,
+      .v651CaptureRoot .finalBillingSummary tfoot{
+        background:#f4f7f9!important;
+        color:#111!important;
+      }
+
+      .v651CaptureRoot .v519BillingPage tfoot td,
+      .v651CaptureRoot .billingSummary tfoot td,
+      .v651CaptureRoot .finalBillingSummary tfoot td{
+        background:#f4f7f9!important;
+        color:#111!important;
+        border-top:2px solid #9aa8b1!important;
+        border-bottom:0!important;
+      }
+
+      /* ---------- Meta-Karten auf Gesamtseite ---------- */
+      .v651CaptureRoot .finalBillingSummary .printMeta,
+      .v651CaptureRoot .v519BillingPage .printMeta{
+        background:transparent!important;
+      }
+
+      .v651CaptureRoot .finalBillingSummary .printMeta > div,
+      .v651CaptureRoot .v519BillingPage .printMeta > div{
+        background:#fff!important;
+        color:#111!important;
+        border:.25mm solid #b7c2c9!important;
+      }
+
+      .v651CaptureRoot .finalBillingSummary .printMeta b,
+      .v651CaptureRoot .v519BillingPage .printMeta b{
+        color:#333!important;
+      }
+
+      /* ---------- sämtliche Dark-Mode-Reste neutralisieren ---------- */
+      .v651CaptureRoot .billingTotalsBox *,
+      .v651CaptureRoot .billingSummary *,
+      .v651CaptureRoot .finalBillingSummary *{
+        text-shadow:none!important;
+      }
+    `;
+  }
+
+  v651CaptureCss=function(){
+    return baseCaptureCssV791()+"\n"+v791MobileBillingLightCss();
+  };
+})();
+</script>
 
 </body>
 </html>
