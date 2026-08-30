@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.30</title>
+<title>Kollaudierung – V7.31</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.30 <span class="v693BuildStamp">Build 7.30</span></h1>
+     <h1>Kollaudierung – V7.31 <span class="v693BuildStamp">Build 7.31</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.30",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.31",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.30";
+const KOLLAPP_VERSION="7.31";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -31582,6 +31582,320 @@ window.addEventListener("load",()=>{
       installPlacement();
       refresh();
     },500);
+  });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.31 – EIGENE, UNABHÄNGIGE GEOMETRIELEISTE
+   ============================================================ */
+#v727GeometryTop,
+#v728GeometryInline{display:none!important}
+
+#selectedAnnBox .v721EditStatus,
+#selectedAnnBox .v723EditHelp,
+#selectedAnnBox #v725GeometryEditor,
+#selectedAnnBox .planEditHint{display:none!important}
+
+#v731GeometryBar{
+  display:none;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  width:100%;
+  padding:7px 9px;
+  margin:2px 0 0;
+  border-top:1px solid #dce6eb;
+  background:#f8fbfd;
+  border-radius:0 0 8px 8px;
+}
+#v731GeometryBar.show{display:flex!important}
+#v731GeometryBar .v731Title{
+  font-size:11px;font-weight:700;color:#365b70;margin-right:2px;white-space:nowrap
+}
+#v731GeometryBar button{
+  min-width:36px;min-height:34px;padding:5px 9px;border-radius:8px;font-size:11px;
+  pointer-events:auto!important;touch-action:manipulation!important
+}
+#v731GeometryBar button.active{
+  background:#f0a000!important;border-color:#d78d00!important;color:#fff!important
+}
+#v731GeometryBar .v731Hint{
+  margin-left:4px;font-size:10.5px;color:#657984;white-space:nowrap
+}
+#v731GeometryBar.waiting .v731Hint{color:#7a5b00;font-weight:700}
+
+@media(max-width:1100px){
+  #v731GeometryBar{gap:5px;padding:6px 7px}
+  #v731GeometryBar .v731Hint{white-space:normal;flex:1 1 180px}
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.31 – DIREKTE PUNKT-/ECKENAUSWAHL
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  let target=null;
+
+  function selectedAnn(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+  function editable(a){
+    return !!a && (a.type==="line" || a.type==="rect" || a.type==="circle");
+  }
+  function corners(a){
+    return [
+      {x:a.x1,y:a.y1},{x:a.x2,y:a.y1},
+      {x:a.x2,y:a.y2},{x:a.x1,y:a.y2}
+    ];
+  }
+
+  function ensureBar(){
+    let bar=$("v731GeometryBar");
+    if(bar)return bar;
+    const tools=document.querySelector(".planTools");
+    if(!tools)return null;
+
+    bar=document.createElement("div");
+    bar.id="v731GeometryBar";
+
+    const toolGroup=tools.querySelector('.planToolGroup[data-group="tools"]');
+    if(toolGroup && toolGroup.parentNode){
+      toolGroup.insertAdjacentElement("afterend",bar);
+    }else{
+      tools.insertBefore(bar,tools.children[1]||null);
+    }
+    return bar;
+  }
+
+  function syncLegacyActiveClass(){
+    const src=$("v725GeometryEditor");
+    if(!src)return;
+    src.querySelectorAll("button[data-v725-kind][data-v725-index]").forEach(btn=>{
+      const on=!!target &&
+        target.annId===selectedAnnotationId &&
+        target.kind===btn.dataset.v725Kind &&
+        target.index===Number(btn.dataset.v725Index);
+      btn.classList.toggle("active",on);
+    });
+  }
+
+  function renderBar(){
+    const bar=ensureBar();
+    if(!bar)return;
+    const a=selectedAnn();
+
+    if(!a || planTool!=="select" || !editable(a)){
+      target=null;
+      syncLegacyActiveClass();
+      bar.classList.remove("show","waiting");
+      bar.innerHTML="";
+      return;
+    }
+
+    const isLine=a.type==="line";
+    const count=isLine ? (a.points||[]).length : 4;
+    const kind=isLine ? "vertex" : "corner";
+    const title=isLine
+      ? ((a.mode==="polyline" || count>2) ? "Polylinie bearbeiten" : "Linie bearbeiten")
+      : (a.type==="circle" ? "Kreis bearbeiten" : "Rechteck bearbeiten");
+
+    bar.classList.add("show");
+    bar.classList.toggle("waiting",!!target && target.annId===a.id);
+    bar.innerHTML="";
+
+    const label=document.createElement("span");
+    label.className="v731Title";
+    label.textContent=title+":";
+    bar.appendChild(label);
+
+    for(let i=0;i<count;i++){
+      const btn=document.createElement("button");
+      btn.type="button";
+      btn.className="secondary";
+
+      const active=!!target &&
+        target.annId===a.id &&
+        target.kind===kind &&
+        target.index===i;
+
+      if(active)btn.classList.add("active");
+      btn.textContent=(kind==="vertex"?"P":"E")+(i+1);
+
+      const choose=ev=>{
+        if(ev.pointerType==="mouse" && ev.button!==0)return;
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+
+        target={annId:a.id,kind,index:i};
+        syncLegacyActiveClass();
+        renderBar();
+        try{renderPlanAnnotations?.()}catch(e){}
+      };
+
+      btn.addEventListener("pointerdown",choose,{passive:false});
+      btn.addEventListener("click",ev=>{
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+      },{passive:false});
+      btn.addEventListener("touchstart",ev=>{
+        if(ev.touches?.length!==1)return;
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+
+        target={annId:a.id,kind,index:i};
+        syncLegacyActiveClass();
+        renderBar();
+        try{renderPlanAnnotations?.()}catch(e){}
+      },{passive:false});
+
+      bar.appendChild(btn);
+    }
+
+    const hint=document.createElement("span");
+    hint.className="v731Hint";
+    hint.textContent=(target && target.annId===a.id)
+      ? "→ jetzt neue Position im Plan tippen"
+      : "Punkt wählen → neue Position im Plan tippen";
+    bar.appendChild(hint);
+  }
+
+  function applyAt(pt){
+    if(!target)return false;
+
+    const pl=activePlan?.();
+    const a=pl?.annotations?.find(x=>x.id===target.annId);
+    if(!a || !editable(a)){
+      target=null;
+      syncLegacyActiveClass();
+      renderBar();
+      return false;
+    }
+
+    pt={x:clamp(pt.x,0,1000),y:clamp(pt.y,0,1000)};
+
+    if(target.kind==="vertex" && a.type==="line"){
+      if(!Array.isArray(a.points) || !a.points[target.index])return false;
+      a.points[target.index]={x:pt.x,y:pt.y};
+    }else if(target.kind==="corner" && (a.type==="rect" || a.type==="circle")){
+      const cs=corners(a);
+      const opposite=cs[(target.index+2)%4];
+
+      if(a.type==="rect"){
+        const b=normalizeRectBounds(opposite,pt);
+        a.x1=b.x1;a.y1=b.y1;a.x2=b.x2;a.y2=b.y2;
+      }else{
+        const b=normalizeCircleBounds(opposite,pt);
+        a.x1=b.x1;a.y1=b.y1;a.x2=b.x2;a.y2=b.y2;
+      }
+    }else{
+      return false;
+    }
+
+    target=null;
+    syncLegacyActiveClass();
+
+    try{
+      if(typeof currentAccess==="function" && currentAccess().mode==="worker"){
+        markAnnotationSyncDirty?.(a,true);
+      }
+    }catch(e){}
+
+    persist?.();
+    renderPlanAnnotations?.();
+    renderSelectedAnnotation?.();
+    renderBar();
+    return true;
+  }
+
+  function isPlanPoint(ev){
+    const vp=$("planViewport");
+    if(!vp)return false;
+    if(ev.target && vp.contains(ev.target))return true;
+
+    if(typeof ev.clientX==="number" && typeof ev.clientY==="number"){
+      const r=vp.getBoundingClientRect();
+      return ev.clientX>=r.left && ev.clientX<=r.right &&
+             ev.clientY>=r.top  && ev.clientY<=r.bottom;
+    }
+    return false;
+  }
+
+  function installPlacement(){
+    if(window.__v731PlacementInstalled)return;
+    window.__v731PlacementInstalled=true;
+
+    window.addEventListener("pointerdown",ev=>{
+      if(!target || planTool!=="select")return;
+      if(!isPlanPoint(ev))return;
+      if(ev.pointerType==="mouse" && ev.button!==0)return;
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      applyAt(planCoords(ev));
+    },{capture:true,passive:false});
+
+    window.addEventListener("touchstart",ev=>{
+      if(!target || planTool!=="select" || ev.touches?.length!==1)return;
+      const t=ev.touches[0];
+      const fake={clientX:t.clientX,clientY:t.clientY,target:ev.target};
+      if(!isPlanPoint(fake))return;
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      applyAt(planCoords(t));
+    },{capture:true,passive:false});
+  }
+
+  function refresh(){setTimeout(renderBar,0)}
+
+  const oldSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=oldSelected.apply(this,arguments);refresh();return r;
+  };
+
+  const oldRender=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    const r=oldRender.apply(this,arguments);refresh();return r;
+  };
+
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    if(tool!=="select")target=null;
+    const r=oldSet.apply(this,arguments);
+    syncLegacyActiveClass();refresh();return r;
+  };
+
+  const oldSelect=selectPlanAnnotation;
+  selectPlanAnnotation=function(id){
+    if(target?.annId!==id)target=null;
+    const r=oldSelect.apply(this,arguments);
+    syncLegacyActiveClass();refresh();return r;
+  };
+
+  const oldDelete=deleteSelectedAnnotation;
+  deleteSelectedAnnotation=function(){
+    target=null;
+    const r=oldDelete.apply(this,arguments);
+    syncLegacyActiveClass();refresh();return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    target=null;
+    const r=await oldOpen.apply(this,arguments);
+    installPlacement();syncLegacyActiveClass();renderBar();return r;
+  };
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      ensureBar();installPlacement();syncLegacyActiveClass();renderBar();
+    },550);
   });
 })();
 </script>
