@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.31</title>
+<title>Kollaudierung – V7.32</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.31 <span class="v693BuildStamp">Build 7.31</span></h1>
+     <h1>Kollaudierung – V7.32 <span class="v693BuildStamp">Build 7.32</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.31",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.32",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.31";
+const KOLLAPP_VERSION="7.32";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -31896,6 +31896,202 @@ window.addEventListener("load",()=>{
     setTimeout(()=>{
       ensureBar();installPlacement();syncLegacyActiveClass();renderBar();
     },550);
+  });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.32 – AKTIVER GEOMETRIEPUNKT BLEIBT SICHTBAR GELB
+   ============================================================ */
+#planOverlay .v732PointMarker{pointer-events:none!important}
+#planOverlay .v732PointDot{
+  fill:#fff;
+  stroke:#0d5e91;
+  stroke-width:2.5;
+  vector-effect:non-scaling-stroke;
+}
+#planOverlay .v732PointDot.active{
+  fill:#ffb000!important;
+  stroke:#7a5200!important;
+  stroke-width:3.2;
+}
+#planOverlay .v732PointText{
+  fill:#0d4f78;
+  font-weight:700;
+  text-anchor:middle;
+  dominant-baseline:middle;
+  paint-order:stroke;
+  stroke:#fff;
+  stroke-width:3px;
+  stroke-linejoin:round;
+}
+#planOverlay .v732PointText.active{
+  fill:#7a5200!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.32 – Gelbstatus direkt aus der sichtbaren V7.31-Leiste lesen.
+   Kein Rückgriff mehr auf versteckte Legacy-Buttons.
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+  let redrawQueued=false;
+
+  function selectedAnn(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+
+  function activeTopTarget(){
+    const bar=$("v731GeometryBar");
+    if(!bar || !bar.classList.contains("show"))return null;
+
+    const buttons=[...bar.querySelectorAll("button")];
+    const active=buttons.find(b=>b.classList.contains("active"));
+    if(!active)return null;
+
+    const a=selectedAnn();
+    if(!a)return null;
+
+    const txt=(active.textContent||"").trim().toUpperCase();
+    const m=txt.match(/^([PE])(\d+)$/);
+    if(!m)return null;
+
+    return {
+      kind:m[1]==="P" ? "vertex" : "corner",
+      index:Number(m[2])-1,
+      annId:a.id
+    };
+  }
+
+  function corners(a){
+    return [
+      {x:a.x1,y:a.y1},
+      {x:a.x2,y:a.y1},
+      {x:a.x2,y:a.y2},
+      {x:a.x1,y:a.y2}
+    ];
+  }
+
+  function addMarker(svg,p,label,isActive){
+    const z=typeof v59MarkerScale==="function" ? v59MarkerScale() : 1;
+    const x=planPxX(p.x),y=planPxY(p.y);
+
+    const g=svgEl("g",{class:"v732PointMarker"});
+    const dot=svgEl("circle",{
+      cx:x,cy:y,r:11*z,
+      class:"v732PointDot"+(isActive?" active":"")
+    });
+    const text=svgEl("text",{
+      x:x,y:y+0.5*z,
+      "font-size":11*z,
+      class:"v732PointText"+(isActive?" active":"")
+    });
+    text.textContent=label;
+    g.append(dot,text);
+    svg.appendChild(g);
+  }
+
+  function redraw(){
+    redrawQueued=false;
+
+    const svg=$("planOverlay");
+    if(!svg)return;
+
+    /* V7.26-Anzeige komplett ersetzen, damit kein alter Status durchblitzt. */
+    svg.querySelectorAll(".v726PointMarker,.v732PointMarker").forEach(n=>n.remove());
+
+    const a=selectedAnn();
+    if(!a || planTool!=="select")return;
+
+    const target=activeTopTarget();
+
+    if(a.type==="line" && Array.isArray(a.points)){
+      a.points.forEach((p,i)=>{
+        addMarker(svg,p,`P${i+1}`,
+          target?.annId===a.id &&
+          target?.kind==="vertex" &&
+          target?.index===i
+        );
+      });
+    }else if(a.type==="rect" || a.type==="circle"){
+      corners(a).forEach((p,i)=>{
+        addMarker(svg,p,`E${i+1}`,
+          target?.annId===a.id &&
+          target?.kind==="corner" &&
+          target?.index===i
+        );
+      });
+    }
+  }
+
+  function queueRedraw(){
+    if(redrawQueued)return;
+    redrawQueued=true;
+    requestAnimationFrame(redraw);
+  }
+
+  /* Nach jedem Planrender die endgültige V7.32-Anzeige setzen. */
+  const oldRender=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    const r=oldRender.apply(this,arguments);
+    queueRedraw();
+    return r;
+  };
+
+  /*
+    Die V7.31-Leiste wird teilweise asynchron neu aufgebaut.
+    Deshalb beobachten wir genau deren Buttons/Klassen und zeichnen danach
+    den gelben Punkt erneut. Damit bleibt er sichtbar, bis die Zielposition
+    gesetzt und der Button wieder deaktiviert wird.
+  */
+  function watchBar(){
+    const bar=$("v731GeometryBar");
+    if(!bar || bar.dataset.v732Watch==="1")return;
+    bar.dataset.v732Watch="1";
+
+    const obs=new MutationObserver(queueRedraw);
+    obs.observe(bar,{
+      subtree:true,
+      childList:true,
+      attributes:true,
+      attributeFilter:["class"]
+    });
+  }
+
+  const oldSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=oldSelected.apply(this,arguments);
+    setTimeout(()=>{
+      watchBar();
+      queueRedraw();
+    },0);
+    return r;
+  };
+
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    const r=oldSet.apply(this,arguments);
+    setTimeout(queueRedraw,0);
+    return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    const r=await oldOpen.apply(this,arguments);
+    watchBar();
+    queueRedraw();
+    return r;
+  };
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      watchBar();
+      queueRedraw();
+    },650);
   });
 })();
 </script>
