@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.27</title>
+<title>Kollaudierung – V7.28</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.27 <span class="v693BuildStamp">Build 7.27</span></h1>
+     <h1>Kollaudierung – V7.28 <span class="v693BuildStamp">Build 7.28</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.27",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.28",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.27";
+const KOLLAPP_VERSION="7.28";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -30905,6 +30905,225 @@ window.addEventListener("load",()=>{
       installObserver();
       refresh();
     },380);
+  });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.28 – KOMPAKTE GEOMETRIEBEARBEITUNG IN DER WERKZEUGLEISTE
+   ============================================================ */
+
+/* alten großen V7.27-Geometrieblock vollständig ausblenden */
+#v727GeometryTop{display:none!important}
+
+/* alte/doppelte Geometrie-Hinweise rechts ausblenden */
+#selectedAnnBox .v721EditStatus,
+#selectedAnnBox .v723EditHelp,
+#selectedAnnBox #v725GeometryEditor{
+  display:none!important;
+}
+
+/* kompakte Punkt-/Eckenauswahl direkt in der Toolleiste */
+#v728GeometryInline{
+  display:none;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+  padding:0;
+  margin:0;
+}
+#v728GeometryInline.show{display:flex}
+#v728GeometryInline .v728Label{
+  font-size:11px;
+  font-weight:700;
+  color:#476272;
+  margin-right:2px;
+  white-space:nowrap;
+}
+#v728GeometryInline button{
+  min-width:34px;
+  min-height:34px;
+  padding:5px 8px;
+  font-size:11px;
+  border-radius:8px;
+}
+#v728GeometryInline button.active{
+  background:#f0a000!important;
+  border-color:#d78d00!important;
+  color:#fff!important;
+}
+#v728GeometryInline .v728Waiting{
+  font-size:10.5px;
+  color:#765a08;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+/* Rechter Bereich etwas ruhiger */
+#selectedAnnBox .planEditHint{
+  display:none!important;
+}
+
+@media(max-width:1100px){
+  #v728GeometryInline{
+    width:100%;
+  }
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.28 – V7.25-Geometrieauswahl kompakt in Toolzeile spiegeln
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function selectedAnn(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+
+  function ensureInline(){
+    let box=$('v728GeometryInline');
+    if(box)return box;
+
+    const tools=document.querySelector('.planTools');
+    if(!tools)return null;
+
+    box=document.createElement('div');
+    box.id='v728GeometryInline';
+
+    /* Direkt hinter den Zeichenwerkzeugen platzieren */
+    const firstRow=tools.querySelector('.planToolGroup[data-group="tools"]') || tools.firstElementChild || tools;
+    if(firstRow.parentNode===tools){
+      firstRow.insertAdjacentElement('afterend',box);
+    }else{
+      tools.insertBefore(box,tools.children[1]||null);
+    }
+    return box;
+  }
+
+  function sourcePanel(){return $('v725GeometryEditor');}
+
+  function renderInline(){
+    const box=ensureInline();
+    if(!box)return;
+
+    const a=selectedAnn();
+    const src=sourcePanel();
+
+    if(!a || planTool!=='select' || !src || src.style.display==='none' || !['line','rect','circle'].includes(a.type)){
+      box.classList.remove('show');
+      box.innerHTML='';
+      return;
+    }
+
+    const srcButtons=[...src.querySelectorAll('button[data-v725-kind][data-v725-index]')];
+    if(!srcButtons.length){
+      box.classList.remove('show');
+      box.innerHTML='';
+      return;
+    }
+
+    const active=src.querySelector('button.active[data-v725-kind]');
+    const title=a.type==='line'
+      ? ((a.mode==='polyline'||(a.points||[]).length>2)?'Polylinie':'Linie')
+      : (a.type==='circle'?'Kreis':'Rechteck');
+
+    box.classList.add('show');
+    box.innerHTML=`<span class="v728Label">${title}:</span>`;
+
+    srcButtons.forEach(srcBtn=>{
+      const kind=srcBtn.dataset.v725Kind;
+      const idx=Number(srcBtn.dataset.v725Index);
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='secondary'+(srcBtn.classList.contains('active')?' active':'');
+      btn.textContent=kind==='vertex'?`P${idx+1}`:`E${idx+1}`;
+      btn.title=srcBtn.textContent.trim();
+      btn.addEventListener('click',ev=>{
+        ev.preventDefault();
+        ev.stopPropagation();
+        srcBtn.click();
+        setTimeout(renderInline,0);
+      });
+      box.appendChild(btn);
+    });
+
+    if(active){
+      const hint=document.createElement('span');
+      hint.className='v728Waiting';
+      hint.textContent='→ neue Position im Plan tippen';
+      box.appendChild(hint);
+    }
+  }
+
+  function hideRightHints(){
+    const right=$('selectedAnnBox');
+    if(!right)return;
+    right.querySelectorAll('.v721EditStatus,.v723EditHelp,#v725GeometryEditor,.planEditHint').forEach(el=>{
+      el.style.display='none';
+    });
+  }
+
+  function refresh(){
+    setTimeout(()=>{
+      hideRightHints();
+      renderInline();
+    },0);
+  }
+
+  const oldSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=oldSelected.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldRender=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    const r=oldRender.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    const r=oldSet.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldSelect=selectPlanAnnotation;
+  selectPlanAnnotation=function(id){
+    const r=oldSelect.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    const r=await oldOpen.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  function observeSource(){
+    const src=sourcePanel();
+    if(!src || src.dataset.v728Watch==='1')return;
+    src.dataset.v728Watch='1';
+    const obs=new MutationObserver(()=>renderInline());
+    obs.observe(src,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
+  }
+
+  window.addEventListener('load',()=>{
+    setTimeout(()=>{
+      ensureInline();
+      observeSource();
+      hideRightHints();
+      renderInline();
+    },420);
   });
 })();
 </script>
