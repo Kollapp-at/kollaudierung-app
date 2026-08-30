@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.38</title>
+<title>Kollaudierung – V7.39</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.38 <span class="v693BuildStamp">Build 7.38</span></h1>
+     <h1>Kollaudierung – V7.39 <span class="v693BuildStamp">Build 7.39</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.38",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.39",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.38";
+const KOLLAPP_VERSION="7.39";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -33873,6 +33873,356 @@ tbody tr:hover td{
       installPlanListClear();
     },700);
   });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.39 – HINWEISE / UX AUFRÄUMEN
+   ============================================================ */
+
+/* Einheitliche, dezente Hilfstexte */
+.v739Hint{
+  margin-top:5px!important;
+  color:#667b87!important;
+  font-size:10.5px!important;
+  line-height:1.38!important;
+}
+.v739Hint strong,
+.v739Hint b{
+  color:#435e6d!important;
+}
+.v739CompactHint{
+  display:flex;
+  align-items:flex-start;
+  gap:6px;
+  margin-top:6px;
+  color:#617783;
+  font-size:10.5px;
+  line-height:1.35;
+}
+.v739CompactHint::before{
+  content:"i";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 16px;
+  width:16px;
+  height:16px;
+  border-radius:999px;
+  background:#e9f2f7;
+  color:#39718f;
+  font-size:10px;
+  font-weight:800;
+  margin-top:0;
+}
+
+/* Lange Zusatzinfos nur bei Bedarf */
+.v739Details{
+  margin-top:8px;
+  border:1px solid #d9e4ea;
+  border-radius:9px;
+  background:#f8fbfd;
+  overflow:hidden;
+}
+.v739Details summary{
+  cursor:pointer;
+  padding:8px 10px;
+  color:#456372;
+  font-size:10.5px;
+  font-weight:750;
+  list-style:none;
+  user-select:none;
+}
+.v739Details summary::-webkit-details-marker{display:none}
+.v739Details summary::after{
+  content:"›";
+  float:right;
+  font-size:16px;
+  line-height:12px;
+  transform:rotate(90deg);
+  transition:transform .15s ease;
+}
+.v739Details[open] summary::after{transform:rotate(-90deg)}
+.v739DetailsBody{
+  border-top:1px solid #e2e9ed;
+  padding:9px 10px;
+  color:#627681;
+  font-size:10.5px;
+  line-height:1.45;
+}
+
+/* Plan: allgemeine Hilfe auf eine einzige Zeile reduzieren */
+#v739PlanUsageHint{
+  margin:4px 0 8px;
+  padding:6px 9px;
+  border-radius:8px;
+  background:#f5f9fb;
+  border:1px solid #dce7ed;
+  color:#617986;
+  font-size:10.5px;
+  line-height:1.35;
+}
+.planInfoStack .planInfoNote,
+#mobilePlanHint{
+  display:none!important;
+}
+
+/* Automatische Zuordnung rechts reicht als Erklärung */
+.planSide .planLinkBox{
+  display:none!important;
+}
+
+/* Rechter Planbereich etwas ruhiger */
+.planSide .autoPlanLinkBox{
+  margin-bottom:9px!important;
+}
+.planSide .autoPlanLinkBox .small:first-child{
+  font-size:10px!important;
+  color:#6a7f8b!important;
+}
+
+/* Terminologie-Legende im Übergabe-Reiter ist nicht nötig */
+.terminologyHint{
+  display:none!important;
+}
+
+/* Lange Hinweise in großen Karten nicht wie Primärinhalt wirken lassen */
+.v655QuickSave .small,
+.v637PhotoBox .small,
+.v675SyncCard .small,
+.v674ProjectCard .small{
+  line-height:1.4;
+}
+
+/* Tablet: Hilfen nochmals kompakter */
+@media(max-width:1100px){
+  .v739Hint,
+  .v739CompactHint,
+  #v739PlanUsageHint,
+  .v739Details summary,
+  .v739DetailsBody{
+    font-size:10px!important;
+  }
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.39 – sichtbare Hinweise redaktionell ordnen / verschieben
+   ============================================================ */
+(function(){
+  function norm(s){
+    return String(s||"").replace(/\s+/g," ").trim();
+  }
+
+  function allTextEls(){
+    return [...document.querySelectorAll(
+      ".small,.notice,.info,.planFileNote,.planLineHelp,.mobilePlanHint"
+    )];
+  }
+
+  function findStarts(text){
+    return allTextEls().find(el=>norm(el.textContent).startsWith(text))||null;
+  }
+
+  function setHint(el,text,compact=false){
+    if(!el)return;
+    el.innerHTML=text;
+    el.classList.add(compact?"v739CompactHint":"v739Hint");
+  }
+
+  function hideStarts(text){
+    const el=findStarts(text);
+    if(el)el.style.display="none";
+  }
+
+  function replaceWithDetails(el,title,body){
+    if(!el || el.dataset.v739Details==="1")return;
+    el.dataset.v739Details="1";
+
+    const details=document.createElement("details");
+    details.className="v739Details noPrint";
+    details.innerHTML=`
+      <summary>${title}</summary>
+      <div class="v739DetailsBody">${body}</div>
+    `;
+    el.replaceWith(details);
+  }
+
+  function tidyEntryHints(){
+    setHint(
+      findStarts("Jede gespeicherte Eintragung erhält automatisch"),
+      "Die <b>Erfassungs-ID</b> wird beim Speichern automatisch vergeben.",
+      true
+    );
+
+    const calc=document.getElementById("calcHint");
+    if(calc){
+      calc.textContent="Rechenarten: +  −  ×  ÷  · Klammern möglich";
+      calc.classList.add("v739Hint");
+    }
+
+    setHint(
+      findStarts("Eine Erfassung kann mehrere LV-Unterpositionen enthalten."),
+      "Mehrere LV-Unterpositionen können gemeinsam unter derselben Erfassungs-ID gespeichert werden."
+    );
+
+    setHint(
+      findStarts("Kein Plan oder Foto erforderlich?"),
+      "Plan und Fotos sind optional und können später ergänzt werden."
+    );
+
+    setHint(
+      findStarts("Der ausgewählte Plan wird mit der Aufmaßerfassung gespeichert"),
+      "Dieser Plan wird für die Erfassungs-ID und den Plan-Nachweis verwendet."
+    );
+
+    setHint(
+      findStarts("Hier können zusätzliche Bilder zur aktuellen Erfassungs-ID"),
+      "Bilder werden dieser Erfassungs-ID zugeordnet und im Export verwendet."
+    );
+
+    /* Direkt unter Foto war derselbe Plan-Hinweis nochmals vorhanden. */
+    hideStarts("Planmarkierung: Sie kann sofort gesetzt");
+
+    const planHead=findStarts("Der oben ausgewählte Plan wird automatisch geladen.");
+    if(planHead){
+      planHead.textContent="Werkzeug wählen und direkt im Plan markieren.";
+      planHead.classList.add("v739Hint");
+    }
+
+    const fileNote=findStarts("Planbilder werden lokal im Browser gespeichert.");
+    if(fileNote){
+      fileNote.textContent="Plan lokal gespeichert · Originaldatei bleibt unverändert.";
+      fileNote.classList.add("v739Hint");
+    }
+
+    /* Alte doppelte Plan-Erklärung rechts entfernen. */
+    hideStarts("Keine weitere Zuordnung nötig:");
+
+    /* Alte Nummerierungen stammen aus einem früheren Ablauf und widersprechen
+       den heutigen Schritten 1–7. */
+    document.querySelectorAll("#entryPlanWorkspace h2").forEach(h=>{
+      if(norm(h.textContent).startsWith("3. Plan markieren")){
+        h.textContent="Plan markieren / bearbeiten";
+      }
+    });
+    document.querySelectorAll("#entryFinalizeCard h2").forEach(h=>{
+      if(norm(h.textContent).startsWith("4. Erfassung speichern")){
+        h.textContent="Erfassung abschließen";
+      }
+    });
+
+    setHint(
+      findStarts("Erst hier werden Aufmaß, Menge, Planverknüpfung"),
+      "Speichert die aktuellen Eingaben einschließlich vorhandener Planmarkierungen."
+    );
+  }
+
+  function tidyPlanHints(){
+    const tools=document.querySelector(".planTools");
+    if(!tools)return;
+
+    let hint=document.getElementById("v739PlanUsageHint");
+    if(!hint){
+      hint=document.createElement("div");
+      hint.id="v739PlanUsageHint";
+      hint.className="noPrint";
+      const stack=document.querySelector(".planInfoStack");
+      if(stack)stack.insertAdjacentElement("afterend",hint);
+      else tools.insertAdjacentElement("afterend",hint);
+    }
+
+    const coarse=window.matchMedia?.("(pointer: coarse)")?.matches;
+    hint.innerHTML=coarse
+      ? "<b>Plan bedienen:</b> Hand = verschieben · 2 Finger = Zoom · „Andere IDs“ / „Andere AMBL“ steuern sichtbare Markierungen."
+      : "<b>Plan bedienen:</b> Mausrad = Zoom · mittlere Maustaste = verschieben · „Andere IDs“ / „Andere AMBL“ steuern sichtbare Markierungen.";
+  }
+
+  function tidySheetExportHints(){
+    setHint(
+      findStarts("Plan-Nachweise werden automatisch mit ausgegeben."),
+      "Aufmaß-PDF enthält Plan-Nachweise und eine kompakte Fotoübersicht. Vollständige Bilder gibt es zusätzlich als Fotodoku-PDF."
+    );
+
+    /* Suchhinweis redundant zum Suchfeld und Ergebniszähler. */
+    hideStarts("Sucht gleichzeitig in LG, Position, Leistung");
+
+    const browserPrint=findStarts("Hinweis zum Browser-Druck:");
+    replaceWithDetails(
+      browserPrint,
+      "Browser-Druck: eigene Kopf-/Fußzeilen",
+      "Chrome, Edge und Safari können zusätzlich Datum, URL bzw. Dateipfad drucken. Wenn nur das Kollapp-Firmenlayout erscheinen soll, im Druckdialog <b>„Kopf- und Fußzeilen“ deaktivieren</b>."
+    );
+
+    setHint(
+      findStarts("Das Logo wird lokal in der App gespeichert"),
+      "Logo wird lokal gespeichert und für PDF-/Druckexporte verwendet."
+    );
+  }
+
+  function tidySyncHints(){
+    /* Begriffserklärung ist als dauerhafte Leiste hier unnötig. */
+    document.querySelectorAll(".terminologyHint").forEach(el=>el.style.display="none");
+
+    const reserve=findStarts("Die Arbeitsdatei erhält einen eigenen ID-Bereich.");
+    const sel=document.getElementById("handoffIdReserve");
+    if(reserve && sel){
+      reserve.innerHTML="Reserviert neue IDs exklusiv für diese Arbeitsdatei und verhindert Überschneidungen mit anderen Monteuren.";
+      reserve.classList.add("v739Hint");
+      sel.insertAdjacentElement("afterend",reserve);
+    }
+
+    /* Der lokale Löschhinweis gehört zum Projekt-Reiter / Gefahrenbereich. */
+    hideStarts("Projekt abgeschlossen?");
+
+    const workSmall=findStarts("Auf dem Monteurgerät wird hier ausschließlich");
+    if(workSmall)workSmall.style.display="none";
+
+    const workWarn=findStarts("Wichtig: Keine Datensicherung auswählen.");
+    if(workWarn){
+      workWarn.innerHTML="<b>Nur Arbeitsdatei laden:</b> Datei muss <b>ARBEITSDATEI</b> im Namen tragen und auf <b>.json</b> enden. Keine Datensicherung verwenden.";
+      workWarn.classList.add("v739Hint");
+      const pick=document.querySelector('label[for="workImportFile"]');
+      if(pick)pick.insertAdjacentElement("afterend",workWarn);
+    }
+  }
+
+  function tidyProjectImportHints(){
+    setHint(
+      findStarts("Entfernt dieses Projekt nur auf diesem Gerät."),
+      "Löscht ausschließlich die lokale Projektkopie auf diesem Gerät."
+    );
+
+    const planUpload=findStarts("Für V5 wird die gewählte PDF-Seite");
+    if(planUpload){
+      planUpload.innerHTML="Die gewählte PDF-Seite bzw. das Bild wird lokal als Planansicht gespeichert. Die Originaldatei bleibt unverändert.";
+      planUpload.classList.add("v739Hint");
+    }
+
+    const importLong=findStarts("Bei Excel sucht die App automatisch nach einer LV-Übersicht.");
+    replaceWithDetails(
+      importLong,
+      "Details zur automatischen Import-Erkennung",
+      "Bei Excel sucht Kollapp nach einer LV-Übersicht. Bei textbasierten PDFs werden Tabellenzeilen aus der Seitenposition rekonstruiert. Reine Scan-PDFs werden erkannt und nicht mit unsicheren Werten importiert."
+    );
+  }
+
+  function apply(){
+    tidyEntryHints();
+    tidyPlanHints();
+    tidySheetExportHints();
+    tidySyncHints();
+    tidyProjectImportHints();
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",()=>setTimeout(apply,50),{once:true});
+  }else{
+    setTimeout(apply,50);
+  }
 })();
 </script>
 
