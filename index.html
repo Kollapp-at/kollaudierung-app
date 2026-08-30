@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.16</title>
+<title>Kollaudierung – V7.17</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.16 <span class="v693BuildStamp">Build 7.16</span></h1>
+     <h1>Kollaudierung – V7.17 <span class="v693BuildStamp">Build 7.17</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.16",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.17",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.16";
+const KOLLAPP_VERSION="7.17";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -28319,6 +28319,182 @@ window.addEventListener("load",()=>{
   openPlan=async function(id){
     await oldOpen(id);
     setTimeout(install,0);
+  };
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.17 – STABILER 2-FINGER-ZOOM/PAN OHNE pinch=null-FEHLER
+   ============================================================ */
+(function(){
+  let gesture=null;
+  let gestureRaf=0;
+
+  const $=id=>document.getElementById(id);
+
+  function v717Dist(a,b){
+    return Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
+  }
+
+  function v717Mid(a,b){
+    return {x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2};
+  }
+
+  function v717CancelPendingFrame(){
+    if(gestureRaf){
+      cancelAnimationFrame(gestureRaf);
+      gestureRaf=0;
+    }
+  }
+
+  function v717CancelDrawingDraftForGesture(){
+    try{
+      freehandDraftPoints=[];
+      freehandPointerId=null;
+    }catch(e){}
+    try{v516FreehandPointerId=null;}catch(e){}
+    try{
+      v655TouchFreehandActive=false;
+      v655TouchFreehandIdentifier=null;
+    }catch(e){}
+    try{planShapeDraft=null;}catch(e){}
+    try{
+      v662ShapeTouchId=null;
+      v662ShapeMoved=false;
+    }catch(e){}
+  }
+
+  function v717Begin(ev){
+    if(!ev.touches || ev.touches.length!==2) return;
+    if(!activePlan?.()) return;
+
+    const vp=$("planViewport");
+    const stage=$("planStage");
+    if(!vp || !stage) return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    v717CancelPendingFrame();
+    v717CancelDrawingDraftForGesture();
+
+    const m=v717Mid(ev.touches[0],ev.touches[1]);
+    const vr=vp.getBoundingClientRect();
+    const cx=m.x-vr.left;
+    const cy=m.y-vr.top;
+    const startZoom=Math.max(.12,Number(planZoom||1));
+
+    const contentX=vp.scrollLeft + cx - stage.offsetLeft;
+    const contentY=vp.scrollTop  + cy - stage.offsetTop;
+
+    gesture={
+      token:Date.now()+Math.random(),
+      startDist:Math.max(1,v717Dist(ev.touches[0],ev.touches[1])),
+      startZoom,
+      naturalX:contentX/startZoom,
+      naturalY:contentY/startZoom
+    };
+
+    vp.classList.add("v716Pinching");
+  }
+
+  function v717Move(ev){
+    if(!gesture || !ev.touches || ev.touches.length!==2) return;
+
+    const vp=$("planViewport");
+    const stage=$("planStage");
+    if(!vp || !stage) return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    /*
+      Wichtig:
+      Alle Werte werden VOR requestAnimationFrame lokal kopiert.
+      Selbst wenn touchend danach gesture=null setzt, bleibt dieser Frame sicher.
+    */
+    const g=gesture;
+    const token=g.token;
+    const d=Math.max(1,v717Dist(ev.touches[0],ev.touches[1]));
+    const nextZoom=Math.max(.12,Math.min(5,g.startZoom*(d/g.startDist)));
+    const m=v717Mid(ev.touches[0],ev.touches[1]);
+    const vr=vp.getBoundingClientRect();
+    const cx=m.x-vr.left;
+    const cy=m.y-vr.top;
+    const naturalX=g.naturalX;
+    const naturalY=g.naturalY;
+
+    v717CancelPendingFrame();
+
+    gestureRaf=requestAnimationFrame(()=>{
+      gestureRaf=0;
+
+      /* Eine inzwischen neu gestartete Geste darf nicht von einem alten Frame überschrieben werden. */
+      if(gesture && gesture.token!==token) return;
+
+      planZoom=nextZoom;
+      setPlanStageSize();
+
+      vp.scrollLeft=stage.offsetLeft + naturalX*nextZoom - cx;
+      vp.scrollTop =stage.offsetTop  + naturalY*nextZoom - cy;
+    });
+  }
+
+  function v717End(ev){
+    if(!gesture) return;
+    if(ev.touches && ev.touches.length>=2) return;
+
+    const vp=$("planViewport");
+
+    /*
+      Offenen RAF zuerst abbrechen, dann Zustand löschen.
+      Das verhindert exakt den V7.16-Fehler pinch.naturalX auf null.
+    */
+    v717CancelPendingFrame();
+
+    if(vp) vp.classList.remove("v716Pinching");
+    gesture=null;
+
+    try{scheduleSharpPdfRender?.(false);}catch(e){}
+  }
+
+  function v717Install(){
+    const vp=$("planViewport");
+    if(!vp || vp.dataset.v717Pinch==="1") return;
+
+    vp.dataset.v717Pinch="1";
+
+    /*
+      V7.16-Handler sind bereits registriert.
+      V7.17 läuft zuerst im Capture und stoppt ausschließlich 2-Finger-Gesten,
+      sodass die alten Handler dafür nicht mehr ausgeführt werden.
+      Ein-Finger-Zeichnen bleibt vollständig bei der bestehenden Werkzeuglogik.
+    */
+    vp.addEventListener("touchstart",function(ev){
+      if(ev.touches?.length===2) v717Begin(ev);
+    },{capture:true,passive:false});
+
+    vp.addEventListener("touchmove",function(ev){
+      if(gesture && ev.touches?.length===2) v717Move(ev);
+    },{capture:true,passive:false});
+
+    vp.addEventListener("touchend",function(ev){
+      if(gesture) v717End(ev);
+    },{capture:true,passive:true});
+
+    vp.addEventListener("touchcancel",function(ev){
+      if(gesture) v717End(ev);
+    },{capture:true,passive:true});
+  }
+
+  window.addEventListener("load",()=>setTimeout(v717Install,260));
+
+  const v717OldOpen=openPlan;
+  openPlan=async function(id){
+    await v717OldOpen(id);
+    setTimeout(v717Install,0);
   };
 })();
 </script>
