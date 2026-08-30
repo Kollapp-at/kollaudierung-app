@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.89</title>
+<title>Kollaudierung – V7.90</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.89 <span class="v693BuildStamp">Build 7.89</span></h1>
+     <h1>Kollaudierung – V7.90 <span class="v693BuildStamp">Build 7.90</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16351,7 +16351,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.89",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.90",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26132,7 +26132,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.89";
+const KOLLAPP_VERSION="7.90";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -42857,6 +42857,81 @@ window.v787ScrollTop=function(){
 @media(min-width:1800px){
   main{
     max-width:1720px!important;
+  }
+}
+</style>
+
+
+<style id="v790-nav-surface">
+/* ============================================================
+   V7.90 – Hauptnavigation klar vom Seitenhintergrund abheben
+   ============================================================ */
+
+/* Grundfläche der kompletten Reiterleiste */
+.tabs.noPrint{
+  border:1px solid #c9d8e2!important;
+  border-radius:12px!important;
+  background:#f1f6f9!important;
+  box-shadow:
+    0 2px 8px rgba(21,49,66,.08),
+    inset 0 1px 0 rgba(255,255,255,.72)!important;
+  padding:7px!important;
+}
+
+/* Light Mode: Buttons neutral auf eigener Navigationsfläche */
+html:not([data-theme="dark"]) .tabs.noPrint .tab:not(.active){
+  background:transparent!important;
+  color:#425968!important;
+  border-color:transparent!important;
+}
+html:not([data-theme="dark"]) .tabs.noPrint .tab:not(.active):hover{
+  background:#e6eef3!important;
+  border-color:#d2e0e8!important;
+}
+
+/* Dark Mode: Navigation deutlich heller/blauer als Seitenfläche */
+html[data-theme="dark"] .tabs.noPrint{
+  background:#0d2434!important;
+  border-color:#31566d!important;
+  box-shadow:
+    0 3px 12px rgba(0,0,0,.26),
+    inset 0 1px 0 rgba(255,255,255,.025)!important;
+}
+
+html[data-theme="dark"] .tabs.noPrint .tab:not(.active){
+  background:transparent!important;
+  color:#c9d8e1!important;
+  border-color:transparent!important;
+}
+html[data-theme="dark"] .tabs.noPrint .tab:not(.active):hover{
+  background:#17364a!important;
+  color:#f2f7fa!important;
+  border-color:#365f78!important;
+}
+
+/* Aktiver Reiter stärker auf der abgesetzten Leiste */
+.tabs.noPrint .tab.active{
+  box-shadow:
+    0 1px 4px rgba(0,0,0,.12),
+    inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+
+/* Seitenanfang optisch zur Navigation passend */
+html:not([data-theme="dark"]) .tabs.noPrint #v787TopBtn{
+  background:#e7eef3!important;
+  border-color:#ccdae3!important;
+}
+html[data-theme="dark"] .tabs.noPrint #v787TopBtn{
+  background:#17364a!important;
+  border-color:#3d647d!important;
+  color:#eef5f9!important;
+}
+
+/* auf Tablet/Handy etwas kompakter, Fläche bleibt klar erkennbar */
+@media(max-width:1100px){
+  .tabs.noPrint{
+    padding:6px!important;
+    border-radius:10px!important;
   }
 }
 </style>
