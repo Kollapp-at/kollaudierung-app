@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.03</title>
+<title>Kollaudierung – V7.05</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -6816,6 +6816,218 @@ main > section.view,
   }
 }
 
+
+/* ============================================================
+   V7.04 – Suchliste Text oben / LV-Nummer unten + Save actions
+   ============================================================ */
+#view-entry .mobilePosResult{
+  justify-content:flex-start !important;
+}
+#view-entry .mobilePosResult .mprText{
+  order:1 !important;
+  font-size:13.5px !important;
+  line-height:1.4 !important;
+  font-weight:600 !important;
+  color:#22313f !important;
+  margin:0 0 6px 0 !important;
+}
+#view-entry .mobilePosResult .mprCode{
+  order:2 !important;
+  font-size:12px !important;
+  line-height:1.25 !important;
+  color:#587187 !important;
+  margin:0 !important;
+}
+#view-entry .mobilePosResult .mprMeta{
+  order:3 !important;
+  margin-top:8px !important;
+}
+#view-entry .v704SaveActions{
+  margin-top:10px !important;
+  gap:10px !important;
+  flex-wrap:wrap !important;
+}
+#view-entry .v704SaveActions button{
+  min-height:36px !important;
+}
+#view-entry #posInfo .small b{
+  color:#274865;
+}
+
+
+/* ============================================================
+   V7.05 – Menge/Rechenansatz optisch beruhigt
+   ============================================================ */
+#view-entry #entryCard{
+  --v705-blue:#2f739b;
+  --v705-green:#5f8c72;
+  --v705-line:#dfe7ec;
+  --v705-soft:#f7fafc;
+}
+
+/* Der rechte Bereich soll wie ein Arbeitsablauf wirken, nicht wie graue Boxen. */
+#view-entry #entryCard > .v692SectionTitle{
+  margin-top:14px !important;
+  padding-top:13px !important;
+  border-top:1px solid #e6ecef !important;
+  border-bottom:0 !important;
+}
+#view-entry #entryCard > .v692SectionTitle:first-of-type{
+  margin-top:0 !important;
+  padding-top:0 !important;
+  border-top:0 !important;
+}
+#view-entry #entryCard .v692SectionTitle > span{
+  width:25px !important;
+  height:25px !important;
+  min-width:25px !important;
+  border-radius:8px !important;
+  background:#edf5fa !important;
+  color:#2f739b !important;
+  font-weight:800 !important;
+}
+#view-entry #entryCard .v692SectionTitle b{
+  font-size:13px !important;
+  line-height:1.25 !important;
+}
+#view-entry #entryCard .v692SectionTitle small{
+  margin-top:1px !important;
+  color:#71808a !important;
+}
+
+/* Rechenansatz selbst als klarer Fokus */
+#view-entry #calc{
+  min-height:46px !important;
+  border-radius:10px !important;
+  border-color:#bfd0da !important;
+  font-size:14.5px !important;
+  font-weight:700 !important;
+  padding:10px 12px !important;
+}
+#view-entry #calc:focus{
+  border-color:#5d96b5 !important;
+  box-shadow:0 0 0 3px rgba(47,115,155,.08) !important;
+}
+
+/* Vorlagenhinweis deutlich kleiner und weniger dominant */
+#view-entry #entryCard .v682TemplateHint{
+  margin:7px 0 0 !important;
+  padding:7px 10px !important;
+  border:1px solid #ead9a8 !important;
+  border-left:3px solid #b18d3d !important;
+  border-radius:8px !important;
+  background:#fffaf0 !important;
+  font-size:10.5px !important;
+  line-height:1.35 !important;
+  color:#71571c !important;
+}
+
+/* Ergebnis wie ein Ergebnisfeld, nicht wie ein großer grauer Block */
+#view-entry #entryCard .v705CalcResult{
+  display:grid !important;
+  grid-template-columns:auto minmax(0,1fr) !important;
+  grid-template-areas:
+    "label value"
+    "hint hint" !important;
+  align-items:center !important;
+  gap:2px 12px !important;
+  margin-top:8px !important;
+  padding:10px 12px !important;
+  min-height:62px !important;
+  border:1px solid #dce7ed !important;
+  border-left:4px solid var(--v705-blue) !important;
+  border-radius:10px !important;
+  background:#f8fbfd !important;
+}
+#view-entry #entryCard .v705CalcResult > .small:first-child{
+  grid-area:label !important;
+  margin:0 !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  color:#6a7a84 !important;
+}
+#view-entry #entryCard .v705CalcResult .calcResult{
+  grid-area:value !important;
+  justify-self:start !important;
+  font-size:22px !important;
+  line-height:1 !important;
+  font-weight:850 !important;
+  color:#203946 !important;
+}
+#view-entry #entryCard .v705CalcResult #calcHint{
+  grid-area:hint !important;
+  margin-top:3px !important;
+  font-size:10.5px !important;
+  line-height:1.3 !important;
+  color:#75858e !important;
+}
+#view-entry #entryCard .v705CalcResult.good{
+  border-left-color:#5f8c72 !important;
+  background:#f5faf7 !important;
+}
+#view-entry #entryCard .v705CalcResult.bad{
+  border-left-color:#b45555 !important;
+  background:#fff7f7 !important;
+}
+
+/* LV-Unterpositionen als helle, echte Karte */
+#view-entry #entryCard .multiLvBox{
+  margin-top:8px !important;
+  padding:12px 13px !important;
+  border:1px solid var(--v705-line) !important;
+  border-radius:10px !important;
+  background:#fbfcfd !important;
+}
+#view-entry #entryCard .multiLvBox > .toolbar{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  gap:10px 12px !important;
+  align-items:center !important;
+}
+#view-entry #entryCard .multiLvBox > .toolbar b{
+  font-size:12px !important;
+  color:#2c414c !important;
+}
+#view-entry #entryCard .multiLvBox > .toolbar .small{
+  margin-top:2px !important;
+  font-size:10.5px !important;
+  line-height:1.35 !important;
+}
+#view-entry #entryCard .multiLvBox > .toolbar button{
+  min-height:36px !important;
+  padding:7px 10px !important;
+  border:1px solid #d8e3e9 !important;
+  background:#f1f5f7 !important;
+  color:#314853 !important;
+  white-space:nowrap !important;
+}
+#view-entry #entryCard .multiLvList{
+  margin-top:9px !important;
+  padding-top:8px !important;
+  border-top:1px solid #e7edf0 !important;
+}
+#view-entry #entryCard .multiLvList > .small{
+  color:#74838c !important;
+  font-size:10.5px !important;
+}
+
+/* Status-/Speicherbereich etwas kompakter, damit 1/2 stärker wirken. */
+#view-entry #entryCard .v692StatusGrid{
+  margin-top:8px !important;
+}
+#view-entry #entryCard .v655QuickSave{
+  margin-top:8px !important;
+}
+
+@media(max-width:700px){
+  #view-entry #entryCard .multiLvBox > .toolbar{
+    grid-template-columns:1fr !important;
+  }
+  #view-entry #entryCard .multiLvBox > .toolbar button{
+    width:100% !important;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -6846,7 +7058,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.03 <span class="v693BuildStamp">Build 7.03</span></h1>
+     <h1>Kollaudierung – V7.05 <span class="v693BuildStamp">Build 7.05</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -6958,18 +7170,18 @@ main > section.view,
 
    <div class="card v666Section v666MeasureSection" id="entryCard">
     <h2>2. Menge / Rechenansatz</h2>
-    <div class="v692SectionTitle"><span>1</span><div><b>Menge erfassen</b><small>Rechenansatz oder Vorlage</small></div></div>
+    <div class="v692SectionTitle v705AmountTitle"><span>1</span><div><b>Menge erfassen</b><small>Rechenansatz oder Vorlage</small></div></div>
     <label>Rechenansatz</label>
     <input id="calc" placeholder="z. B. 2,50 + 1,20 oder 0 für Vorlage" oninput="previewCalc()">
     <div class="v682TemplateHint">
      <b>Vorlage:</b> Rechenansatz <b>0</b> eingeben. Die Erfassungs-ID wird mit Menge 0 als Vorlage gespeichert und kann später fertig ausgefüllt werden.
     </div>
-    <div id="calcPreview" class="calcPreview">
+    <div id="calcPreview" class="calcPreview v705CalcResult">
      <div class="small">Ergebnis</div>
      <div class="calcResult" id="calcResult">–</div>
      <div class="small" id="calcHint">+, −, ×, ÷ und Klammern sind möglich.</div>
     </div>
-    <div class="v692SectionTitle"><span>2</span><div><b>LV-Unterpositionen</b><small>Positionen derselben Erfassungs-ID</small></div></div>
+    <div class="v692SectionTitle v705LvTitle"><span>2</span><div><b>LV-Unterpositionen</b><small>Positionen derselben Erfassungs-ID</small></div></div>
     <div class="multiLvBox" id="multiLvBox">
      <div class="toolbar" style="justify-content:space-between;align-items:center">
       <div>
@@ -7021,6 +7233,10 @@ main > section.view,
     <div class="v655QuickSave v666SaveSection noPrint">
      <button type="button" class="primary v655QuickSaveBtn" onclick="finalizeCurrentEntry()">Erfassung speichern</button>
      <div class="small">Kein Plan oder Foto erforderlich? Die Erfassung kann hier direkt gespeichert werden. Planmarkierungen und Bilder können später jederzeit ergänzt werden.</div>
+     <div class="toolbar v704SaveActions">
+      <button class="secondary" onclick="clearCurrentEntryDraft()">Eingabe leeren</button>
+      <button class="danger" id="cancelEditBtn" style="display:none" onclick="cancelEdit()">Bearbeitung abbrechen</button>
+     </div>
     </div>
 
 
@@ -7080,10 +7296,7 @@ main > section.view,
       <div class="small">Noch keine Zusatzbilder gewählt.</div>
      </div>
     </div>
-    <div class="toolbar">
-     <button class="secondary" onclick="clearCurrentEntryDraft()">Eingabe leeren</button>
-     <button class="danger" id="cancelEditBtn" style="display:none" onclick="cancelEdit()">Bearbeitung abbrechen</button>
-    </div>
+
     <div id="message" class="small" style="margin-top:9px"></div>
     <div class="small" style="margin-top:5px"><b>Planmarkierung:</b> Sie kann sofort gesetzt oder nach dem Speichern jederzeit über „Planmarkierung bearbeiten“ ergänzt bzw. geändert werden.</div>
    </div>
@@ -14470,8 +14683,8 @@ function renderMobilePositionResults(){
       Number.isFinite(Number(p.lv_qty)) ? `LV ${num(p.lv_qty)}` : ""
     ].filter(Boolean).join(" · ");
     return `<button type="button" class="mobilePosResult ${p.pos===selected?"selected":""}" onclick="selectMobilePosition('${String(p.pos).replace(/'/g,"\\'")}')">
-      <span class="mprCode">${esc(p.pos)}</span>
       <span class="mprText">${esc(p.text)}</span>
+      <span class="mprCode">${esc(p.pos)}</span>
       ${meta?`<span class="mprMeta">${esc(meta)}</span>`:""}
     </button>`;
   }).join("");
@@ -15783,7 +15996,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.03",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.05",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -25267,7 +25480,7 @@ renderMobilePositionResults=function(){
 
   if(selected){
     const p=getPos(selected);
-    count.innerHTML=`Ausgewählt: <b>${esc(selected)}</b>${p?.text?` · ${esc(p.text)}`:""} · ${list.length} Treffer`;
+    count.innerHTML=`Ausgewählt: <b>${p?.text?esc(p.text):esc(selected)}</b> · ${esc(selected)} · ${list.length} Treffer`;
   }else{
     count.textContent=q
       ? `${list.length} Treffer · Position antippen`
@@ -25289,8 +25502,8 @@ renderMobilePositionResults=function(){
       class="mobilePosResult ${p.pos===selected?"selected":""}"
       data-pos="${esc(p.pos)}"
       onclick="selectMobilePosition('${String(p.pos).replace(/'/g,"\\'")}')">
-      <span class="mprCode">${esc(p.pos)}</span>
       <span class="mprText">${esc(p.text)}</span>
+      <span class="mprCode">${esc(p.pos)}</span>
       ${meta?`<span class="mprMeta">${esc(meta)}</span>`:""}
     </button>`;
   }).join("");
@@ -25564,7 +25777,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.03";
+const KOLLAPP_VERSION="7.05";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -25720,7 +25933,7 @@ renderMobilePositionResults=function(options={}){
 
   if(selected){
     const p=getPos(selected);
-    count.innerHTML=`Ausgewählt: <b>${esc(selected)}</b>${p?.text?` · ${esc(p.text)}`:""} · ${list.length} Treffer`;
+    count.innerHTML=`Ausgewählt: <b>${p?.text?esc(p.text):esc(selected)}</b> · ${esc(selected)} · ${list.length} Treffer`;
   }else{
     count.textContent=q
       ? `${list.length} Treffer · Position auswählen`
@@ -25747,8 +25960,8 @@ renderMobilePositionResults=function(options={}){
       aria-pressed="${String(p.pos)===String(selected)?"true":"false"}"
       onclick="selectMobilePosition('${String(p.pos).replace(/'/g,"\\'")}')"
       onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectMobilePosition('${String(p.pos).replace(/'/g,"\\'")}')}">
-      <span class="mprCode">${esc(p.pos)}</span>
       <span class="mprText">${esc(p.text)}</span>
+      <span class="mprCode">${esc(p.pos)}</span>
       ${meta?`<span class="mprMeta">${esc(meta)}</span>`:""}
     </div>`;
   }).join("");
