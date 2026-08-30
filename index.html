@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.97</title>
+<title>Kollaudierung – V7.98</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.97 <span class="v693BuildStamp">Build 7.97</span></h1>
+     <h1>Kollaudierung – V7.98 <span class="v693BuildStamp">Build 7.98</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16369,7 +16369,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.97",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.98",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26150,7 +26150,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.97";
+const KOLLAPP_VERSION="7.98";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -43617,177 +43617,217 @@ html[data-theme="dark"] .v742PrepareBtn.v795PrepareBtn:disabled{
 </script>
 
 
-<style id="v797-tablet-save-final">
+<style id="v798-tablet-save-diagnostic">
 /* ============================================================
-   V7.97 – Tablet-Speichern: direkte, delegierte Touch-Auslösung
+   V7.98 – Tablet-Speichern: direkter Touchstart-Pfad + Diagnose
    ============================================================ */
 #finalSaveEntryBtn,
 .v655QuickSaveBtn{
   touch-action:manipulation!important;
   -webkit-user-select:none!important;
   user-select:none!important;
-  -webkit-tap-highlight-color:rgba(31,95,139,.18)!important;
+  -webkit-tap-highlight-color:rgba(31,95,139,.22)!important;
   cursor:pointer!important;
   position:relative!important;
-  z-index:40!important;
+  z-index:80!important;
   pointer-events:auto!important;
 }
-#finalSaveEntryBtn.v797Tap,
-.v655QuickSaveBtn.v797Tap{
-  transform:scale(.985);
-  filter:brightness(.96);
+#finalSaveEntryBtn.v798Tap,
+.v655QuickSaveBtn.v798Tap{
+  transform:scale(.98)!important;
+  filter:brightness(.94)!important;
 }
-@media(pointer:coarse){
-  #finalSaveEntryBtn,
-  .v655QuickSaveBtn{
-    min-height:54px!important;
-    padding:12px 18px!important;
+#v798TabletSaveDiag{
+  display:none;
+  margin-top:9px;
+  padding:9px 11px;
+  border:1px solid #b8d4e6;
+  border-radius:9px;
+  background:#eef7fc;
+  color:#28495e;
+  font-size:11px;
+  font-weight:700;
+  line-height:1.4;
+  white-space:normal;
+}
+#v798TabletSaveDiag.show{display:block}
+#v798TabletSaveDiag.ok{border-color:#a8d5ba;background:#eef9f2;color:#175c37}
+#v798TabletSaveDiag.bad{border-color:#e0b4b4;background:#fff0f0;color:#8d2525}
+html[data-theme="dark"] #v798TabletSaveDiag{background:#193140;color:#d8eefb;border-color:#41657a}
+html[data-theme="dark"] #v798TabletSaveDiag.ok{background:#173829;color:#bce9cb;border-color:#3c7454}
+html[data-theme="dark"] #v798TabletSaveDiag.bad{background:#49242a;color:#ffd1d1;border-color:#92515a}
+@media(pointer:coarse), (max-width:1100px){
+  #finalSaveEntryBtn,.v655QuickSaveBtn{
+    min-height:56px!important;
+    padding:13px 18px!important;
     font-size:15px!important;
   }
+  #v798TabletSaveDiag{display:block}
 }
 </style>
 
 <script>
 /* ============================================================
-   V7.97 – Tablet/iPad Save-Fix
-   - Capture-Handler greift VOR älteren Button-Listenern.
-   - Pointer Events sind der Primärpfad für iPad/Android/Pencil.
-   - touchend nur als Fallback für ältere Safari-Versionen.
-   - click bleibt als Desktop-/Tastatur-Fallback erhalten.
+   V7.98 – Tablet/iPad Save-Fix
+   Primär wird bereits auf touchstart/pointerdown gespeichert.
+   Damit umgehen wir vollständig Probleme mit verschlucktem pointerup/click.
+   Zusätzlich zeigt eine kleine Diagnose direkt unter dem Speicherbereich,
+   ob der Touch erkannt und die Speicherlogik tatsächlich ausgeführt wurde.
    ============================================================ */
 (function(){
-  let saving=false;
-  let lastDirectSave=0;
-  let lastPointerSave=0;
+  let running=false;
+  let lastStart=0;
+  let lastKind="";
 
-  function saveButtonFromTarget(target){
+  function isSaveButton(target){
     if(!target || !target.closest)return null;
     return target.closest("#finalSaveEntryBtn, .v655QuickSaveBtn");
   }
 
-  function visualTap(btn){
-    if(!btn)return;
-    btn.classList.add("v797Tap");
-    setTimeout(()=>btn.classList.remove("v797Tap"),140);
+  function diagBox(){
+    let box=document.getElementById("v798TabletSaveDiag");
+    if(box)return box;
+    box=document.createElement("div");
+    box.id="v798TabletSaveDiag";
+    box.setAttribute("role","status");
+    box.textContent="Tablet-Speicherdiagnose bereit.";
+    const top=document.querySelector(".v655QuickSaveBtn")?.closest(".v655QuickSave");
+    const bottom=document.getElementById("finalSaveEntryBtn")?.parentElement;
+    (top||bottom||document.getElementById("entryCard"))?.appendChild(box);
+    return box;
   }
 
-  function descOk(){
-    return !!(document.getElementById("lineDesc")?.value||"").trim();
+  function setDiag(text,state=""){
+    const b=diagBox();
+    if(!b)return;
+    b.classList.add("show");
+    b.classList.remove("ok","bad");
+    if(state)b.classList.add(state);
+    b.textContent=text;
   }
 
-  function showMissingDescription(){
-    const desc=document.getElementById("lineDesc");
-    if(!desc)return;
-    desc.classList.add("v794MissingDesc");
-    document.getElementById("v794DescWarning")?.classList.add("show");
+  function tap(btn){
     try{
-      v646SetFinalizeMessage(
-        "⚠ Bitte zuerst eine Positionsbeschreibung eingeben. Die Erfassung wurde nicht gespeichert.",
-        true
-      );
-    }catch(_){
-      try{msg("Bitte zuerst eine Positionsbeschreibung eingeben.",true)}catch(__){}
-    }
-    try{desc.scrollIntoView({behavior:"smooth",block:"center"})}catch(_){}
+      btn.classList.add("v798Tap");
+      setTimeout(()=>btn.classList.remove("v798Tap"),160);
+    }catch(_){ }
   }
 
-  function commitFocusedField(){
-    const a=document.activeElement;
-    if(!a || a===document.body)return;
+  function activeDescription(){
+    return (document.getElementById("lineDesc")?.value||"").trim();
+  }
+
+  function commitCurrentField(){
     try{
-      if(a.matches?.("input, textarea, select"))a.blur();
-    }catch(_){}
+      const a=document.activeElement;
+      if(a && a!==document.body && a.matches?.("input,textarea,select"))a.blur();
+    }catch(_){ }
   }
 
-  function doSave(btn){
+  function finalizeNow(btn,kind){
     const now=Date.now();
-    if(saving || now-lastDirectSave<500)return false;
+    if(running || now-lastStart<650)return false;
+    running=true;
+    lastStart=now;
+    lastKind=kind||"event";
+    tap(btn);
 
-    if(!descOk()){
-      showMissingDescription();
-      visualTap(btn);
-      return false;
-    }
+    setDiag(`✓ ${lastKind} erkannt – Speichervorgang gestartet …`);
+    commitCurrentField();
 
-    saving=true;
-    lastDirectSave=now;
-    visualTap(btn);
-    commitFocusedField();
-
-    /* Nach blur einen Tick warten, damit Safari onchange/input sauber abschließt. */
     setTimeout(()=>{
-      try{
-        finalizeCurrentEntry();
-      }catch(err){
-        console.error("V7.97 Erfassung speichern",err);
-        try{
-          v646SetFinalizeMessage(
-            "Erfassung konnte nicht gespeichert werden: "+String(err?.message||err),
-            true
-          );
-        }catch(_){}
-      }finally{
-        setTimeout(()=>{saving=false},420);
+      const p=(()=>{try{return project?.()}catch(_){return null}})();
+      const before=Array.isArray(p?.entries)?p.entries.length:0;
+      const wasEditing=!!(window.editingEntryId || window.v612EditingGroupId);
+
+      if(!activeDescription()){
+        setDiag("✕ Touch erkannt, aber Positionsbeschreibung fehlt.","bad");
+        try{document.getElementById("lineDesc")?.scrollIntoView({behavior:"smooth",block:"center"})}catch(_){ }
+        running=false;
+        return;
       }
-    },0);
+
+      try{
+        if(typeof finalizeCurrentEntry!=="function"){
+          throw new Error("Speicherfunktion finalizeCurrentEntry ist nicht verfügbar");
+        }
+        finalizeCurrentEntry();
+
+        setTimeout(()=>{
+          const pp=(()=>{try{return project?.()}catch(_){return null}})();
+          const after=Array.isArray(pp?.entries)?pp.entries.length:0;
+          const msgText=(document.getElementById("finalizeMessage")?.textContent||"").trim();
+          const good=wasEditing ? !/konnte nicht|bitte|fehler/i.test(msgText) : after>before;
+
+          if(good){
+            setDiag(`✓ Gespeichert. ${msgText||("Datensätze: "+before+" → "+after)}`,"ok");
+          }else{
+            setDiag(`⚠ Touch funktioniert. Speicherlogik wurde ausgeführt, aber es wurde kein neuer Datensatz angelegt.${msgText?" Hinweis: "+msgText:""}`,"bad");
+          }
+          running=false;
+        },120);
+      }catch(err){
+        console.error("V7.98 Tablet speichern",err);
+        setDiag("✕ Speicherfehler: "+String(err?.message||err),"bad");
+        running=false;
+      }
+    },35);
     return false;
   }
 
-  function consume(ev,btn){
-    try{ev.preventDefault()}catch(_){}
-    try{ev.stopImmediatePropagation()}catch(_){try{ev.stopPropagation()}catch(__){}}
-    return doSave(btn);
+  function consume(ev,btn,kind){
+    try{ev.preventDefault()}catch(_){ }
+    try{ev.stopImmediatePropagation()}catch(_){try{ev.stopPropagation()}catch(__){ }}
+    return finalizeNow(btn,kind);
   }
 
-  /* Primär: Pointer Events – funktionieren auf aktuellem iPadOS, Android und mit Pencil. */
-  document.addEventListener("pointerup",function(ev){
-    const btn=saveButtonFromTarget(ev.target);
+  /* iPad/iPhone: touchstart ist der früheste und zuverlässigste Pfad. */
+  document.addEventListener("touchstart",function(ev){
+    const btn=isSaveButton(ev.target);
     if(!btn)return;
-    if(ev.pointerType==="mouse")return; // Maus wird über click behandelt.
-    lastPointerSave=Date.now();
-    consume(ev,btn);
+    consume(ev,btn,"touchstart");
+  },{capture:true,passive:false});
+
+  /* Android/iPadOS/Pencil: Pointerdown zusätzlich als gleichwertiger Pfad. */
+  document.addEventListener("pointerdown",function(ev){
+    const btn=isSaveButton(ev.target);
+    if(!btn)return;
+    if(ev.pointerType==="mouse")return;
+    consume(ev,btn,"pointerdown"+(ev.pointerType?"/"+ev.pointerType:""));
   },true);
 
-  /* Fallback nur wenn der Browser keine Pointer Events unterstützt. */
-  if(!window.PointerEvent){
-    document.addEventListener("touchend",function(ev){
-      const btn=saveButtonFromTarget(ev.target);
-      if(!btn)return;
-      consume(ev,btn);
-    },{capture:true,passive:false});
-  }
-
-  /* Desktop, Tastatur und synthetischer Click. Nach Touch/Pointer nicht doppelt ausführen. */
+  /* Desktop/Tastatur und Browser-Fallback. */
   document.addEventListener("click",function(ev){
-    const btn=saveButtonFromTarget(ev.target);
+    const btn=isSaveButton(ev.target);
     if(!btn)return;
-    if(Date.now()-lastPointerSave<1100){
-      try{ev.preventDefault()}catch(_){}
-      try{ev.stopImmediatePropagation()}catch(_){}
+    if(Date.now()-lastStart<1000){
+      try{ev.preventDefault()}catch(_){ }
+      try{ev.stopImmediatePropagation()}catch(_){ }
       return;
     }
-    consume(ev,btn);
+    consume(ev,btn,"click");
   },true);
 
-  /* Defensive: ältere Inline-/Listener bleiben vorhanden, werden aber durch Capture abgefangen. */
-  function hardenButtons(){
+  function harden(){
     document.querySelectorAll("#finalSaveEntryBtn, .v655QuickSaveBtn").forEach(btn=>{
       btn.type="button";
       btn.style.pointerEvents="auto";
+      btn.style.touchAction="manipulation";
       btn.setAttribute("aria-label","Erfassung speichern");
     });
+    diagBox();
   }
 
   window.addEventListener("load",()=>{
-    hardenButtons();
-    setTimeout(hardenButtons,300);
-    setTimeout(hardenButtons,1000);
+    harden();
+    setTimeout(harden,300);
+    setTimeout(harden,1000);
   });
 
-  const baseShowViewV797=showView;
+  const baseShowViewV798=showView;
   showView=function(name){
-    const r=baseShowViewV797.apply(this,arguments);
-    if(name==="entry")setTimeout(hardenButtons,0);
+    const r=baseShowViewV798.apply(this,arguments);
+    if(name==="entry")setTimeout(harden,0);
     return r;
   };
   window.showView=showView;
