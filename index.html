@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.85</title>
+<title>Kollaudierung – V7.86</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.85 <span class="v693BuildStamp">Build 7.85</span></h1>
+     <h1>Kollaudierung – V7.86 <span class="v693BuildStamp">Build 7.86</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -7426,12 +7426,12 @@ main > section.view,
  </div>
 
  <div class="tabs noPrint">
-  <button id="tab-entry" class="tab active" onclick="showView('entry')"><span class="v667TabIcon">✎</span><span>Erfassen</span></button>
-  <button id="tab-sheet" class="tab" onclick="showView('sheet')"><span class="v667TabIcon">▤</span><span>Aufmaßblatt</span></button>
-  <button id="tab-lv" class="tab" onclick="showView('lv')"><span class="v667TabIcon">≡</span><span>LV-Übersicht</span></button>
-  <button id="tab-export" class="tab" onclick="showView('export')"><span class="v667TabIcon">⇩</span><span>Export</span></button>
-  <button id="tab-sync" class="tab" onclick="showView('sync')"><span class="v667TabIcon">⇄</span><span>Benutzer & Projektübergabe</span></button>
-  <button id="tab-project" class="tab" onclick="showView('project')"><span class="v667TabIcon">⌂</span><span>Projekt</span></button>
+  <button id="tab-entry" class="tab active" onclick="v786TabSwitch('entry')"><span class="v667TabIcon">✎</span><span>Erfassen</span></button>
+  <button id="tab-sheet" class="tab" onclick="v786TabSwitch('sheet')"><span class="v667TabIcon">▤</span><span>Aufmaßblatt</span></button>
+  <button id="tab-lv" class="tab" onclick="v786TabSwitch('lv')"><span class="v667TabIcon">≡</span><span>LV-Übersicht</span></button>
+  <button id="tab-export" class="tab" onclick="v786TabSwitch('export')"><span class="v667TabIcon">⇩</span><span>Export</span></button>
+  <button id="tab-sync" class="tab" onclick="v786TabSwitch('sync')"><span class="v667TabIcon">⇄</span><span>Benutzer & Projektübergabe</span></button>
+  <button id="tab-project" class="tab" onclick="v786TabSwitch('project')"><span class="v667TabIcon">⌂</span><span>Projekt</span></button>
  </div>
 
  <section id="view-entry" class="view active">
@@ -16350,7 +16350,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.85",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.86",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26131,7 +26131,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.85";
+const KOLLAPP_VERSION="7.86";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -42582,6 +42582,105 @@ html[data-theme="dark"] .v784HintMode.active{
     };
   };
 
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.86 – Jeder Hauptreiter merkt seine letzte Scroll-Position
+   Nur Klick auf die Hauptnavigation. Programmgesteuerte Sprünge
+   (z. B. "Plan bearbeiten") verwenden weiterhin showView().
+   ============================================================ */
+(function(){
+  const VIEWS=["entry","sheet","lv","export","sync","project"];
+  const positions=Object.create(null);
+
+  function currentView(){
+    const active=document.querySelector(".tabs.noPrint .tab.active");
+    const id=active?.id||"";
+    const name=id.startsWith("tab-") ? id.slice(4) : "";
+    return VIEWS.includes(name) ? name : "entry";
+  }
+
+  function storageKey(){
+    let pid="global";
+    try{
+      const p=project?.();
+      pid=String(p?.id||p?.projectId||p?.name||"global");
+    }catch(_){}
+    return "kollapp_v786_scroll_"+pid;
+  }
+
+  function loadStored(){
+    try{
+      const raw=sessionStorage.getItem(storageKey());
+      if(!raw)return;
+      const obj=JSON.parse(raw);
+      for(const name of VIEWS){
+        const y=Number(obj?.[name]);
+        if(Number.isFinite(y) && y>=0)positions[name]=y;
+      }
+    }catch(_){}
+  }
+
+  function saveStored(){
+    try{
+      sessionStorage.setItem(storageKey(),JSON.stringify(positions));
+    }catch(_){}
+  }
+
+  function remember(name){
+    if(!VIEWS.includes(name))return;
+    positions[name]=Math.max(0,Math.round(window.scrollY||0));
+    saveStored();
+  }
+
+  function restore(name){
+    const y=Number(positions[name]);
+    if(!Number.isFinite(y))return;
+
+    /*
+      showView() hat historisch selbst einen RAF-Sprung zum Reiteranfang.
+      Deshalb erst zwei Frames später unsere gespeicherte Position setzen.
+    */
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        const maxY=Math.max(
+          0,
+          document.documentElement.scrollHeight-window.innerHeight
+        );
+        window.scrollTo({
+          top:Math.min(Math.max(0,y),maxY),
+          left:window.scrollX,
+          behavior:"auto"
+        });
+      });
+    });
+  }
+
+  window.v786TabSwitch=function(name){
+    if(!VIEWS.includes(name))return;
+
+    const from=currentView();
+    remember(from);
+
+    /* Bestehende, stabile Navigation unverändert ausführen. */
+    showView(name);
+
+    /* Beim ersten Besuch bleibt das bisherige Verhalten (Reiteranfang). */
+    if(Object.prototype.hasOwnProperty.call(positions,name)){
+      restore(name);
+    }
+  };
+
+  /* Beim Verlassen/Neuladen aktuellen Stand ebenfalls merken. */
+  window.addEventListener("beforeunload",()=>{
+    remember(currentView());
+  });
+
+  /* Session-Werte laden; beeinflusst den Startbildschirm noch nicht. */
+  loadStored();
 })();
 </script>
 
