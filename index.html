@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.40</title>
+<title>Kollaudierung – V7.41</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.40 <span class="v693BuildStamp">Build 7.40</span></h1>
+     <h1>Kollaudierung – V7.41 <span class="v693BuildStamp">Build 7.41</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -7448,6 +7448,10 @@ main > section.view,
     <div class="grid2">
      <div><label>Übergeordneter Bereich</label><input id="edTopArea" placeholder="Übergeordneter Bereich"></div>
      <div><label>Anlagenteil / Bereich</label><input id="edArea" placeholder="Bereich / Anlagenteil"></div>
+    </div>
+    <div class="grid2">
+     <div><label>Ebene</label><input id="edLevel" placeholder="z. B. 2. OG"></div>
+     <div><label>Raumnummer</label><input id="edRoom" placeholder="z. B. 02.315"></div>
     </div>
     <label>Blatt-Anmerkung</label><input id="edNote" placeholder="optional">
     <div class="toolbar" style="margin-top:10px">
@@ -16310,7 +16314,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.40",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.41",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26095,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.40";
+const KOLLAPP_VERSION="7.41";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -34633,6 +34637,246 @@ tbody tr:hover td{
  const oldRenderProjectAdmin=renderProjectAdmin;
  renderProjectAdmin=function(){const r=oldRenderProjectAdmin.apply(this,arguments);setTimeout(()=>{ensureCard();renderCard()},0);return r}
  window.addEventListener('load',()=>setTimeout(()=>{ensureCard();ensureModal();renderCard()},800));
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.41 – EBENE + RAUMNUMMER AM AUFMASSBLATT
+   ============================================================ */
+.v741SheetMetaInline{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px 10px;
+  margin-top:4px;
+  color:#667b87;
+  font-size:10.5px;
+}
+.v741SheetMetaInline b{color:#405d6d}
+</style>
+
+<script>
+/* ============================================================
+   V7.41 – Aufmaßblatt-Stammdaten Ebene / Raumnummer
+   Nur Metadaten-Erweiterung. Bestehende Erfassungs-/Planlogik bleibt gleich.
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function metaParts(sh){
+    if(!sh)return [];
+    const parts=[];
+    if(sh.level)parts.push(`Ebene: ${sh.level}`);
+    if(sh.room)parts.push(`Raum: ${sh.room}`);
+    return parts;
+  }
+
+  function fullArea(sh){
+    return [sh?.topArea,sh?.area].filter(Boolean).join(" – ");
+  }
+
+  function selectorLabel(sh){
+    const lead=[sh.code,sh.level,sh.room].filter(Boolean).join(" · ");
+    const area=fullArea(sh);
+    return `${lead}${area?` · ${area}`:""}`;
+  }
+
+  /* ---------- Editor ---------- */
+  const baseOpenSheetEditor=openSheetEditor;
+  openSheetEditor=function(edit){
+    const r=baseOpenSheetEditor.apply(this,arguments);
+    const sh=activeSheet();
+    if($("edLevel")) $("edLevel").value=edit?(sh?.level||""):"";
+    if($("edRoom")) $("edRoom").value=edit?(sh?.room||""):"";
+    return r;
+  };
+
+  const baseSaveSheet=saveSheet;
+  saveSheet=function(){
+    const level=$("edLevel")?.value.trim()||"";
+    const room=$("edRoom")?.value.trim()||"";
+
+    const beforeIds=new Set((project()?.sheets||[]).map(s=>s.id));
+    const r=baseSaveSheet.apply(this,arguments);
+
+    /*
+      baseSaveSheet legt/bearbeitet das Blatt zuverlässig.
+      Danach nur die zwei neuen Metadaten ergänzen.
+    */
+    let sh=activeSheet();
+    if(sh){
+      sh.level=level;
+      sh.room=room;
+      persist?.();
+      renderSheetSelect?.();
+      renderAll?.();
+    }
+    return r;
+  };
+
+  /* ---------- Selektoren / Schnellanzeige ---------- */
+  const baseRenderSheetSelect=renderSheetSelect;
+  renderSheetSelect=function(){
+    const r=baseRenderSheetSelect.apply(this,arguments);
+
+    const p=project?.();
+    const sel=$("sheetSelect");
+    if(p && sel && p.sheets?.length){
+      [...sel.options].forEach(opt=>{
+        const sh=p.sheets.find(s=>s.id===opt.value);
+        if(sh) opt.textContent=selectorLabel(sh);
+      });
+    }
+
+    const sh=activeSheet();
+    const quick=$("sheetAreaQuick");
+    if(quick && sh){
+      quick.value=[
+        sh.level?`Ebene ${sh.level}`:"",
+        sh.room?`Raum ${sh.room}`:"",
+        fullArea(sh)
+      ].filter(Boolean).join(" · ");
+    }
+
+    const viewSel=$("sheetViewSelect");
+    if(p && viewSel){
+      [...viewSel.options].forEach(opt=>{
+        const sh=p.sheets.find(s=>s.id===opt.value);
+        if(sh) opt.textContent=selectorLabel(sh);
+      });
+    }
+
+    return r;
+  };
+
+  /* ---------- Browser-Aufmaßblatt ---------- */
+  const baseRenderSheet=renderSheet;
+  renderSheet=function(){
+    const r=baseRenderSheet.apply(this,arguments);
+
+    const sh=activeSheet();
+    if(!sh)return r;
+
+    const title=$("sheetTitle");
+    if(title){
+      title.innerHTML=`
+        <div><b>${esc(sh.code||"")}</b> · ${esc(fullArea(sh)||"ohne Bereich")}</div>
+        ${(sh.level||sh.room)?`
+          <div class="v741SheetMetaInline">
+            ${sh.level?`<span><b>Ebene:</b> ${esc(sh.level)}</span>`:""}
+            ${sh.room?`<span><b>Raumnummer:</b> ${esc(sh.room)}</span>`:""}
+          </div>`:""}
+      `;
+    }
+
+    const ph=$("sheetPrintHead");
+    if(ph){
+      ph.innerHTML=`<div class="projectMeta">
+        <div class="metaCell"><b>Projekt</b>${esc(project().meta.name)}</div>
+        <div class="metaCell"><b>Projektnr.</b>${esc(project().meta.number||"–")}</div>
+        <div class="metaCell"><b>Kollaudierungsblatt</b>${esc(sh.code||"–")}</div>
+        <div class="metaCell"><b>Datum / Gewerk</b>${esc(sh.date||"–")} · ${esc(sh.trade||"–")}</div>
+        <div class="metaCell"><b>Bereich</b>${esc(fullArea(sh)||"–")}</div>
+        <div class="metaCell"><b>Ebene</b>${esc(sh.level||"–")}</div>
+        <div class="metaCell"><b>Raumnummer</b>${esc(sh.room||"–")}</div>
+        <div class="metaCell"><b>Auftragnehmer</b>${esc(project().meta.contractor||"–")}</div>
+      </div>`;
+    }
+
+    return r;
+  };
+
+  /* ---------- PDF-Metabereich ---------- */
+  if(typeof v519MetaHtml==="function"){
+    v519MetaHtml=function(sh){
+      return `<div class="printMeta">
+        <div><b>Projekt</b><br>${esc(project().meta.name)}</div>
+        <div><b>Projektnr.</b><br>${esc(project().meta.number||"–")}</div>
+        <div><b>Aufmaßblatt</b><br>${esc(sh.code||"–")}</div>
+        <div><b>Bereich</b><br>${esc(fullArea(sh)||"–")}</div>
+        <div><b>Ebene</b><br>${esc(sh.level||"–")}</div>
+        <div><b>Raumnummer</b><br>${esc(sh.room||"–")}</div>
+        <div><b>Datum</b><br>${esc(sh.date||"–")}</div>
+        <div><b>Gewerk</b><br>${esc(sh.trade||"–")}</div>
+      </div>`;
+    };
+  }
+
+  /* ---------- CSV um Ebene / Raumnummer ergänzen ---------- */
+  if(typeof v622CsvRowsForSheets==="function"){
+    const baseCsvRows=v622CsvRowsForSheets;
+    v622CsvRowsForSheets=function(selected){
+      const result=baseCsvRows.apply(this,arguments);
+      const rows=result?.rows;
+      const fresh=result?.fresh||[];
+
+      if(!Array.isArray(rows) || !rows.length)return result;
+
+      /* Header: nach Bereich zwei neue Spalten */
+      const header=rows[0];
+      const areaIx=header.indexOf("Bereich");
+      if(areaIx>=0 && !header.includes("Ebene")){
+        header.splice(areaIx+1,0,"Ebene","Raumnummer");
+
+        /*
+          Datenzeilen besitzen Aufmaßblatt-Code in Spalte 2.
+          Summenzeilen ebenfalls; dort Metadaten leer lassen.
+        */
+        for(let i=1;i<rows.length;i++){
+          const row=rows[i];
+          if(!Array.isArray(row))continue;
+
+          const code=String(row[2]||"");
+          const sh=fresh.find(s=>String(s.code||"")===code);
+          row.splice(areaIx+1,0,sh?.level||"",sh?.room||"");
+        }
+      }
+      return result;
+    };
+  }
+
+  /* ---------- Sammelauswahl-Labels ebenfalls informativer ---------- */
+  if(typeof renderSheetSelectionGrid==="function"){
+    const baseGrid=renderSheetSelectionGrid;
+    renderSheetSelectionGrid=function(){
+      const r=baseGrid.apply(this,arguments);
+      const p=project?.();
+      const grid=$("sheetCheckGrid");
+      if(p && grid){
+        [...grid.querySelectorAll(".sheetCheckItem")].forEach(item=>{
+          const cb=item.querySelector('input[type="checkbox"]');
+          const label=item.querySelector("label");
+          const sh=p.sheets.find(s=>s.id===cb?.value || s.id===cb?.dataset?.sheetId);
+          /* Falls value nicht die ID enthält, bestehendes Label unverändert lassen. */
+          if(sh && label){
+            const count=label.querySelector(".sm")?.outerHTML||"";
+            label.innerHTML=`<b>${esc(sh.code)}</b> · ${esc([sh.level,sh.room,fullArea(sh)].filter(Boolean).join(" · ")||"ohne Bereich")}${count}`;
+          }
+        });
+      }
+      return r;
+    };
+  }
+
+  /* Erstbestand alter Projekte: Felder nur normalisieren, niemals Inhalte ändern. */
+  function normalizeSheets(){
+    Object.values(state?.projects||{}).forEach(p=>{
+      (p.sheets||[]).forEach(sh=>{
+        if(typeof sh.level!=="string")sh.level="";
+        if(typeof sh.room!=="string")sh.room="";
+      });
+    });
+  }
+
+  window.addEventListener("load",()=>{
+    normalizeSheets();
+    persist?.();
+    setTimeout(()=>{
+      renderSheetSelect?.();
+      if(activeSheet())renderSheet?.();
+    },350);
+  });
 })();
 </script>
 
