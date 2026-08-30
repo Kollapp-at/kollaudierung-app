@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.44</title>
+<title>Kollaudierung – V7.46</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.44 <span class="v693BuildStamp">Build 7.44</span></h1>
+     <h1>Kollaudierung – V7.46 <span class="v693BuildStamp">Build 7.46</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16319,7 +16319,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.44",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.46",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26100,7 +26100,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.44";
+const KOLLAPP_VERSION="7.46";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -35413,6 +35413,239 @@ tbody tr:hover td{
   if(document.readyState==="loading"){
     document.addEventListener("DOMContentLoaded",apply,{once:true});
   }else apply();
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.45 – BESSERE AUSWAHL-TREFFERFLÄCHEN IM PLAN
+   Unsichtbar, ausschließlich im Werkzeug "Auswählen" aktiv.
+   ============================================================ */
+#planOverlay .v745SelectHit{
+  opacity:0!important;
+  pointer-events:none!important;
+  cursor:pointer!important;
+  touch-action:manipulation!important;
+}
+
+/* Nur im Auswahlmodus werden die vergrößerten Trefferflächen aktiv. */
+#planOverlay.v745SelectMode .v745SelectHit{
+  pointer-events:all!important;
+}
+
+/* Bei Linien/Freihand nur der verbreiterte Stroke, nicht die Bounding Box. */
+#planOverlay.v745SelectMode .v745StrokeHit{
+  pointer-events:stroke!important;
+}
+
+/* Rechteck/Kreis dürfen innen ebenfalls angetippt werden. */
+#planOverlay.v745SelectMode .v745AreaHit{
+  pointer-events:all!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.45 – universelle Auswahl-Hitboxen
+   Keine Änderung an Zeichen-/Radierer-/Geometriebearbeitungslogik.
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function annById(id){
+    return activePlan?.()?.annotations?.find(a=>String(a.id)===String(id))||null;
+  }
+
+  function addHitForGroup(g,a){
+    if(!g || !a || g.querySelector(".v745SelectHit"))return;
+
+    const z=typeof v59MarkerScale==="function" ? v59MarkerScale() : 1;
+    let hit=null;
+
+    if(a.type==="point"){
+      hit=svgEl("circle",{
+        cx:planPxX(a.x),
+        cy:planPxY(a.y),
+        r:Math.max(22*z,18),
+        fill:"#000",
+        class:"v745SelectHit v745AreaHit"
+      });
+
+    }else if(a.type==="line" || a.type==="freehand" || a.type==="scribble"){
+      const pts=(a.points||[])
+        .map(p=>`${planPxX(p.x)},${planPxY(p.y)}`)
+        .join(" ");
+
+      if(pts){
+        hit=svgEl("polyline",{
+          points:pts,
+          fill:"none",
+          stroke:"#000",
+          "stroke-width":Math.max(Number(a.width||7)*z+20,24),
+          "stroke-linecap":"round",
+          "stroke-linejoin":"round",
+          class:"v745SelectHit v745StrokeHit"
+        });
+      }
+
+    }else if(a.type==="rect"){
+      const x1=planPxX(a.x1), y1=planPxY(a.y1);
+      const x2=planPxX(a.x2), y2=planPxY(a.y2);
+      hit=svgEl("rect",{
+        x:Math.min(x1,x2),
+        y:Math.min(y1,y2),
+        width:Math.max(1,Math.abs(x2-x1)),
+        height:Math.max(1,Math.abs(y2-y1)),
+        fill:"#000",
+        stroke:"#000",
+        "stroke-width":Math.max(16,16*z),
+        class:"v745SelectHit v745AreaHit"
+      });
+
+    }else if(a.type==="circle"){
+      const x1=planPxX(a.x1), y1=planPxY(a.y1);
+      const x2=planPxX(a.x2), y2=planPxY(a.y2);
+      const cx=(x1+x2)/2, cy=(y1+y2)/2;
+      const r=Math.max(8,Math.min(Math.abs(x2-x1),Math.abs(y2-y1))/2);
+      hit=svgEl("circle",{
+        cx,cy,r,
+        fill:"#000",
+        stroke:"#000",
+        "stroke-width":Math.max(16,16*z),
+        class:"v745SelectHit v745AreaHit"
+      });
+
+    }else if(a.type==="text"){
+      /*
+        Text-BBox nach dem Render auslesen.
+        Etwas Padding macht den Text auf Touch gut anwählbar.
+      */
+      const t=g.querySelector("text");
+      if(t){
+        try{
+          const b=t.getBBox();
+          const pad=Math.max(10,10*z);
+          hit=svgEl("rect",{
+            x:b.x-pad,
+            y:b.y-pad,
+            width:Math.max(24,b.width+2*pad),
+            height:Math.max(24,b.height+2*pad),
+            fill:"#000",
+            class:"v745SelectHit v745AreaHit"
+          });
+        }catch(e){}
+      }
+    }
+
+    if(!hit)return;
+
+    /*
+      Trefferfläche als erstes Element einfügen, damit sichtbare
+      Geometrie/Editorgriffe weiterhin oben gezeichnet bleiben.
+      Click bubbelt zum bestehenden .ann-Handler.
+    */
+    g.insertBefore(hit,g.firstChild);
+  }
+
+  function installHits(){
+    const svg=$("planOverlay");
+    const pl=activePlan?.();
+    if(!svg || !pl)return;
+
+    svg.classList.toggle("v745SelectMode",planTool==="select");
+
+    svg.querySelectorAll("g.ann[data-id]").forEach(g=>{
+      const a=annById(g.dataset.id);
+      if(a)addHitForGroup(g,a);
+    });
+  }
+
+  /*
+    Nach jedem normalen Render Trefferflächen ergänzen.
+    renderPlanAnnotations selbst bleibt vollständig bestehen.
+  */
+  const oldRender=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    const r=oldRender.apply(this,arguments);
+    requestAnimationFrame(installHits);
+    return r;
+  };
+
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    const r=oldSet.apply(this,arguments);
+    requestAnimationFrame(installHits);
+    return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    const r=await oldOpen.apply(this,arguments);
+    requestAnimationFrame(installHits);
+    return r;
+  };
+
+  window.addEventListener("load",()=>{
+    setTimeout(installHits,500);
+  });
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.46 – "Planmarkierung bearbeiten" springt automatisch zum Plan
+   Reiner Navigations-/Scroll-Patch; Planlogik bleibt unverändert.
+   ============================================================ */
+(function(){
+  function v746ScrollToPlan(){
+    let tries=0;
+
+    function go(){
+      tries++;
+      const stage=document.getElementById("planStage");
+      const viewport=document.getElementById("planViewport");
+
+      /*
+        Nach showView/openPlan kann der Plan erst einen Moment später
+        sichtbar/layoutet sein. Sobald er eine echte Höhe hat, scrollen.
+      */
+      const target=stage || viewport;
+      if(target && target.getClientRects().length && target.offsetHeight>0){
+        target.scrollIntoView({
+          behavior:"smooth",
+          block:"start",
+          inline:"nearest"
+        });
+        return;
+      }
+
+      if(tries<20)setTimeout(go,50);
+    }
+
+    setTimeout(go,20);
+  }
+
+  const baseMarkEntryOnPlan=markEntryOnPlan;
+  markEntryOnPlan=function(entryId){
+    const r=baseMarkEntryOnPlan.apply(this,arguments);
+    v746ScrollToPlan();
+    return r;
+  };
+
+  /*
+    Auch der LV-Unterpositions-Button rechts neben dem Plan nutzt den
+    gleichen automatischen Fokus, falls diese Route den Plan neu öffnet.
+  */
+  if(typeof window.v737EditLvFromPlan==="function"){
+    const baseLvPlanEdit=window.v737EditLvFromPlan;
+    window.v737EditLvFromPlan=function(pos){
+      const r=baseLvPlanEdit.apply(this,arguments);
+      v746ScrollToPlan();
+      return r;
+    };
+  }
 })();
 </script>
 
