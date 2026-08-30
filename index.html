@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.86</title>
+<title>Kollaudierung – V7.87</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.86 <span class="v693BuildStamp">Build 7.86</span></h1>
+     <h1>Kollaudierung – V7.87 <span class="v693BuildStamp">Build 7.87</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -7432,6 +7432,7 @@ main > section.view,
   <button id="tab-export" class="tab" onclick="v786TabSwitch('export')"><span class="v667TabIcon">⇩</span><span>Export</span></button>
   <button id="tab-sync" class="tab" onclick="v786TabSwitch('sync')"><span class="v667TabIcon">⇄</span><span>Benutzer & Projektübergabe</span></button>
   <button id="tab-project" class="tab" onclick="v786TabSwitch('project')"><span class="v667TabIcon">⌂</span><span>Projekt</span></button>
+  <button id="v787TopBtn" class="v787TopBtn" type="button" onclick="v787ScrollTop()" title="Zum Seitenanfang"><span class="v787TopIcon">↑</span><span>Seitenanfang</span></button>
  </div>
 
  <section id="view-entry" class="view active">
@@ -16350,7 +16351,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.86",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.87",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26131,7 +26132,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.86";
+const KOLLAPP_VERSION="7.87";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -42682,6 +42683,87 @@ html[data-theme="dark"] .v784HintMode.active{
   /* Session-Werte laden; beeinflusst den Startbildschirm noch nicht. */
   loadStored();
 })();
+</script>
+
+
+<style id="v787-top-button-style">
+/* ============================================================
+   V7.87 – Schneller Sprung zum Seitenanfang
+   ============================================================ */
+.tabs.noPrint .v787TopBtn{
+  appearance:none;
+  border:1px solid var(--line);
+  border-radius:8px;
+  min-height:38px;
+  padding:7px 11px;
+  font:inherit;
+  font-size:11.5px;
+  font-weight:700;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  background:#eef3f6;
+  color:#29404f;
+  transition:background .12s ease,border-color .12s ease,transform .08s ease;
+}
+.tabs.noPrint .v787TopBtn:hover{
+  background:#e2ebf0;
+  border-color:#b8cbd7;
+}
+.tabs.noPrint .v787TopBtn:active{
+  transform:translateY(1px);
+}
+.v787TopIcon{
+  font-size:15px;
+  line-height:1;
+  font-weight:900;
+}
+
+/* Dark Mode */
+html[data-theme="dark"] .tabs.noPrint .v787TopBtn{
+  background:#142c3d!important;
+  color:#eef5f9!important;
+  border-color:#3d6179!important;
+}
+html[data-theme="dark"] .tabs.noPrint .v787TopBtn:hover{
+  background:#19384d!important;
+  border-color:#4d7690!important;
+}
+
+/* Tablet: gleiche Höhe wie die Reiter */
+@media(min-width:601px) and (max-width:1100px){
+  .tabs.noPrint .v787TopBtn{
+    min-height:42px!important;
+    font-size:12px!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
+  }
+}
+
+/* Handy: kompakt, damit die Navigation übersichtlich bleibt */
+@media(max-width:600px){
+  .tabs.noPrint .v787TopBtn{
+    min-height:40px!important;
+    padding:6px 8px!important;
+    font-size:11px!important;
+  }
+  .tabs.noPrint .v787TopBtn .v787TopIcon{
+    font-size:14px!important;
+  }
+}
+</style>
+
+<script>
+/* V7.87 – bewusst getrennt von showView()/Tab-State. */
+window.v787ScrollTop=function(){
+  try{
+    window.scrollTo({top:0,left:0,behavior:"smooth"});
+  }catch(_){
+    window.scrollTo(0,0);
+  }
+};
 </script>
 
 </body>
