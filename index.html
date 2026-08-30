@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.26</title>
+<title>Kollaudierung – V7.27</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.26 <span class="v693BuildStamp">Build 7.26</span></h1>
+     <h1>Kollaudierung – V7.27 <span class="v693BuildStamp">Build 7.27</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.26",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.27",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.26";
+const KOLLAPP_VERSION="7.27";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -30657,6 +30657,255 @@ window.addEventListener("load",()=>{
       return r;
     };
   }
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.27 – GEOMETRIEPUNKTE DIREKT OBEN IN DER PLANLEISTE
+   ============================================================ */
+#v727GeometryTop{
+  display:none;
+  width:100%;
+  margin-top:4px;
+  padding:8px 9px;
+  border:1px solid #c9dce8;
+  border-radius:9px;
+  background:#f7fbfd;
+}
+#v727GeometryTop.show{display:block}
+#v727GeometryTop .v727Head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:7px;
+}
+#v727GeometryTop .v727Title{
+  font-weight:700;
+  color:#244b62;
+  font-size:12px;
+}
+#v727GeometryTop .v727Hint{
+  color:#617683;
+  font-size:10.5px;
+}
+#v727GeometryTop .v727Buttons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+#v727GeometryTop .v727Buttons button{
+  min-height:34px;
+  padding:6px 9px;
+  font-size:11px;
+}
+#v727GeometryTop .v727Buttons button.active{
+  background:#f0a000!important;
+  border-color:#d78d00!important;
+  color:#fff!important;
+}
+#v727GeometryTop.waiting{
+  background:#fff8df;
+  border-color:#e5c76d;
+}
+#v727GeometryTop.waiting .v727Hint{
+  color:#765a08;
+  font-weight:600;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.27 – V7.25 Geometrie-Editor nach oben spiegeln
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function ensureTopPanel(){
+    let panel=$("v727GeometryTop");
+    if(panel)return panel;
+
+    const tools=document.querySelector(".planTools");
+    if(!tools)return null;
+
+    panel=document.createElement("div");
+    panel.id="v727GeometryTop";
+
+    const insertionPoint =
+      document.getElementById("planLineHelp")?.parentElement ||
+      tools;
+
+    if(insertionPoint===tools){
+      tools.appendChild(panel);
+    }else{
+      insertionPoint.insertBefore(panel,insertionPoint.firstChild);
+    }
+
+    return panel;
+  }
+
+  function selectedAnn(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+
+  function bottomPanel(){
+    return $("v725GeometryEditor");
+  }
+
+  function renderTop(){
+    const top=ensureTopPanel();
+    if(!top)return;
+
+    const a=selectedAnn();
+    const source=bottomPanel();
+
+    if(!a || planTool!=="select" || !source || source.style.display==="none" ||
+       !["line","rect","circle"].includes(a.type)){
+      top.classList.remove("show","waiting");
+      top.innerHTML="";
+      return;
+    }
+
+    const sourceButtons=[...source.querySelectorAll("button[data-v725-kind][data-v725-index]")];
+    if(!sourceButtons.length){
+      top.classList.remove("show","waiting");
+      top.innerHTML="";
+      return;
+    }
+
+    const activeSource=source.querySelector("button.active[data-v725-kind]");
+    const waiting=!!activeSource;
+
+    top.classList.toggle("show",true);
+    top.classList.toggle("waiting",waiting);
+
+    const title=a.type==="line"
+      ? ((a.mode==="polyline"||(a.points||[]).length>2) ? "Polylinie bearbeiten" : "Linie bearbeiten")
+      : (a.type==="circle" ? "Kreis bearbeiten" : "Rechteck bearbeiten");
+
+    top.innerHTML=`
+      <div class="v727Head">
+        <div class="v727Title">${title}</div>
+        <div class="v727Hint">${waiting
+          ? "Jetzt neue Position direkt im Plan antippen."
+          : "Punkt/Ecke auswählen, danach neue Position im Plan antippen."}</div>
+      </div>
+      <div class="v727Buttons"></div>
+    `;
+
+    const wrap=top.querySelector(".v727Buttons");
+
+    sourceButtons.forEach(srcBtn=>{
+      const btn=document.createElement("button");
+      btn.type="button";
+      btn.className="secondary"+(srcBtn.classList.contains("active")?" active":"");
+
+      const kind=srcBtn.dataset.v725Kind;
+      const idx=Number(srcBtn.dataset.v725Index);
+
+      if(kind==="vertex"){
+        btn.textContent=`P${idx+1}`;
+      }else{
+        btn.textContent=`E${idx+1}`;
+      }
+
+      btn.title=srcBtn.textContent.trim();
+
+      btn.addEventListener("click",ev=>{
+        ev.preventDefault();
+        ev.stopPropagation();
+        srcBtn.click();
+        setTimeout(renderTop,0);
+      });
+
+      wrap.appendChild(btn);
+    });
+  }
+
+  /* Unten nur kurzen Hinweis stehen lassen, Buttons optisch verstecken.
+     Die Logik bleibt im V7.25-Panel erhalten und wird von oben ausgelöst. */
+  function simplifyBottom(){
+    const source=bottomPanel();
+    if(!source)return;
+
+    const a=selectedAnn();
+    if(!a || !["line","rect","circle"].includes(a.type))return;
+
+    const buttons=source.querySelector(".v725EditorButtons");
+    const title=source.querySelector(".v725EditorTitle");
+    const text=source.querySelector(".v725EditorText");
+
+    if(buttons)buttons.style.display="none";
+    if(title)title.textContent="Geometrie bearbeiten";
+    if(text)text.innerHTML='Die Bearbeitungspunkte befinden sich jetzt <b>oben direkt in der Planleiste</b>.';
+  }
+
+  function refresh(){
+    setTimeout(()=>{
+      simplifyBottom();
+      renderTop();
+    },0);
+  }
+
+  const oldRenderSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=oldRenderSelected.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldRenderPlan=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    const r=oldRenderPlan.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    const r=oldSet.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldSelect=selectPlanAnnotation;
+  selectPlanAnnotation=function(id){
+    const r=oldSelect.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    const r=await oldOpen.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  /* Bottom-Panel wird durch V7.25 neu aufgebaut -> Änderungen beobachten */
+  function installObserver(){
+    const source=bottomPanel();
+    if(!source || source.dataset.v727Observer==="1")return;
+    source.dataset.v727Observer="1";
+
+    const obs=new MutationObserver(()=>refresh());
+    obs.observe(source,{
+      childList:true,
+      subtree:true,
+      attributes:true,
+      attributeFilter:["class","style"]
+    });
+  }
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      ensureTopPanel();
+      installObserver();
+      refresh();
+    },380);
+  });
 })();
 </script>
 
