@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V6.99</title>
+<title>Kollaudierung – V7.00</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -6412,6 +6412,71 @@ main > section.view,
   }
 }
 
+
+/* ============================================================
+   V7.00 – POSITIONSLISTE LESBAR / NICHTS MEHR ABGESCHNITTEN
+   ============================================================ */
+
+#view-entry .mobilePosResults{
+  gap:9px!important;
+  padding:5px 7px 8px 3px!important;
+}
+
+#view-entry .mobilePosResult,
+#view-entry .mobilePosResult.selected{
+  min-height:0!important;
+  height:auto!important;
+  padding:12px 13px 13px!important;
+  overflow:visible!important;
+}
+
+#view-entry .mobilePosResult .mprCode{
+  display:block!important;
+  margin:0 0 5px!important;
+  line-height:1.22!important;
+}
+
+#view-entry .mobilePosResult .mprText{
+  display:block!important;
+  margin:0!important;
+  line-height:1.4!important;
+}
+
+#view-entry .mobilePosResult .mprMeta{
+  display:block!important;
+  margin:8px 0 0!important;
+  padding:6px 105px 0 0!important;
+  line-height:1.35!important;
+  border-top:1px solid #edf2f5!important;
+  min-height:20px;
+}
+
+/* Auswahlbadge bleibt oben, ohne Text zu überdecken. */
+#view-entry .mobilePosResult.selected::after{
+  top:11px!important;
+  right:10px!important;
+}
+
+/* Listenfenster etwas größer, damit der Komfort trotz höherer Karten erhalten bleibt. */
+@media(min-width:1101px){
+  #view-entry .mobilePosResults{
+    height:440px!important;
+    max-height:440px!important;
+  }
+}
+@media(min-width:601px) and (max-width:1100px){
+  #view-entry .mobilePosResults{
+    height:430px!important;
+    max-height:430px!important;
+  }
+}
+@media(max-width:600px){
+  #view-entry .mobilePosResults{
+    height:345px!important;
+    max-height:345px!important;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -6442,7 +6507,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V6.99 <span class="v693BuildStamp">Build 6.99</span></h1>
+     <h1>Kollaudierung – V7.00 <span class="v693BuildStamp">Build 7.00</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -15379,7 +15444,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=6.99",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.00",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -25160,7 +25225,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="6.99";
+const KOLLAPP_VERSION="7.00";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
