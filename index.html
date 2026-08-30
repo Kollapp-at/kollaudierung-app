@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.94</title>
+<title>Kollaudierung – V7.95</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.94 <span class="v693BuildStamp">Build 7.94</span></h1>
+     <h1>Kollaudierung – V7.95 <span class="v693BuildStamp">Build 7.95</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16369,7 +16369,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.94",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.95",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26150,7 +26150,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.94";
+const KOLLAPP_VERSION="7.95";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -43447,6 +43447,172 @@ html[data-theme="dark"] #v794DescWarning{
     return r;
   };
   window.showView=showView;
+})();
+</script>
+
+
+<style id="v795-prepare-btn-refresh">
+/* ============================================================
+   V7.95 – Button „LV-Unterposition vorbereiten“ klarer gestalten
+   ============================================================ */
+.v742PrepareBtn.v795PrepareBtn{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:12px!important;
+  min-height:52px!important;
+  padding:12px 16px!important;
+  border-radius:14px!important;
+  border:1px solid #2f89c6!important;
+  background:linear-gradient(180deg,#62bff8 0%, #3b9fe2 100%)!important;
+  color:#fff!important;
+  box-shadow:0 8px 20px rgba(21,98,150,.22)!important;
+  font-weight:800!important;
+  text-align:left!important;
+  transition:transform .12s ease, box-shadow .18s ease, filter .18s ease!important;
+}
+.v742PrepareBtn.v795PrepareBtn:hover{
+  transform:translateY(-1px)!important;
+  box-shadow:0 10px 22px rgba(21,98,150,.26)!important;
+  filter:saturate(1.04)!important;
+}
+.v742PrepareBtn.v795PrepareBtn:active{
+  transform:translateY(0)!important;
+  box-shadow:0 5px 14px rgba(21,98,150,.24)!important;
+}
+.v742PrepareBtn.v795PrepareBtn:disabled{
+  border-color:#b7cad8!important;
+  background:linear-gradient(180deg,#dce9f1 0%, #cddbe4 100%)!important;
+  color:#567283!important;
+  box-shadow:none!important;
+  cursor:not-allowed!important;
+  transform:none!important;
+  filter:none!important;
+}
+.v795PrepareBtn .v795Plus{
+  flex:0 0 auto;
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.34);
+  font-size:17px;
+  line-height:1;
+  font-weight:900;
+}
+.v795PrepareBtn .v795TextWrap{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  line-height:1.1;
+}
+.v795PrepareBtn .v795Main{
+  display:block;
+  font-size:14px;
+  font-weight:900;
+  color:#fff;
+}
+.v795PrepareBtn .v795Sub{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-top:3px;
+  font-size:11px;
+  font-weight:700;
+  color:rgba(255,255,255,.92);
+  flex-wrap:wrap;
+}
+.v795PrepareBtn .v795Pos{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 8px;
+  border-radius:999px;
+  background:#ffffff;
+  color:#175d93;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.02em;
+  box-shadow:0 1px 3px rgba(9,45,72,.12);
+}
+.v742PrepareBtn.v795PrepareBtn:disabled .v795Plus{
+  background:rgba(255,255,255,.38);
+  border-color:rgba(255,255,255,.55);
+}
+.v742PrepareBtn.v795PrepareBtn:disabled .v795Main{color:#355063!important}
+.v742PrepareBtn.v795PrepareBtn:disabled .v795Sub{color:#567283!important}
+.v742PrepareBtn.v795PrepareBtn:disabled .v795Pos{
+  background:rgba(255,255,255,.7);
+  color:#567283;
+}
+html[data-theme="dark"] .v742PrepareBtn.v795PrepareBtn{
+  border-color:#46a7e8!important;
+  background:linear-gradient(180deg,#56b4ef 0%, #2486c8 100%)!important;
+  box-shadow:0 10px 22px rgba(7,29,47,.34)!important;
+}
+html[data-theme="dark"] .v742PrepareBtn.v795PrepareBtn:disabled{
+  border-color:#45657b!important;
+  background:linear-gradient(180deg,#29475b 0%, #233d4f 100%)!important;
+  color:#9db3c2!important;
+}
+@media(max-width:1100px){
+  .v742PrepareBtn.v795PrepareBtn{
+    width:100%!important;
+    justify-content:flex-start!important;
+  }
+}
+@media(max-width:640px){
+  .v742PrepareBtn.v795PrepareBtn{
+    min-height:56px!important;
+    padding:12px 14px!important;
+    gap:10px!important;
+  }
+  .v795PrepareBtn .v795Main{font-size:13.5px}
+  .v795PrepareBtn .v795Sub{font-size:10.5px}
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.95 – Klarerer Text / Badge für „vorbereiten“-Button
+   ============================================================ */
+(function(){
+  const safe=(v)=>String(v||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]||m));
+
+  function renderPrepareButtonV795(){
+    const btn=document.querySelector('.v742PrepareBtn');
+    const pos=document.getElementById('posSelect')?.value||'';
+    if(!btn)return;
+
+    btn.classList.add('v795PrepareBtn');
+    btn.disabled=!pos;
+
+    if(pos){
+      btn.innerHTML=`<span class="v795Plus">＋</span><span class="v795TextWrap"><span class="v795Main">LV-Unterposition vorbereiten</span><span class="v795Sub"><span class="v795Pos">${safe(pos)}</span><span>für diese Erfassung vormerken</span></span></span>`;
+      btn.setAttribute('aria-label',`${pos} für diese Erfassung vorbereiten`);
+      btn.title=`${pos} für diese Erfassung vorbereiten`;
+    }else{
+      btn.innerHTML=`<span class="v795Plus">＋</span><span class="v795TextWrap"><span class="v795Main">LV-Unterposition vorbereiten</span><span class="v795Sub"><span>Bitte zuerst links eine Position auswählen</span></span></span>`;
+      btn.setAttribute('aria-label','Bitte zuerst eine LV-Unterposition auswählen');
+      btn.title='Bitte zuerst eine LV-Unterposition auswählen';
+    }
+  }
+
+  const baseShowPosInfoV795=showPosInfo;
+  showPosInfo=function(){
+    const r=baseShowPosInfoV795.apply(this,arguments);
+    renderPrepareButtonV795();
+    return r;
+  };
+  window.showPosInfo=showPosInfo;
+
+  window.addEventListener('load',()=>{
+    setTimeout(renderPrepareButtonV795,200);
+    setTimeout(renderPrepareButtonV795,700);
+  });
 })();
 </script>
 
