@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.24</title>
+<title>Kollaudierung – V7.25</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.24 <span class="v693BuildStamp">Build 7.24</span></h1>
+     <h1>Kollaudierung – V7.25 <span class="v693BuildStamp">Build 7.25</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.24",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.25",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.24";
+const KOLLAPP_VERSION="7.25";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -30132,6 +30132,348 @@ window.addEventListener("load",()=>{
     try{renderDraftEntrySummary?.();renderAutoPlanLinkSummary?.()}catch(e){}
   };
 
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.25 – UNABHÄNGIGE GEOMETRIE-BEARBEITUNG
+   Keine weißen SVG-Griffe mehr notwendig.
+   ============================================================ */
+
+/* Alte weiße Bearbeitungsgriffe aus V7.19–V7.23 ausblenden.
+   Der blaue Verschiebegriff (.move) bleibt bestehen. */
+#planOverlay .v723EditHandle,
+#planOverlay .v723EditHit,
+#planOverlay .v722VertexHandle,
+#planOverlay .v722Hit,
+#planOverlay .v721HandleHit{
+  display:none!important;
+}
+#planOverlay .planEditHandle:not(.move){
+  display:none!important;
+}
+
+.v725Editor{
+  margin-top:10px;
+  padding:10px;
+  border:1px solid #c9dce8;
+  background:#f6fafc;
+  border-radius:10px;
+}
+.v725EditorTitle{
+  font-weight:700;
+  color:#244b62;
+  margin-bottom:6px;
+}
+.v725EditorText{
+  font-size:11.5px;
+  line-height:1.4;
+  color:#536975;
+  margin-bottom:8px;
+}
+.v725EditorButtons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.v725EditorButtons button{
+  min-height:38px;
+  padding:7px 10px;
+}
+.v725EditorButtons button.active{
+  background:#f0a000!important;
+  border-color:#d78d00!important;
+  color:#fff!important;
+}
+.v725EditorWaiting{
+  margin-top:8px;
+  padding:8px 10px;
+  border-radius:8px;
+  background:#fff6d9;
+  border:1px solid #e6c564;
+  color:#735806;
+  font-size:11.5px;
+  line-height:1.4;
+}
+.v725PointNumber{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:20px;
+  height:20px;
+  border-radius:999px;
+  background:#e4eef4;
+  color:#244b62;
+  font-weight:700;
+  margin-right:4px;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.25 – Punkt/Ecke auswählen -> einmal im Plan neu setzen
+   ============================================================ */
+(function(){
+  let editTarget=null; // {annId, kind:'vertex'|'corner', index}
+  const $=id=>document.getElementById(id);
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+  function selectedAnn(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+
+  function isGeomEditable(a){
+    return !!a && (a.type==="line" || a.type==="rect" || a.type==="circle");
+  }
+
+  function cornerName(i){
+    return ["oben links","oben rechts","unten rechts","unten links"][i] || `Ecke ${i+1}`;
+  }
+
+  function ensurePanel(){
+    const box=$("selectedAnnBox");
+    if(!box)return null;
+
+    let panel=$("v725GeometryEditor");
+    if(!panel){
+      panel=document.createElement("div");
+      panel.id="v725GeometryEditor";
+      panel.className="v725Editor";
+      box.appendChild(panel);
+    }
+    return panel;
+  }
+
+  function renderPanel(){
+    const panel=ensurePanel();
+    if(!panel)return;
+
+    const a=selectedAnn();
+    if(!a || !isGeomEditable(a)){
+      panel.style.display="none";
+      editTarget=null;
+      return;
+    }
+
+    panel.style.display="block";
+
+    let buttons="";
+    if(a.type==="line"){
+      const pts=a.points||[];
+      buttons=pts.map((p,i)=>`
+        <button type="button" class="secondary ${editTarget?.annId===a.id&&editTarget?.kind==="vertex"&&editTarget?.index===i?"active":""}"
+          data-v725-kind="vertex" data-v725-index="${i}">
+          <span class="v725PointNumber">${i+1}</span>Punkt ${i+1} ändern
+        </button>`).join("");
+    }else{
+      buttons=[0,1,2,3].map(i=>`
+        <button type="button" class="secondary ${editTarget?.annId===a.id&&editTarget?.kind==="corner"&&editTarget?.index===i?"active":""}"
+          data-v725-kind="corner" data-v725-index="${i}">
+          Ecke ${i+1} · ${cornerName(i)}
+        </button>`).join("");
+    }
+
+    const waiting=editTarget?.annId===a.id
+      ? `<div class="v725EditorWaiting"><b>Zielpunkt wählen:</b> Jetzt einmal direkt auf die gewünschte neue Position im Plan tippen oder klicken.</div>`
+      : "";
+
+    panel.innerHTML=`
+      <div class="v725EditorTitle">Geometrie bearbeiten</div>
+      <div class="v725EditorText">
+        ${a.type==="line"
+          ? `Bei ${a.mode==="polyline"||((a.points||[]).length>2)?"der Polylinie":"der Linie"} zuerst den zu ändernden Punkt auswählen und danach die neue Position im Plan antippen.`
+          : `Bei ${a.type==="circle"?"dem Kreis":"dem Rechteck"} zuerst eine Ecke auswählen und danach die neue Position im Plan antippen.`}
+        Der blaue Griff verschiebt weiterhin die gesamte Markierung.
+      </div>
+      <div class="v725EditorButtons">${buttons}</div>
+      ${waiting}
+    `;
+
+    panel.querySelectorAll("button[data-v725-kind]").forEach(btn=>{
+      btn.addEventListener("click",ev=>{
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        editTarget={
+          annId:a.id,
+          kind:btn.dataset.v725Kind,
+          index:Number(btn.dataset.v725Index)
+        };
+        renderPanel();
+      });
+    });
+  }
+
+  function cornersOf(a){
+    return [
+      {x:a.x1,y:a.y1},
+      {x:a.x2,y:a.y1},
+      {x:a.x2,y:a.y2},
+      {x:a.x1,y:a.y2}
+    ];
+  }
+
+  function applyTarget(pt){
+    if(!editTarget)return false;
+
+    const pl=activePlan?.();
+    const a=pl?.annotations?.find(x=>x.id===editTarget.annId);
+    if(!a || !isGeomEditable(a)){
+      editTarget=null;
+      renderPanel();
+      return false;
+    }
+
+    pt={x:clamp(pt.x,0,1000),y:clamp(pt.y,0,1000)};
+
+    if(editTarget.kind==="vertex" && a.type==="line"){
+      if(!Array.isArray(a.points) || !a.points[editTarget.index]){
+        editTarget=null;
+        renderPanel();
+        return false;
+      }
+      a.points[editTarget.index]={x:pt.x,y:pt.y};
+
+    }else if(editTarget.kind==="corner" && (a.type==="rect"||a.type==="circle")){
+      const cs=cornersOf(a);
+      const opposite=cs[(editTarget.index+2)%4];
+
+      if(a.type==="rect"){
+        const b=normalizeRectBounds(opposite,pt);
+        a.x1=b.x1;a.y1=b.y1;a.x2=b.x2;a.y2=b.y2;
+      }else{
+        const b=normalizeCircleBounds(opposite,pt);
+        a.x1=b.x1;a.y1=b.y1;a.x2=b.x2;a.y2=b.y2;
+      }
+    }else{
+      return false;
+    }
+
+    editTarget=null;
+
+    try{
+      if(typeof currentAccess==="function" && currentAccess().mode==="worker"){
+        markAnnotationSyncDirty?.(a,true);
+      }
+    }catch(e){}
+
+    persist?.();
+    renderPlanAnnotations?.();
+    renderSelectedAnnotation?.();
+    renderPanel();
+    return true;
+  }
+
+  function eventIsInsidePlan(ev){
+    const vp=$("planViewport");
+    if(!vp)return false;
+
+    const target=ev.target;
+    if(target && vp.contains(target))return true;
+
+    /* Fallback nach Koordinaten – wichtig für Safari/Pencil. */
+    if(typeof ev.clientX==="number" && typeof ev.clientY==="number"){
+      const r=vp.getBoundingClientRect();
+      return ev.clientX>=r.left && ev.clientX<=r.right &&
+             ev.clientY>=r.top  && ev.clientY<=r.bottom;
+    }
+    return false;
+  }
+
+  function installGlobalPlacement(){
+    if(window.__v725PlacementInstalled)return;
+    window.__v725PlacementInstalled=true;
+
+    /*
+      Window-Capture läuft VOR SVG/Plan-Handlern.
+      Sobald ein Bearbeitungspunkt gewählt wurde, gehört der nächste
+      Plan-Tipp ausschließlich dem Geometrie-Editor.
+    */
+    window.addEventListener("pointerdown",ev=>{
+      if(!editTarget)return;
+      if(!eventIsInsidePlan(ev))return;
+      if(ev.button!==undefined && ev.pointerType==="mouse" && ev.button!==0)return;
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+
+      const ok=applyTarget(planCoords(ev));
+      if(ok){
+        try{
+          navigator.vibrate?.(20);
+        }catch(e){}
+      }
+    },{capture:true,passive:false});
+
+    /* Reiner Touch-Fallback für ältere Safari-Pfade. */
+    window.addEventListener("touchstart",ev=>{
+      if(!editTarget || !ev.touches || ev.touches.length!==1)return;
+
+      const t=ev.touches[0];
+      const fake={
+        clientX:t.clientX,
+        clientY:t.clientY,
+        target:ev.target
+      };
+      if(!eventIsInsidePlan(fake))return;
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+
+      applyTarget(planCoords(t));
+    },{capture:true,passive:false});
+  }
+
+  /* Markierungswechsel: alte Punktwahl verwerfen. */
+  const oldSelect=selectPlanAnnotation;
+  selectPlanAnnotation=function(id){
+    if(editTarget?.annId!==id)editTarget=null;
+    const r=oldSelect.apply(this,arguments);
+    setTimeout(renderPanel,0);
+    return r;
+  };
+
+  /* Werkzeugwechsel: nur im Auswahlmodus darf Geometrie geändert werden. */
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    if(tool!=="select")editTarget=null;
+    const r=oldSet.apply(this,arguments);
+    setTimeout(renderPanel,0);
+    return r;
+  };
+
+  const oldSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=oldSelected.apply(this,arguments);
+    renderPanel();
+    return r;
+  };
+
+  const oldDelete=deleteSelectedAnnotation;
+  deleteSelectedAnnotation=function(){
+    editTarget=null;
+    const r=oldDelete.apply(this,arguments);
+    setTimeout(renderPanel,0);
+    return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    editTarget=null;
+    const r=await oldOpen.apply(this,arguments);
+    installGlobalPlacement();
+    renderPanel();
+    return r;
+  };
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      installGlobalPlacement();
+      renderPanel();
+    },300);
+  });
 })();
 </script>
 
