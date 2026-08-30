@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.83</title>
+<title>Kollaudierung – V7.85</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.83 <span class="v693BuildStamp">Build 7.83</span></h1>
+     <h1>Kollaudierung – V7.85 <span class="v693BuildStamp">Build 7.85</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -7723,6 +7723,19 @@ main > section.view,
       </div>
       <div id="planLineHelp" class="planLineHelp">Linienwerkzeug: Verlauf mit mehreren Klicks setzen. Mit Doppelklick oder „Linie abschließen“ speichern.</div>
       <div id="planFreehandHelp" class="planLineHelp">Freihand: Mit Apple Pencil, S Pen, Finger oder Maus direkt auf dem Plan zeichnen. Beim Abheben wird die Markierung übernommen.</div>
+      <div id="v784FreehandModeHint" class="v784FreehandModeHint noPrint" style="display:none">
+       <div class="v784HintTitle" id="v784FreehandModeTitle"></div>
+       <div class="v784HintCompare">
+        <div id="v784FreehandCompare" class="v784HintMode">
+         <b>✎ Freihand</b>
+         <span>Normale Planmarkierung zur aktuellen Erfassungs-ID. Die Markierung bleibt einzeln auswählbar und gehört als Nachweis zur Erfassung.</span>
+        </div>
+        <div id="v784ScribbleCompare" class="v784HintMode">
+         <b>≈ Kritzeln</b>
+         <span>Freie Hintergrundskizze für die gesamte Erfassungs-ID. Sie liegt hinter den anderen Markierungen und wird ohne eigene ID-Beschriftung dargestellt.</span>
+        </div>
+       </div>
+      </div>
       <div class="small noPrint" style="margin:5px 0 4px"><b>Desktop:</b> Mausrad = Zoom um den Mauszeiger · mittlere Maustaste gedrückt = Plan verschieben.</div>
       <div class="small noPrint" style="margin:0 0 8px"><b>AMBL-Filter:</b> Mit „Andere AMBL“ kannst du Markierungen anderer Aufmaßblätter auf demselben Plan ein- oder ausblenden.</div>
       <div id="mobilePlanHint" class="mobilePlanHint noPrint"><b>Smartphone:</b> „Hand“ = Plan mit einem Finger verschieben · zwei Finger = zoomen · Zeichenwerkzeug wählen = direkt markieren.</div>
@@ -16337,7 +16350,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.83",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.85",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26131,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.83";
+const KOLLAPP_VERSION="7.85";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -42255,6 +42268,320 @@ html[data-theme="dark"] #toggleOtherIdsBtn.v783Off{
     setTimeout(bind,350);
     setTimeout(bind,1000);
   });
+})();
+</script>
+
+
+<style id="v784-freehand-hint-style">
+/* ============================================================
+   V7.84 – Hinweis Freihand vs. Kritzeln
+   ============================================================ */
+.v784FreehandModeHint{
+  margin:7px 0 9px;
+  padding:10px 11px;
+  border:1px solid #cfdde6;
+  border-radius:10px;
+  background:#f7fafc;
+}
+.v784HintTitle{
+  margin-bottom:8px;
+  font-size:12px;
+  font-weight:800;
+  color:#243b4a;
+}
+.v784HintCompare{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.v784HintMode{
+  padding:8px 9px;
+  border:1px solid #d8e3e9;
+  border-radius:8px;
+  background:#fff;
+  min-width:0;
+}
+.v784HintMode b{
+  display:block;
+  margin-bottom:3px;
+  font-size:11.5px;
+}
+.v784HintMode span{
+  display:block;
+  font-size:10.5px;
+  line-height:1.4;
+  color:#5e717d;
+}
+.v784HintMode.active{
+  border-color:#5a9fc9;
+  background:#eef7fc;
+  box-shadow:inset 3px 0 0 #3d91c3;
+}
+
+html[data-theme="dark"] .v784FreehandModeHint{
+  background:#10283a!important;
+  border-color:#3b5e75!important;
+}
+html[data-theme="dark"] .v784HintTitle{
+  color:#f3f8fb!important;
+}
+html[data-theme="dark"] .v784HintMode{
+  background:#0d2231!important;
+  border-color:#35566e!important;
+}
+html[data-theme="dark"] .v784HintMode b{
+  color:#eef5f9!important;
+}
+html[data-theme="dark"] .v784HintMode span{
+  color:#c2d3dd!important;
+}
+html[data-theme="dark"] .v784HintMode.active{
+  background:#17384d!important;
+  border-color:#4f8eb3!important;
+  box-shadow:inset 3px 0 0 #55a5d5!important;
+}
+
+@media(max-width:700px){
+  .v784HintCompare{grid-template-columns:1fr}
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.84 – Hinweisbox passend zum echten Freihand-Modus
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function mode(){
+    try{return String(v659FreehandMode||"freehand")}catch(_){return "freehand"}
+  }
+
+  function showHint(activeMode){
+    const box=$("v784FreehandModeHint");
+    const title=$("v784FreehandModeTitle");
+    if(!box||!title)return;
+
+    const isScribble=activeMode==="scribble";
+    box.style.display="block";
+    title.textContent=isScribble
+      ? "Kritzeln aktiv – geeignet für eine grobe Hintergrundskizze zur ganzen ID."
+      : "Freihand aktiv – geeignet für eine normale, einzeln bearbeitbare Planmarkierung.";
+
+    $("v784FreehandCompare")?.classList.toggle("active",!isScribble);
+    $("v784ScribbleCompare")?.classList.toggle("active",isScribble);
+  }
+
+  function hideHint(){
+    const box=$("v784FreehandModeHint");
+    if(box)box.style.display="none";
+  }
+
+  /* Die in V7.83 stabilisierten Buttons gezielt erweitern. */
+  const baseFree=window.v783SelectFreehand;
+  if(typeof baseFree==="function"){
+    window.v783SelectFreehand=function(){
+      const r=baseFree.apply(this,arguments);
+      showHint("freehand");
+      return r;
+    };
+  }
+
+  const baseScribble=window.v783SelectScribble;
+  if(typeof baseScribble==="function"){
+    window.v783SelectScribble=function(){
+      const r=baseScribble.apply(this,arguments);
+      showHint("scribble");
+      return r;
+    };
+  }
+
+  /* Kritzeln-Altentry weiterhin auf finale V7.84-Funktion führen. */
+  window.v659SelectScribble=function(){
+    return window.v783SelectScribble?.();
+  };
+
+  /* Bei anderem Werkzeug Hinweis wieder ausblenden. */
+  const baseSet=setPlanTool;
+  setPlanTool=function(tool){
+    const r=baseSet.apply(this,arguments);
+    if(tool==="freehand"){
+      showHint(mode());
+    }else{
+      hideHint();
+    }
+    return r;
+  };
+  window.setPlanTool=setPlanTool;
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      let t="";
+      try{t=String(planTool||"")}catch(_){}
+      if(t==="freehand")showHint(mode());
+      else hideHint();
+    },500);
+  });
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.85 – KRITZELN NUR ALS HINTERGRUND IM EXPORT
+   - keine eigene Plan-Nachweis-Seite
+   - wird hinter normalen Markierungen derselben ID mitgezeichnet
+   ============================================================ */
+(function(){
+
+  function v785AnchorIdForEntry(e){
+    if(!e)return "";
+    try{
+      const a=typeof v612AnchorEntry==="function" ? (v612AnchorEntry(e)||e) : e;
+      return String(a?.id||"");
+    }catch(_){
+      return String(e?.id||"");
+    }
+  }
+
+  function v785AnchorIdForAnn(a){
+    if(!a)return "";
+    const entries=project()?.entries||[];
+    const e=
+      entries.find(x=>String(x.id)===String(a.entryId||"")) ||
+      entries.find(x=>String(x.id)===String(a.lvEntryId||"")) ||
+      null;
+    return v785AnchorIdForEntry(e) || String(a.entryId||a.lvEntryId||"");
+  }
+
+  /* ----------------------------------------------------------
+     1) Kritzeleien niemals als eigenen Plan-Nachweis behandeln.
+     annotationsForSheet() ist die Quelle für die einzelnen
+     Nachweisblöcke; direkte Planbeilage nutzt weiterhin annVisible().
+     ---------------------------------------------------------- */
+  const baseAnnotationsForSheetV785=annotationsForSheet;
+  annotationsForSheet=function(sh){
+    const links=baseAnnotationsForSheetV785.apply(this,arguments)||[];
+    return links.filter(item=>item?.ann?.type!=="scribble");
+  };
+
+  /* ----------------------------------------------------------
+     2) Beim normalen Nachweis derselben ID Kritzeleien im
+        Hintergrund mitzeichnen.
+        WICHTIG: Crop wird NUR aus den normalen items berechnet.
+        Die Kritzelei vergrößert den Detailausschnitt nicht.
+     ---------------------------------------------------------- */
+  v516MakeClusterEvidenceImages=async function(plan, items, headerText){
+    const img=await getPlanExportImage(plan,5600);
+    if(!img)return null;
+
+    const iw=img.naturalWidth||img.width;
+    const ih=img.naturalHeight||img.height;
+
+    /* Crop ausschließlich anhand der echten Nachweis-Markierungen. */
+    const crop=v516CropForCluster(items);
+
+    /* Zugehörige ID bestimmen. */
+    let targetAnchorId="";
+    const first=items?.[0];
+    if(first?.entry)targetAnchorId=v785AnchorIdForEntry(first.entry);
+    if(!targetAnchorId && first?.ann)targetAnchorId=v785AnchorIdForAnn(first.ann);
+
+    /* Nur Kritzeleien derselben Erfassungs-ID auf demselben Plan. */
+    const scribbles=(plan?.annotations||[]).filter(a=>
+      a?.type==="scribble" &&
+      (!targetAnchorId || v785AnchorIdForAnn(a)===targetAnchorId)
+    );
+
+    const cropAspect=Math.max(0.35,Math.min(3.5,crop.w/crop.h));
+    let dw=1800;
+    let dh=Math.round(dw/cropAspect);
+    if(dh>1500){dh=1500;dw=Math.round(dh*cropAspect);}
+    if(dw<1000){const f=1000/dw;dw=1000;dh=Math.round(dh*f);}
+
+    /* ---------- Detail ---------- */
+    const detail=document.createElement("canvas");
+    detail.width=dw;
+    detail.height=dh;
+    const dctx=detail.getContext("2d");
+
+    const sxPx=crop.x/1000*iw;
+    const syPx=crop.y/1000*ih;
+    const swPx=crop.w/1000*iw;
+    const shPx=crop.h/1000*ih;
+
+    dctx.fillStyle="#fff";
+    dctx.fillRect(0,0,dw,dh);
+    dctx.drawImage(img,sxPx,syPx,swPx,shPx,0,0,dw,dh);
+
+    /* Kritzeleien zuerst = Hintergrund. */
+    const detailTransform={
+      x:0,
+      y:0,
+      cropX:crop.x,
+      cropY:crop.y,
+      sx:dw/crop.w,
+      sy:dh/crop.h
+    };
+    scribbles.forEach(a=>{
+      try{drawSingleAnnotation(dctx,a,detailTransform)}catch(_){}
+    });
+
+    /* Danach normale Markierungen darüber. */
+    for(const item of items){
+      v515DrawDetailAnnotation(dctx,item.ann,crop,dw,dh);
+    }
+
+    v516DrawInfoBox(dctx,headerText,dw);
+
+    /* ---------- Übersicht ---------- */
+    const maxOw=720,maxOh=500,ratio=iw/ih;
+    let ow=maxOw,oh=Math.round(ow/ratio);
+    if(oh>maxOh){oh=maxOh;ow=Math.round(oh*ratio);}
+
+    const overview=document.createElement("canvas");
+    overview.width=ow;
+    overview.height=oh;
+    const octx=overview.getContext("2d");
+
+    octx.fillStyle="#fff";
+    octx.fillRect(0,0,ow,oh);
+    octx.drawImage(img,0,0,ow,oh);
+
+    /* Kritzeleien auch hier zuerst im Hintergrund. */
+    const overviewTransform={
+      x:0,
+      y:0,
+      cropX:0,
+      cropY:0,
+      sx:ow/1000,
+      sy:oh/1000
+    };
+    scribbles.forEach(a=>{
+      try{drawSingleAnnotation(octx,a,overviewTransform)}catch(_){}
+    });
+
+    const ox=crop.x/1000*ow;
+    const oy=crop.y/1000*oh;
+    const owr=crop.w/1000*ow;
+    const ohr=crop.h/1000*oh;
+
+    octx.strokeStyle="#1f5f8b";
+    octx.lineWidth=4;
+    octx.strokeRect(ox,oy,owr,ohr);
+
+    /* Normale Markierungen über Kritzeleien. */
+    for(const item of items){
+      drawSingleAnnotation(octx,item.ann,overviewTransform);
+    }
+
+    return {
+      detail:detail.toDataURL("image/jpeg",0.92),
+      overview:overview.toDataURL("image/jpeg",0.90),
+      crop
+    };
+  };
+
 })();
 </script>
 
