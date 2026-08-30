@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.29</title>
+<title>Kollaudierung – V7.30</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.29 <span class="v693BuildStamp">Build 7.29</span></h1>
+     <h1>Kollaudierung – V7.30 <span class="v693BuildStamp">Build 7.30</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.29",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.30",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.29";
+const KOLLAPP_VERSION="7.30";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -31302,6 +31302,286 @@ window.addEventListener("load",()=>{
       observe();
       renderV729Inline();
     },450);
+  });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.30 – DIREKTE GEOMETRIEBUTTONS
+   ============================================================ */
+#v728GeometryInline button{
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.30 – P1/P2/... und E1/E2/... steuern die Geometrie DIREKT.
+   Kein srcBtn.click() / versteckter Button mehr.
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  let target=null; // {annId, kind, index}
+
+  function selectedAnn(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+
+  function inlineBox(){
+    return $('v728GeometryInline');
+  }
+
+  function sourcePanel(){
+    return $('v725GeometryEditor');
+  }
+
+  function corners(a){
+    return [
+      {x:a.x1,y:a.y1},
+      {x:a.x2,y:a.y1},
+      {x:a.x2,y:a.y2},
+      {x:a.x1,y:a.y2}
+    ];
+  }
+
+  function isEditable(a){
+    return !!a && ['line','rect','circle'].includes(a.type);
+  }
+
+  function syncHiddenActive(){
+    const src=sourcePanel();
+    if(!src)return;
+    src.querySelectorAll('button[data-v725-kind][data-v725-index]').forEach(btn=>{
+      const same=target &&
+        target.annId===selectedAnnotationId &&
+        target.kind===btn.dataset.v725Kind &&
+        target.index===Number(btn.dataset.v725Index);
+      btn.classList.toggle('active',!!same);
+    });
+  }
+
+  function renderInline(){
+    const box=inlineBox();
+    const a=selectedAnn();
+    if(!box)return;
+
+    if(!a || planTool!=='select' || !isEditable(a)){
+      target=null;
+      syncHiddenActive();
+      box.classList.remove('show');
+      box.innerHTML='';
+      return;
+    }
+
+    const count=a.type==='line' ? (a.points||[]).length : 4;
+    const kind=a.type==='line' ? 'vertex' : 'corner';
+    const title=a.type==='line'
+      ? ((a.mode==='polyline'||count>2)?'Polylinie':'Linie')
+      : (a.type==='circle'?'Kreis':'Rechteck');
+
+    box.classList.add('show');
+    box.innerHTML=`<span class="v728Label">${title}:</span>`;
+
+    for(let i=0;i<count;i++){
+      const btn=document.createElement('button');
+      btn.type='button';
+      const active=target &&
+        target.annId===a.id &&
+        target.kind===kind &&
+        target.index===i;
+
+      btn.className='secondary'+(active?' active':'');
+      btn.textContent=kind==='vertex'?`P${i+1}`:`E${i+1}`;
+      btn.title=kind==='vertex'?`Punkt ${i+1} ändern`:`Ecke ${i+1} ändern`;
+
+      const choose=ev=>{
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+
+        target={annId:a.id,kind,index:i};
+        syncHiddenActive();
+        renderInline();
+
+        /* Nummern P1/P2/P3 bzw. E1-E4 aktualisieren. */
+        try{renderPlanAnnotations?.()}catch(e){}
+      };
+
+      btn.addEventListener('pointerdown',choose,{passive:false});
+      btn.addEventListener('click',ev=>{
+        /* pointerdown hat die Auswahl bereits gesetzt.
+           Click nur blockieren, damit kein anderer Handler reagiert. */
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+      },{passive:false});
+
+      box.appendChild(btn);
+    }
+
+    if(target?.annId===a.id){
+      const hint=document.createElement('span');
+      hint.className='v728Waiting';
+      hint.textContent='→ neue Position im Plan tippen';
+      box.appendChild(hint);
+    }
+  }
+
+  function applyAt(pt){
+    if(!target)return false;
+
+    const pl=activePlan?.();
+    const a=pl?.annotations?.find(x=>x.id===target.annId);
+    if(!a || !isEditable(a)){
+      target=null;
+      renderInline();
+      return false;
+    }
+
+    pt={x:clamp(pt.x,0,1000), y:clamp(pt.y,0,1000)};
+
+    if(target.kind==='vertex' && a.type==='line'){
+      if(!Array.isArray(a.points) || !a.points[target.index])return false;
+      a.points[target.index]={x:pt.x,y:pt.y};
+
+    }else if(target.kind==='corner' && (a.type==='rect'||a.type==='circle')){
+      const cs=corners(a);
+      const opposite=cs[(target.index+2)%4];
+
+      if(a.type==='rect'){
+        const b=normalizeRectBounds(opposite,pt);
+        a.x1=b.x1;a.y1=b.y1;a.x2=b.x2;a.y2=b.y2;
+      }else{
+        const b=normalizeCircleBounds(opposite,pt);
+        a.x1=b.x1;a.y1=b.y1;a.x2=b.x2;a.y2=b.y2;
+      }
+    }else{
+      return false;
+    }
+
+    target=null;
+    syncHiddenActive();
+
+    try{
+      if(typeof currentAccess==='function' && currentAccess().mode==='worker'){
+        markAnnotationSyncDirty?.(a,true);
+      }
+    }catch(e){}
+
+    persist?.();
+    renderPlanAnnotations?.();
+    renderSelectedAnnotation?.();
+    renderInline();
+    return true;
+  }
+
+  function insidePlan(ev){
+    const vp=$('planViewport');
+    if(!vp)return false;
+    if(ev.target && vp.contains(ev.target))return true;
+    if(typeof ev.clientX==='number' && typeof ev.clientY==='number'){
+      const r=vp.getBoundingClientRect();
+      return ev.clientX>=r.left && ev.clientX<=r.right &&
+             ev.clientY>=r.top && ev.clientY<=r.bottom;
+    }
+    return false;
+  }
+
+  function installPlacement(){
+    if(window.__v730PlacementInstalled)return;
+    window.__v730PlacementInstalled=true;
+
+    /*
+      Direkter globaler Capture-Handler.
+      Hat NICHTS mit dem versteckten V7.25 editTarget zu tun.
+    */
+    window.addEventListener('pointerdown',ev=>{
+      if(!target || planTool!=='select')return;
+      if(!insidePlan(ev))return;
+      if(ev.pointerType==='mouse' && ev.button!==0)return;
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      applyAt(planCoords(ev));
+    },{capture:true,passive:false});
+
+    window.addEventListener('touchstart',ev=>{
+      if(!target || planTool!=='select' || ev.touches?.length!==1)return;
+      const t=ev.touches[0];
+      const fake={clientX:t.clientX,clientY:t.clientY,target:ev.target};
+      if(!insidePlan(fake))return;
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      applyAt(planCoords(t));
+    },{capture:true,passive:false});
+  }
+
+  /*
+    V7.29 rendert noch die alten Proxy-Buttons.
+    Wir ersetzen deren Ausgabe danach immer durch unsere direkten Buttons.
+  */
+  function refresh(){
+    setTimeout(()=>{
+      syncHiddenActive();
+      renderInline();
+    },0);
+  }
+
+  const oldSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=oldSelected.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldRender=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    const r=oldRender.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    if(tool!=='select')target=null;
+    const r=oldSet.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldSelect=selectPlanAnnotation;
+  selectPlanAnnotation=function(id){
+    if(target?.annId!==id)target=null;
+    const r=oldSelect.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldDelete=deleteSelectedAnnotation;
+  deleteSelectedAnnotation=function(){
+    target=null;
+    const r=oldDelete.apply(this,arguments);
+    refresh();
+    return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    target=null;
+    const r=await oldOpen.apply(this,arguments);
+    installPlacement();
+    refresh();
+    return r;
+  };
+
+  window.addEventListener('load',()=>{
+    setTimeout(()=>{
+      installPlacement();
+      refresh();
+    },500);
   });
 })();
 </script>
