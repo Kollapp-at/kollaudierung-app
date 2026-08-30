@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.53</title>
+<title>Kollaudierung – V7.54</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.53 <span class="v693BuildStamp">Build 7.53</span></h1>
+     <h1>Kollaudierung – V7.54 <span class="v693BuildStamp">Build 7.54</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -7554,7 +7554,10 @@ main > section.view,
 
     <div class="v692SectionTitle v692SaveTitle"><span>4</span><div><b>Erfassung abschließen</b><small>Aufmaß speichern, Plan/Fotos können später ergänzt werden</small></div></div>
     <div class="v655QuickSave v666SaveSection noPrint">
-     <button type="button" class="primary v655QuickSaveBtn" onclick="finalizeCurrentEntry()">Erfassung speichern</button>
+     <div class="toolbar v754TopActions">
+      <button type="button" class="secondary v754PlanJumpBtn" onclick="v754JumpToPlanMarking()">⌖ Zur Planmarkierung</button>
+      <button type="button" class="primary v655QuickSaveBtn" onclick="finalizeCurrentEntry()">Erfassung speichern</button>
+     </div>
      <div class="small">Kein Plan oder Foto erforderlich? Die Erfassung kann hier direkt gespeichert werden. Planmarkierungen und Bilder können später jederzeit ergänzt werden.</div>
      <div class="toolbar v704SaveActions">
       <button class="secondary" onclick="clearCurrentEntryDraft()">Eingabe leeren</button>
@@ -16319,7 +16322,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.53",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.54",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26100,7 +26103,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.53";
+const KOLLAPP_VERSION="7.54";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -36367,6 +36370,59 @@ tbody tr:hover td{
     const r=baseInfoV753.apply(this,arguments);
     requestAnimationFrame(()=>renderMultiLvDraft?.());
     return r;
+  };
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.54 – direkter Sprung zur Planmarkierung aus dem oberen Editor
+   ============================================================ */
+.v754TopActions{
+  align-items:center!important;
+  gap:8px!important;
+}
+.v754PlanJumpBtn{
+  font-weight:800!important;
+}
+@media(max-width:600px){
+  .v754TopActions{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+  }
+  .v754TopActions button{
+    width:100%!important;
+  }
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.54 – Zur Planmarkierung
+   Nur Navigation innerhalb derselben Erfassung.
+   ============================================================ */
+(function(){
+  window.v754JumpToPlanMarking=function(){
+    const workspace=document.getElementById("entryPlanWorkspace");
+    const stage=document.getElementById("planStage");
+    const viewport=document.getElementById("planViewport");
+
+    const target=
+      (stage && stage.style.display!=="none" ? stage : null) ||
+      viewport ||
+      workspace;
+
+    if(!target){
+      msg?.("Planbereich nicht gefunden.",true);
+      return;
+    }
+
+    target.scrollIntoView({
+      behavior:"smooth",
+      block:"start",
+      inline:"nearest"
+    });
   };
 })();
 </script>
