@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.47</title>
+<title>Kollaudierung – V7.48</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.47 <span class="v693BuildStamp">Build 7.47</span></h1>
+     <h1>Kollaudierung – V7.48 <span class="v693BuildStamp">Build 7.48</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16319,7 +16319,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.47",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.48",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26100,7 +26100,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.47";
+const KOLLAPP_VERSION="7.48";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -35827,19 +35827,31 @@ tbody tr:hover td{
   /*
     Beim Wechsel auf ein anderes Aufmaßblatt/Projekt den alten Seitenkontext
     nicht mitschleppen.
+    V7.48: tatsächliche App-Funktionen selectSheet / switchProject verwenden.
   */
-  const baseSheetChanged=sheetChanged;
-  sheetChanged=function(){
-    sidebarEntryId=null;
-    return baseSheetChanged.apply(this,arguments);
-  };
+  if(typeof selectSheet==="function"){
+    const baseSelectSheet=selectSheet;
+    selectSheet=function(){
+      sidebarEntryId=null;
+      return baseSelectSheet.apply(this,arguments);
+    };
+  }
 
-  const baseProjectChanged=projectChanged;
-  projectChanged=function(){
-    sidebarEntryId=null;
-    return baseProjectChanged.apply(this,arguments);
-  };
+  if(typeof switchProject==="function"){
+    const baseSwitchProject=switchProject;
+    switchProject=function(){
+      sidebarEntryId=null;
+      return baseSwitchProject.apply(this,arguments);
+    };
+  }
 })();
+</script>
+
+
+<script>
+/* V7.48 – Hotfix:
+   V7.47 referenzierte nicht vorhandene sheetChanged/projectChanged.
+   Korrigiert auf selectSheet/switchProject. */
 </script>
 
 </body>
