@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.69</title>
+<title>Kollaudierung – V7.70</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.69 <span class="v693BuildStamp">Build 7.69</span></h1>
+     <h1>Kollaudierung – V7.70 <span class="v693BuildStamp">Build 7.70</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.69",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.70",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.69";
+const KOLLAPP_VERSION="7.70";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -40003,6 +40003,142 @@ html[data-theme="dark"] #planStage{
     background:#fff!important;
     color:#111!important;
   }
+}
+</style>
+
+
+<style id="v770-modal-export-fixes">
+/* ============================================================
+   V7.70 – Dark-Mode Feinschliff
+   - Kabellisten-Modal lesbarer
+   - PDF/Export-Linien im Dark Mode neutralisieren
+   ============================================================ */
+
+html[data-theme="dark"] #v740CableModal .modal{
+  background:#0d2130!important;
+  border-color:#41657d!important;
+  color:#f4f8fb!important;
+}
+html[data-theme="dark"] #v740CableModal .modalHead,
+html[data-theme="dark"] #v740CableModal .modalFoot{
+  border-color:#36586f!important;
+}
+html[data-theme="dark"] #v740CableModal h2,
+html[data-theme="dark"] #v740CableModal h3,
+html[data-theme="dark"] #v740CableModal label,
+html[data-theme="dark"] #v740CableModal b{
+  color:#f5f9fc!important;
+}
+html[data-theme="dark"] #v740CableModal .small,
+html[data-theme="dark"] #v740CableModal .v740FootInfo,
+html[data-theme="dark"] #v740CableModal .v740MapCount,
+html[data-theme="dark"] #v740CableModal .v740CheckLine,
+html[data-theme="dark"] #v740CableModal #v740FileName{
+  color:#c9d9e3!important;
+  opacity:1!important;
+}
+html[data-theme="dark"] #v740CableModal .v740Panel{
+  background:#132a3b!important;
+  border-color:#41657d!important;
+}
+html[data-theme="dark"] #v740CableModal .v740SummaryCell,
+html[data-theme="dark"] #v740CableModal .v740MapItem,
+html[data-theme="dark"] #v740CableModal .v740PreviewWrap{
+  background:#0f2434!important;
+  border-color:#3d6077!important;
+  color:#e7eff4!important;
+}
+html[data-theme="dark"] #v740CableModal .v740SummaryCell span{color:#b8cddb!important}
+html[data-theme="dark"] #v740CableModal .v740SummaryCell b,
+html[data-theme="dark"] #v740CableModal .v740MapSig{color:#f5f9fc!important}
+html[data-theme="dark"] #v740CableModal .v740MapAuto{color:#98e0b3!important}
+html[data-theme="dark"] #v740CableModal .v740NoMap{color:#f1cf7b!important}
+html[data-theme="dark"] #v740CableModal input,
+html[data-theme="dark"] #v740CableModal select{
+  background:#0c2030!important;
+  color:#f5f9fc!important;
+  border-color:#466b82!important;
+}
+html[data-theme="dark"] #v740CableModal input::placeholder{color:#97adbb!important;opacity:1!important}
+html[data-theme="dark"] #v740CableModal input[type="checkbox"]{accent-color:#55a5d5}
+html[data-theme="dark"] #v740CableModal table thead th{
+  background:#18374c!important;
+  color:#f6fafc!important;
+  border-color:#45687e!important;
+}
+html[data-theme="dark"] #v740CableModal table tbody td{
+  background:#102636!important;
+  color:#e2ebf1!important;
+  border-color:#2d4e63!important;
+}
+html[data-theme="dark"] #v740CableModal table tbody tr:nth-child(even) td{background:#122a3a!important}
+html[data-theme="dark"] #v740CableModal .info{background:#112a3b!important;color:#dbe6ec!important;border-color:#406279!important}
+html[data-theme="dark"] #v740CableModal .success{background:#173426!important;color:#a9e7c1!important;border:1px solid #4d7f61!important}
+html[data-theme="dark"] #v740CableModal .error{background:#43272b!important;color:#f2bbbb!important;border:1px solid #83545a!important}
+
+/* Export-/PDF-Bereiche im Dark Mode immer neutral hell rendern */
+html[data-theme="dark"] :is(
+  #sheetPrintArea,#sheetMultiPrintArea,#planPrintArea,
+  .sheetPrintBlock,.finalBillingSummary,.exportBrandPreview,
+  .exportLogoPreviewBox,#planPrintSheetWrap,.planPrintCanvasWrap
+){
+  background:#ffffff!important;
+  color:#111111!important;
+  border-color:#c6d0d7!important;
+  box-shadow:none!important;
+  filter:none!important;
+}
+html[data-theme="dark"] :is(
+  #sheetPrintArea,#sheetMultiPrintArea,#planPrintArea,
+  .sheetPrintBlock,.finalBillingSummary,.exportBrandPreview,
+  .exportLogoPreviewBox,#planPrintSheetWrap,.planPrintCanvasWrap
+) *{
+  box-shadow:none!important;
+  text-shadow:none!important;
+}
+html[data-theme="dark"] :is(
+  #sheetPrintArea,#sheetMultiPrintArea,#planPrintArea,
+  .sheetPrintBlock,.finalBillingSummary
+) :is(h1,h2,h3,h4,b,strong,th,td,div,span,p,small,label){
+  color:inherit!important;
+}
+html[data-theme="dark"] :is(
+  body.sheetPrintMode,body.sheetMultiPrintMode,body.planPrintMode
+){
+  background:#ffffff!important;
+  color:#111111!important;
+}
+html[data-theme="dark"] body.sheetPrintMode :is(.exportBrandHeader,.exportFooter,.sheetMetaGrid,.legendRow),
+html[data-theme="dark"] body.sheetMultiPrintMode :is(.exportBrandHeader,.exportFooter,.sheetMetaGrid,.legendRow),
+html[data-theme="dark"] body.planPrintMode :is(.exportBrandHeader,.exportFooter,.sheetMetaGrid,.legendRow){
+  border-color:#b9c2c9!important;
+}
+html[data-theme="dark"] body.sheetPrintMode table thead th,
+html[data-theme="dark"] body.sheetMultiPrintMode table thead th,
+html[data-theme="dark"] body.planPrintMode table thead th{
+  background:#edf2f5!important;
+  color:#1d2a33!important;
+  border-color:#c4cdd4!important;
+}
+html[data-theme="dark"] body.sheetPrintMode table tbody td,
+html[data-theme="dark"] body.sheetMultiPrintMode table tbody td,
+html[data-theme="dark"] body.planPrintMode table tbody td{
+  background:#ffffff!important;
+  color:#111111!important;
+  border-color:#d4dbe0!important;
+}
+html[data-theme="dark"] body.sheetPrintMode .exportFooter,
+html[data-theme="dark"] body.sheetMultiPrintMode .exportFooter,
+html[data-theme="dark"] body.planPrintMode .exportFooter{
+  color:#4c5a64!important;
+}
+
+/* Export-Vorschau im App-View auch klarer */
+html[data-theme="dark"] #view-export .exportBrandPreview,
+html[data-theme="dark"] #view-export .exportLogoPreviewBox{
+  background:#f8fbfd!important;
+  color:#1d2932!important;
+  border-color:#c6d0d7!important;
 }
 </style>
 
