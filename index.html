@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.37</title>
+<title>Kollaudierung – V7.38</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.37 <span class="v693BuildStamp">Build 7.37</span></h1>
+     <h1>Kollaudierung – V7.38 <span class="v693BuildStamp">Build 7.38</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.37",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.38",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.37";
+const KOLLAPP_VERSION="7.38";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -33517,6 +33517,361 @@ tbody tr:hover td{
       ensurePanel();
       render();
     },650);
+  });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.38 – PLAN-FOKUS AUF EINE ERFASSUNGS-ID
+   ============================================================ */
+#toggleOtherIdsBtn.off{
+  background:#fff!important;
+  color:var(--text)!important;
+  border-color:var(--line)!important;
+}
+#toggleOtherIdsBtn{
+  white-space:nowrap;
+}
+#v737SiblingLvPanel .v737Item.planFocus{
+  border-color:#d9a12b!important;
+  background:#fff9e9!important;
+  box-shadow:0 0 0 2px rgba(217,161,43,.08)!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.38
+   "Ändern" rechts neben dem Plan = Planbearbeitung der ID:
+   - gewünschte LV-Unterposition aktiv
+   - passende Markierung auswählen
+   - andere IDs desselben AMBL zunächst ausblenden
+   - eigener Schalter "Andere IDs"
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  let focusedEntryId=null;       // Anchor-ID der fokussierten Erfassungs-ID
+  let focusedPos="";             // aktuell gewünschte LV-Unterposition
+  let showOtherSameSheetIds=true;
+
+  function entryById(id){
+    return (project()?.entries||[]).find(e=>e.id===id)||null;
+  }
+
+  function anchorForEntry(e){
+    if(!e)return null;
+    try{return v612AnchorEntry?.(e)||e}catch(err){return e}
+  }
+
+  function anchorIdForAnnotation(a){
+    if(!a)return "";
+    const e=entryById(a.entryId) || entryById(a.lvEntryId);
+    const anchor=anchorForEntry(e);
+    return anchor?.id || a.entryId || "";
+  }
+
+  function annotationOnActiveSheet(a){
+    try{return annotationBelongsToActiveSheet(a)}catch(e){return true}
+  }
+
+  function ensureOtherIdsButton(){
+    let b=$("toggleOtherIdsBtn");
+    if(b)return b;
+
+    const other=$("toggleOtherAmblBtn");
+    if(!other)return null;
+
+    b=document.createElement("button");
+    b.id="toggleOtherIdsBtn";
+    b.type="button";
+    b.className="okBtn";
+    b.onclick=toggleOtherSameSheetIds;
+
+    other.insertAdjacentElement("afterend",b);
+    updateOtherIdsButton();
+    return b;
+  }
+
+  function updateOtherIdsButton(){
+    const b=$("toggleOtherIdsBtn");
+    if(!b)return;
+
+    b.textContent=`Andere IDs: ${showOtherSameSheetIds?"EIN":"AUS"}`;
+    b.classList.toggle("off",!showOtherSameSheetIds);
+    b.classList.toggle("okBtn",showOtherSameSheetIds);
+    b.classList.toggle("secondary",!showOtherSameSheetIds);
+    b.title=focusedEntryId
+      ? "Andere Erfassungs-IDs desselben Aufmaßblatts ein- oder ausblenden."
+      : "Wird beim gezielten Bearbeiten einer Erfassungs-ID verwendet.";
+  }
+
+  window.toggleOtherSameSheetIds=function(){
+    showOtherSameSheetIds=!showOtherSameSheetIds;
+    updateOtherIdsButton();
+    renderPlanAnnotations?.();
+  };
+
+  function startIdFocus(entry,pos){
+    const anchor=anchorForEntry(entry);
+    if(!anchor)return;
+
+    focusedEntryId=anchor.id;
+    focusedPos=String(pos||entry.pos||"");
+    showOtherSameSheetIds=false;
+
+    /* Beim gezielten Planbearbeiten auch fremde AMBL zunächst ausblenden. */
+    try{
+      if(typeof v511ShowOtherAmbl!=="undefined"){
+        v511ShowOtherAmbl=false;
+        updateOtherAmblButton?.();
+      }
+    }catch(e){}
+
+    ensureOtherIdsButton();
+    updateOtherIdsButton();
+  }
+
+  function clearIdFocus(){
+    focusedEntryId=null;
+    focusedPos="";
+    showOtherSameSheetIds=true;
+    updateOtherIdsButton();
+  }
+
+  /* Bestehende Sichtbarkeitslogik erhalten und nur um ID-Fokus ergänzen. */
+  const baseAnnVisible=annVisible;
+  annVisible=function(a){
+    if(!baseAnnVisible.apply(this,arguments))return false;
+
+    if(
+      focusedEntryId &&
+      !showOtherSameSheetIds &&
+      annotationOnActiveSheet(a) &&
+      anchorIdForAnnotation(a)!==focusedEntryId
+    ){
+      return false;
+    }
+
+    return true;
+  };
+
+  function setDesiredPlanPosition(pos){
+    pos=String(pos||"");
+    if(!pos)return;
+
+    const planPos=$("planPosSelect");
+    if(planPos){
+      const opt=[...planPos.options].find(o=>String(o.value)===pos);
+      if(opt){
+        planPos.value=pos;
+        try{planPosChanged?.()}catch(e){}
+      }
+    }
+
+    /*
+      posSelect dient mehreren späteren Kompatibilitätshelfern als Fallback.
+      Nur setzen, wenn die Position dort vorhanden ist.
+    */
+    const posSel=$("posSelect");
+    if(posSel && [...posSel.options].some(o=>String(o.value)===pos)){
+      posSel.value=pos;
+      try{showPosInfo?.()}catch(e){}
+    }
+  }
+
+  function matchingAnnotation(anchor,wanted,pos){
+    const anns=activePlan()?.annotations||[];
+    if(!anchor)return null;
+
+    const groupIds=new Set(
+      (typeof v612GroupEntries==="function" ? v612GroupEntries(anchor) : [anchor])
+        .map(e=>e.id)
+    );
+
+    const candidates=anns.filter(a=>{
+      const aid=anchorIdForAnnotation(a);
+      return aid===anchor.id || groupIds.has(a.entryId) || groupIds.has(a.lvEntryId);
+    });
+
+    /* 1. genau diese LV-Unterposition */
+    let hit=candidates.find(a=>
+      String(a.lvEntryId||"")===String(wanted?.id||"") ||
+      String(a.pos||"")===String(pos||"")
+    );
+
+    /* 2. gruppenweite Markierung */
+    if(!hit)hit=candidates.find(a=>a.groupScope);
+
+    /* 3. irgendeine Markierung dieser ID */
+    if(!hit)hit=candidates[0]||null;
+
+    return hit;
+  }
+
+  function enterPlanEditForLv(entry,pos){
+    if(!entry)return;
+
+    const anchor=anchorForEntry(entry);
+    const group=typeof v612GroupEntries==="function" ? v612GroupEntries(entry) : [entry];
+    const wanted=group.find(x=>String(x.pos)===String(pos)) || entry;
+
+    startIdFocus(anchor,String(pos||wanted.pos||""));
+
+    const target=
+      anchor.planId ||
+      group.find(x=>x.planId)?.planId ||
+      activePlanId ||
+      plans()[0]?.id;
+
+    if(!target){
+      alert("Für diese Erfassungs-ID ist noch kein Plan vorhanden.");
+      return;
+    }
+
+    group.forEach(x=>x.planId=target);
+    persist?.();
+
+    showView("plans");
+
+    openPlan(target).then(()=>{
+      const entrySel=$("planEntrySelect");
+      if(entrySel){
+        entrySel.value=anchor.id;
+        try{planEntryChanged?.()}catch(e){}
+      }
+
+      setDesiredPlanPosition(pos||wanted.pos);
+
+      setPlanTool?.("select");
+
+      const hit=matchingAnnotation(anchor,wanted,pos||wanted.pos);
+      if(hit){
+        selectedAnnotationId=hit.id;
+        try{selectPlanAnnotation?.(hit.id)}catch(e){
+          renderSelectedAnnotation?.();
+          renderPlanAnnotations?.();
+        }
+      }else{
+        selectedAnnotationId=null;
+        renderSelectedAnnotation?.();
+        renderPlanAnnotations?.();
+      }
+
+      ensureOtherIdsButton();
+      updateOtherIdsButton();
+
+      /* Planbereich sichtbar machen, aber nicht zurück zum Erfassungsformular springen. */
+      setTimeout(()=>{
+        $("planStage")?.scrollIntoView({behavior:"smooth",block:"start"});
+      },30);
+    });
+  }
+
+  /*
+    V7.37 Buttonfunktion ersetzen:
+    NICHT mehr die Unterposition im Erfassungsformular öffnen,
+    sondern wie "Planmarkierung bearbeiten" direkt in den Plan wechseln.
+  */
+  window.v737EditLvFromPlan=function(pos){
+    pos=String(pos||"");
+    if(!pos)return;
+
+    const ann=(activePlan()?.annotations||[]).find(a=>a.id===selectedAnnotationId)||null;
+    let entry=entryById(ann?.entryId) || entryById(ann?.lvEntryId);
+
+    if(!entry && focusedEntryId)entry=entryById(focusedEntryId);
+
+    /* Falls die Seitenliste während einer Gruppenbearbeitung offen ist. */
+    if(!entry && typeof v612EditingGroupId!=="undefined" && v612EditingGroupId){
+      entry=(project()?.entries||[]).find(e=>e.groupId===v612EditingGroupId) || null;
+    }
+
+    if(!entry){
+      const currentPos=$("posSelect")?.value||"";
+      if(currentPos){
+        entry=(project()?.entries||[]).find(e=>String(e.pos)===String(currentPos))||null;
+      }
+    }
+
+    if(!entry)return;
+
+    const group=typeof v612GroupEntries==="function" ? v612GroupEntries(entry) : [entry];
+    const wanted=group.find(e=>String(e.pos)===pos) || entry;
+
+    enterPlanEditForLv(wanted,pos);
+  };
+
+  /*
+    Auch der normale "Planmarkierung bearbeiten"-Einstieg bekommt denselben
+    konzentrierten ID-Fokus. Dadurch verhält sich der Seitenbutton wirklich
+    gleich wie die bestehende Planbearbeitung.
+  */
+  const baseMarkEntryOnPlan=markEntryOnPlan;
+  markEntryOnPlan=function(entryId){
+    const e=entryById(entryId);
+    if(e)startIdFocus(e,e.pos);
+    return baseMarkEntryOnPlan.apply(this,arguments);
+  };
+
+  /* Bei bewusstem normalen Planwechsel Fokus lösen. */
+  function installPlanListClear(){
+    const list=$("planList");
+    if(!list || list.dataset.v738ClearInstalled==="1")return;
+    list.dataset.v738ClearInstalled="1";
+    list.addEventListener("click",()=>{
+      clearIdFocus();
+      renderPlanAnnotations?.();
+    },{capture:true});
+  }
+
+  /* V7.37-Seitenliste optisch aktualisieren: gewünschte Pos. gelb markieren. */
+  function markSiblingFocus(){
+    const panel=$("v737SiblingLvPanel");
+    if(!panel)return;
+
+    panel.querySelectorAll(".v737Item").forEach(item=>item.classList.remove("planFocus"));
+
+    if(!focusedPos)return;
+
+    const buttons=[...panel.querySelectorAll(".v737EditBtn")];
+    const btn=buttons.find(b=>{
+      const oc=b.getAttribute("onclick")||"";
+      return oc.includes(`'${focusedPos.replace(/'/g,"\\'")}'`) ||
+             oc.includes(`"${focusedPos.replace(/"/g,'\\"')}"`);
+    });
+    btn?.closest(".v737Item")?.classList.add("planFocus");
+  }
+
+  const baseSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=baseSelected.apply(this,arguments);
+    setTimeout(()=>{
+      ensureOtherIdsButton();
+      updateOtherIdsButton();
+      markSiblingFocus();
+    },0);
+    return r;
+  };
+
+  const baseOpen=openPlan;
+  openPlan=async function(id){
+    const r=await baseOpen.apply(this,arguments);
+    ensureOtherIdsButton();
+    updateOtherIdsButton();
+    installPlanListClear();
+    setTimeout(markSiblingFocus,0);
+    return r;
+  };
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      ensureOtherIdsButton();
+      updateOtherIdsButton();
+      installPlanListClear();
+    },700);
   });
 })();
 </script>
