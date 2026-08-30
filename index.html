@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.43</title>
+<title>Kollaudierung – V7.44</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.43 <span class="v693BuildStamp">Build 7.43</span></h1>
+     <h1>Kollaudierung – V7.44 <span class="v693BuildStamp">Build 7.44</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16319,7 +16319,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.43",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.44",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26100,7 +26100,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.43";
+const KOLLAPP_VERSION="7.44";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -35112,6 +35112,309 @@ tbody tr:hover td{
   margin-top:0!important;
 }
 </style>
+
+
+<style id="v744-mobile-facelift">
+/* ============================================================
+   V7.44 – MOBILE FEINSCHLIFF
+   Nur <= 600 px. Desktop/Tablet bleiben unverändert.
+   ============================================================ */
+@media(max-width:600px){
+
+  :root{
+    --kollapp-header-height:0px!important;
+    --kollapp-tabs-top:0px!important;
+  }
+
+  /* ---------- Header deutlich kompakter ---------- */
+  header.appHeader{
+    position:relative!important;
+    top:auto!important;
+    padding:
+      max(8px,env(safe-area-inset-top))
+      max(9px,env(safe-area-inset-right))
+      9px
+      max(9px,env(safe-area-inset-left))!important;
+    box-shadow:0 4px 12px rgba(18,34,46,.14)!important;
+  }
+
+  header.appHeader::after{display:none!important}
+
+  .appHeader .headerShell{
+    gap:8px!important;
+  }
+
+  .appHeader .headerTop{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:7px!important;
+  }
+
+  .appHeader .headerBrandBlock{
+    min-width:0!important;
+    gap:8px!important;
+    align-items:center!important;
+    flex-basis:auto!important;
+  }
+
+  .appHeader .headerLogoWrap{
+    width:37px!important;
+    height:37px!important;
+    min-width:37px!important;
+    border-radius:10px!important;
+  }
+
+  .appHeader .headerAppLogo{
+    width:22px!important;
+    height:22px!important;
+  }
+
+  .appHeader .headerEyebrow{
+    font-size:8.5px!important;
+    margin-bottom:1px!important;
+    line-height:1.15!important;
+  }
+
+  .appHeader h1{
+    font-size:19px!important;
+    line-height:1.02!important;
+    letter-spacing:-.018em!important;
+    white-space:nowrap!important;
+  }
+
+  .appHeader .v693BuildStamp{
+    font-size:8.5px!important;
+    padding:2px 5px!important;
+    margin-left:4px!important;
+    vertical-align:middle!important;
+  }
+
+  .appHeader .sub{
+    display:none!important;
+  }
+
+  .appHeader .headerBadgeArea{
+    width:auto!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+  }
+
+  .appHeader #syncModeBadge{
+    padding:4px 7px!important;
+    font-size:9px!important;
+  }
+
+  /* ---------- Projektwahl ---------- */
+  .appHeader .headerControlCard{
+    display:block!important;
+    padding:8px!important;
+    border-radius:11px!important;
+  }
+
+  .appHeader .headerSelectLabel{
+    margin:0 0 4px 1px!important;
+    font-size:9.5px!important;
+  }
+
+  .appHeader .headerControlCard select{
+    min-height:40px!important;
+    height:40px!important;
+    padding:6px 9px!important;
+    border-radius:9px!important;
+    font-size:14px!important;
+  }
+
+  /* 4 Aktionen als 2 x 2 statt vier großer Zeilen */
+  .appHeader .headerActionRow{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:6px!important;
+    margin-top:7px!important;
+  }
+
+  .appHeader .headerActionRow button{
+    width:100%!important;
+    min-width:0!important;
+    min-height:39px!important;
+    height:auto!important;
+    padding:6px 5px!important;
+    font-size:10.5px!important;
+    line-height:1.15!important;
+    white-space:normal!important;
+    border-radius:8px!important;
+  }
+
+  /* ---------- Main ---------- */
+  main{
+    margin-top:5px!important;
+    padding:
+      0 max(7px,env(safe-area-inset-right))
+      28px max(7px,env(safe-area-inset-left))!important;
+  }
+
+  /* ---------- Hauptreiter: 3 x 2, kein seitliches Scrollen ---------- */
+  .tabs.noPrint{
+    position:sticky!important;
+    top:0!important;
+    z-index:34!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    overflow:visible!important;
+    gap:5px!important;
+    margin:5px 0 8px!important;
+    padding:5px!important;
+    border-radius:11px!important;
+  }
+
+  .tabs.noPrint .tab{
+    width:100%!important;
+    min-width:0!important;
+    min-height:43px!important;
+    padding:6px 4px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    font-size:10.5px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+    border-radius:8px!important;
+  }
+
+  /* V6.81 blendete die Icons auf Mobile aus – für die kurze
+     Mobile-Navigation wieder bewusst aktivieren. */
+  .tabs.noPrint .v667TabIcon{
+    display:inline-flex!important;
+    width:15px!important;
+    height:15px!important;
+    flex:0 0 15px!important;
+  }
+
+  .tabs.noPrint .v667TabIcon svg{
+    width:15px!important;
+    height:15px!important;
+  }
+
+  /* Auf Mobile kurze, eindeutige Bezeichnungen verwenden. */
+  .tabs.noPrint .tab > span:last-child{
+    display:none!important;
+  }
+  .tabs.noPrint .tab::after{
+    content:attr(data-mobile-label);
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  /* ---------- Projekt-/Aufmaßblatt-Stammdaten kompakt ---------- */
+  #view-entry .v666ProjectSection{
+    padding:10px!important;
+  }
+
+  #view-entry .v666ProjectSection > h2{
+    margin-bottom:7px!important;
+    padding-bottom:6px!important;
+    font-size:13px!important;
+  }
+
+  #view-entry .projectMeta{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:6px!important;
+    margin-top:4px!important;
+  }
+
+  #view-entry .projectMeta > .metaCell:first-child{
+    grid-column:1/-1!important;
+  }
+
+  #view-entry .metaCell{
+    min-width:0!important;
+    padding:7px 8px!important;
+    border-radius:8px!important;
+  }
+
+  #view-entry .metaCell b{
+    margin-bottom:2px!important;
+    font-size:8.5px!important;
+    line-height:1.1!important;
+    letter-spacing:.035em!important;
+  }
+
+  #view-entry .metaCell{
+    font-size:12.5px!important;
+    line-height:1.2!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  #view-entry .hr{
+    margin:8px 0!important;
+  }
+
+  #view-entry .sheetBar{
+    gap:6px!important;
+  }
+
+  #view-entry .sheetBar label{
+    margin-top:3px!important;
+  }
+
+  #view-entry .sheetBar input,
+  #view-entry .sheetBar select{
+    min-height:42px!important;
+    height:auto!important;
+    font-size:14px!important;
+  }
+
+  /* Karten insgesamt auf Phone etwas dichter */
+  .card{
+    padding:10px!important;
+    border-radius:10px!important;
+  }
+
+  .spacer{height:7px!important}
+}
+
+/* sehr schmale Geräte */
+@media(max-width:380px){
+  .appHeader h1{font-size:17px!important}
+  .appHeader .v693BuildStamp{display:none!important}
+  .tabs.noPrint .tab{
+    font-size:9.5px!important;
+    gap:4px!important;
+  }
+  .tabs.noPrint .v667TabIcon,
+  .tabs.noPrint .v667TabIcon svg{
+    width:14px!important;
+    height:14px!important;
+    flex-basis:14px!important;
+  }
+}
+</style>
+
+<script>
+/* V7.44 – kurze Mobile-Labels, Desktop-/Tablettext bleibt unverändert. */
+(function(){
+  const labels={
+    "tab-entry":"Erfassen",
+    "tab-sheet":"Aufmaß",
+    "tab-lv":"LV",
+    "tab-export":"Export",
+    "tab-sync":"Übergabe",
+    "tab-project":"Projekt"
+  };
+  function apply(){
+    Object.entries(labels).forEach(([id,label])=>{
+      document.getElementById(id)?.setAttribute("data-mobile-label",label);
+    });
+  }
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",apply,{once:true});
+  }else apply();
+})();
+</script>
 
 </body>
 </html>
