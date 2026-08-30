@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.81</title>
+<title>Kollaudierung – V7.82</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.81 <span class="v693BuildStamp">Build 7.81</span></h1>
+     <h1>Kollaudierung – V7.82 <span class="v693BuildStamp">Build 7.82</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.81",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.82",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.81";
+const KOLLAPP_VERSION="7.82";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -41743,6 +41743,196 @@ html:not([data-theme="dark"]) #toggleOtherIdsBtn.v781Off{
   window.addEventListener("load",()=>{
     setTimeout(bindControlsV781,300);
     setTimeout(bindControlsV781,900);
+  });
+})();
+</script>
+
+
+<style id="v782-direct-plan-visibility">
+/* V7.82 – direkte SVG-Sichtbarkeit statt alter Filterkette */
+#planOverlay g.ann.v782Hidden{display:none!important}
+</style>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+
+  /* Eigene UI-Zustände. */
+  window.v782ShowOtherAmbl=true;
+  window.v782ShowOtherIds=true;
+
+  function entryByAnyId(id){
+    if(id===undefined || id===null || id==='')return null;
+    const s=String(id);
+    return (project()?.entries||[]).find(e=>String(e.id)===s)||null;
+  }
+
+  function anchorFor(e){
+    if(!e)return null;
+    try{return (typeof v612AnchorEntry==='function' ? v612AnchorEntry(e) : null) || e}catch(_){return e}
+  }
+
+  function annEntry(a){
+    if(!a)return null;
+    return entryByAnyId(a.entryId) || entryByAnyId(a.lvEntryId) || null;
+  }
+
+  function annAnchorId(a){
+    const e=annEntry(a);
+    return String(anchorFor(e)?.id || a?.entryId || a?.lvEntryId || '');
+  }
+
+  function annSheetId(a){
+    try{
+      if(typeof isDraftEntryId==='function' && isDraftEntryId(a?.entryId)){
+        return String(activeSheet()?.id||'');
+      }
+    }catch(_){}
+    return String(annEntry(a)?.sheetId||'');
+  }
+
+  function focusAnchorId(){
+    const entries=project()?.entries||[];
+
+    const pe=$('planEntrySelect')?.value;
+    if(pe){
+      const e=entryByAnyId(pe);
+      if(e)return String(anchorFor(e)?.id||e.id||'');
+    }
+
+    try{
+      const a=activePlan()?.annotations?.find(x=>String(x.id)===String(selectedAnnotationId||''));
+      const id=annAnchorId(a);
+      if(id)return id;
+    }catch(_){}
+
+    try{
+      if(editingEntryId){
+        const e=entryByAnyId(editingEntryId);
+        if(e)return String(anchorFor(e)?.id||e.id||'');
+      }
+    }catch(_){}
+
+    return '';
+  }
+
+  /* Nur Positionsfilter + Exportfilter in annVisible lassen.
+     AMBL-/ID-Toggles werden NACH dem Render direkt am SVG angewandt. */
+  annVisible=function(a){
+    const f=$('planPosFilter')?.value||'';
+    if(f && String(a?.pos||'')!==String(f))return false;
+    try{
+      if(typeof v683InExport==='function' && v683InExport()){
+        if(typeof v683AnnotationExportable==='function' && !v683AnnotationExportable(a))return false;
+      }
+    }catch(_){}
+    return true;
+  };
+
+  function applySvgVisibility(){
+    const svg=$('planOverlay');
+    const pl=activePlan?.();
+    const sh=activeSheet?.();
+    if(!svg || !pl)return;
+
+    const activeSheetId=String(sh?.id||'');
+    const focus=focusAnchorId();
+
+    svg.querySelectorAll('g.ann[data-id]').forEach(g=>{
+      const a=(pl.annotations||[]).find(x=>String(x.id)===String(g.dataset.id));
+      if(!a)return;
+
+      let visible=true;
+      const sheetId=annSheetId(a);
+      const sameSheet=!activeSheetId || sheetId===activeSheetId;
+
+      if(!window.v782ShowOtherAmbl && !sameSheet) visible=false;
+      if(!window.v782ShowOtherIds && sameSheet && focus && annAnchorId(a)!==focus) visible=false;
+
+      g.classList.toggle('v782Hidden',!visible);
+      g.setAttribute('aria-hidden',visible?'false':'true');
+    });
+  }
+
+  function paintToggle(btn,on,label){
+    if(!btn)return;
+    btn.textContent=`${label}: ${on?'EIN':'AUS'}`;
+    btn.classList.toggle('v781On',on);
+    btn.classList.toggle('v781Off',!on);
+    btn.classList.toggle('okBtn',on);
+    btn.classList.toggle('secondary',!on);
+    btn.classList.toggle('off',!on);
+    btn.setAttribute('aria-pressed',on?'true':'false');
+  }
+
+  function syncButtons(){
+    paintToggle($('toggleOtherAmblBtn'),!!window.v782ShowOtherAmbl,'Andere AMBL');
+    paintToggle($('toggleOtherIdsBtn'),!!window.v782ShowOtherIds,'Andere IDs');
+  }
+
+  window.v782ToggleOtherAmbl=function(){
+    window.v782ShowOtherAmbl=!window.v782ShowOtherAmbl;
+    try{v511ShowOtherAmbl=window.v782ShowOtherAmbl}catch(_){}
+    syncButtons();
+    applySvgVisibility();
+  };
+
+  window.v782ToggleOtherIds=function(){
+    window.v782ShowOtherIds=!window.v782ShowOtherIds;
+    syncButtons();
+    applySvgVisibility();
+  };
+
+  function bind(){
+    const a=$('toggleOtherAmblBtn');
+    if(a)a.onclick=function(ev){ev?.preventDefault?.();ev?.stopPropagation?.();v782ToggleOtherAmbl();return false};
+    const i=$('toggleOtherIdsBtn');
+    if(i)i.onclick=function(ev){ev?.preventDefault?.();ev?.stopPropagation?.();v782ToggleOtherIds();return false};
+    syncButtons();
+    applySvgVisibility();
+  }
+
+  /* Render: alle Annotationen erzeugen, danach DOM-Sichtbarkeit anwenden. */
+  const baseRender=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    const r=baseRender.apply(this,arguments);
+    requestAnimationFrame(()=>{bind();applySvgVisibility();});
+    return r;
+  };
+  window.renderPlanAnnotations=renderPlanAnnotations;
+
+  const baseOpen=openPlan;
+  openPlan=async function(){
+    const r=await baseOpen.apply(this,arguments);
+    requestAnimationFrame(()=>{bind();applySvgVisibility();});
+    return r;
+  };
+  window.openPlan=openPlan;
+
+  /* Beim gezielten Bearbeiten zunächst andere AMBL + IDs ausblenden. */
+  if(typeof window.markEntryOnPlan==='function'){
+    const base=window.markEntryOnPlan;
+    window.markEntryOnPlan=function(){
+      window.v782ShowOtherAmbl=false;
+      window.v782ShowOtherIds=false;
+      const r=base.apply(this,arguments);
+      setTimeout(()=>{bind();renderPlanAnnotations?.();},0);
+      return r;
+    };
+  }
+  if(typeof window.v737EditLvFromPlan==='function'){
+    const base=window.v737EditLvFromPlan;
+    window.v737EditLvFromPlan=function(){
+      window.v782ShowOtherAmbl=false;
+      window.v782ShowOtherIds=false;
+      const r=base.apply(this,arguments);
+      setTimeout(()=>{bind();renderPlanAnnotations?.();},0);
+      return r;
+    };
+  }
+
+  window.addEventListener('load',()=>{
+    setTimeout(bind,350);
+    setTimeout(bind,1000);
   });
 })();
 </script>
