@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.92</title>
+<title>Kollaudierung – V7.93</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.92 <span class="v693BuildStamp">Build 7.92</span></h1>
+     <h1>Kollaudierung – V7.93 <span class="v693BuildStamp">Build 7.93</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -8615,10 +8615,10 @@ function renderProject(){
 function renderStats(){
  const p=project();
  document.getElementById("stPos").textContent=positions().length;
- document.getElementById("stSheets").textContent=p.sheets.length;
- document.getElementById("stEntries").textContent=p.entries.length;
- document.getElementById("stValue").textContent=euro(collValue());
- document.getElementById("stOrder").textContent=euro(orderValue());
+ document.getElementById("stSheets").textContent=Array.isArray(p?.sheets)?p.sheets.length:0;
+ document.getElementById("stEntries").textContent=Array.isArray(p?.entries)?p.entries.length:0;
+ document.getElementById("stValue").textContent=euro(p?collValue():0);
+ document.getElementById("stOrder").textContent=euro(p?orderValue():0);
 }
 function showView(name){
  ["entry","sheet","lv","project"].forEach(v=>{
@@ -8675,6 +8675,13 @@ function deleteCurrentProject(){
 /* SHEETS */
 function renderSheetSelect(){
  const sel=document.getElementById("sheetSelect"),p=project();
+ if(!sel)return;
+ if(!p){
+  sel.innerHTML='<option value="">– noch kein Projekt –</option>';
+  const quick=document.getElementById("sheetAreaQuick");if(quick)quick.value="";
+  return;
+ }
+ if(!Array.isArray(p.sheets))p.sheets=[];
  if(!p.sheets.length){
   sel.innerHTML='<option value="">– noch kein Aufmaßblatt –</option>';p.activeSheetId=null;
  }else{
@@ -8682,7 +8689,8 @@ function renderSheetSelect(){
   sel.innerHTML=p.sheets.map(s=>`<option value="${esc(s.id)}">${esc(s.code)} · ${esc([s.topArea,s.area].filter(Boolean).join(" – ")||"ohne Bereich")}</option>`).join("");
   sel.value=p.activeSheetId;
  }
- const s=activeSheet();document.getElementById("sheetAreaQuick").value=s?[s.topArea,s.area].filter(Boolean).join(" – "):"";
+ const s=activeSheet(),quick=document.getElementById("sheetAreaQuick");
+ if(quick)quick.value=s?[s.topArea,s.area].filter(Boolean).join(" – "):"";
 }
 function selectSheet(){project().activeSheetId=document.getElementById("sheetSelect").value||null;editingEntryId=null;persist();renderSheetSelect();showPosInfo();renderAll()}
 function nextSheetCode(){
@@ -9054,6 +9062,10 @@ function finishProjectImport(){
   state.currentProjectId=id;
  }else{
   const p=state.projects[wizard.editingProjectId];
+  if(!p){alert("Das zu bearbeitende Projekt wurde nicht gefunden. Bitte den Import neu öffnen.");return}
+  if(!Array.isArray(p.sheets))p.sheets=[];
+  if(!Array.isArray(p.entries))p.entries=[];
+  if(!Array.isArray(p.positions))p.positions=[];
   if(p.entries.length&& !confirm(`Das Projekt enthält bereits ${p.entries.length} Erfassungen. Das LV wird ersetzt. Bestehende Aufmaße bleiben erhalten; Positionen, die im neuen LV fehlen, können danach nicht mehr korrekt ausgewertet werden. Trotzdem fortfahren?`))return;
   const manualKeep=(p.positions||[]).filter(x=>x.manual===true);p.positions=imported.concat(manualKeep.filter(m=>!imported.some(i=>i.pos===m.pos)));p.importInfo={fileName:wizard.fileName,sheetName,importedAt:new Date().toLocaleString("de-AT"),count:imported.length};p.meta.source=wizard.fileName;
   if(!p.sheets.length&&importSheets.length){p.sheets=importSheets;p.activeSheetId=importSheets[0].id}
@@ -9939,7 +9951,13 @@ let selectedSheetExportIds=new Set();
 
 function syncSheetViewSelector(){
  const sel=document.getElementById("sheetViewSelect");if(!sel)return;
- const p=project(),current=p.activeSheetId;
+ const p=project();
+ if(!p){
+  sel.innerHTML='<option value="">– kein Projekt –</option>';
+  return;
+ }
+ if(!Array.isArray(p.sheets))p.sheets=[];
+ const current=p.activeSheetId;
  sel.innerHTML=p.sheets.length?p.sheets.map(sh=>`<option value="${esc(sh.id)}">${esc(sh.code)} · ${esc([sh.topArea,sh.area].filter(Boolean).join(" – ")||"ohne Bereich")}</option>`).join(""):'<option value="">– kein Aufmaßblatt –</option>';
  if(p.sheets.some(sh=>sh.id===current))sel.value=current;
 }
@@ -16351,7 +16369,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.92",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.93",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26132,7 +26150,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.92";
+const KOLLAPP_VERSION="7.93";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -34438,7 +34456,7 @@ tbody tr:hover td{
      <div class="v740TopGrid">
       <div class="v740Panel">
        <h3>1 · Kabelliste laden</h3>
-       <div class="small">Unterstützt PDF (Lohr / Kieback & Peter) sowie Excel / CSV mit typischen Kabelspalten.</div>
+       <div class="small">Unterstützt PDF sowie Excel / CSV mit typischen Kabelspalten. Die Struktur wird automatisch erkannt.</div>
        <div class="toolbar" style="margin-top:9px">
         <label for="v740CableFile" class="primary v740FileLabel" style="margin:0">Datei auswählen</label>
         <input id="v740CableFile" type="file" accept=".pdf,.xlsx,.xls,.csv,application/pdf,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="v740CableFileChanged(event)">
@@ -34548,10 +34566,10 @@ tbody tr:hover td{
  }
  async function parsePdf(file){
    const pages=await pdfItems(file); const all=nrm(pages.map(p=>p.text).join(' '));
-   if(all.includes('kieback')||all.includes('kabel-liste'))return {profile:'Kieback & Peter',rows:parseKieback(pages)};
-   if(all.includes('vorabkabelliste')||all.includes('lohr'))return {profile:'Lohr Vorabkabelliste',rows:parseLohr(pages)};
-   const k=parseKieback(pages); if(k.length)return {profile:'PDF · Kabel-Nr.-Erkennung',rows:k};
-   const l=parseLohr(pages); if(l.length)return {profile:'PDF · Kabelbezeichnungs-Erkennung',rows:l};
+   if(all.includes('kieback')||all.includes('kabel-liste'))return {profile:'PDF · automatische Erkennung',rows:parseKieback(pages)};
+   if(all.includes('vorabkabelliste')||all.includes('lohr'))return {profile:'PDF · automatische Erkennung',rows:parseLohr(pages)};
+   const k=parseKieback(pages); if(k.length)return {profile:'PDF · automatische Erkennung',rows:k};
+   const l=parseLohr(pages); if(l.length)return {profile:'PDF · automatische Erkennung',rows:l};
    throw new Error('Die PDF enthält Text, aber keine unterstützte Kabellistenstruktur. Bitte Excel/CSV verwenden oder die Liste als neues Profil ergänzen.');
  }
 
@@ -43222,6 +43240,33 @@ html[data-theme="dark"] .tabs.noPrint #v787TopBtn{
   v651CaptureCss=function(){
     return baseCaptureCssV792()+"\n"+v792ForceLightTotalsCss();
   };
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.93 – Import-Sicherheitsnetz
+   Während des Neu-Projekt-Wizards existiert bewusst noch kein Projekt.
+   UI-Refresh darf deshalb nicht auf p.sheets / p.entries zugreifen.
+   ============================================================ */
+(function(){
+  const baseRenderAllV793=renderAll;
+  renderAll=function(){
+    const pr=project();
+    if(!pr){
+      try{renderStats?.()}catch(_){}
+      try{renderRecent?.()}catch(_){}
+      try{renderSheet?.()}catch(_){}
+      try{renderLV?.()}catch(_){}
+      return;
+    }
+    if(!Array.isArray(pr.sheets))pr.sheets=[];
+    if(!Array.isArray(pr.entries))pr.entries=[];
+    if(!Array.isArray(pr.positions))pr.positions=[];
+    return baseRenderAllV793.apply(this,arguments);
+  };
+  window.renderAll=renderAll;
 })();
 </script>
 
