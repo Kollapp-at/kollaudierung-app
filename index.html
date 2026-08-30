@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.71</title>
+<title>Kollaudierung – V7.72</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.71 <span class="v693BuildStamp">Build 7.71</span></h1>
+     <h1>Kollaudierung – V7.72 <span class="v693BuildStamp">Build 7.72</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.71",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.72",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.71";
+const KOLLAPP_VERSION="7.72";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -40195,6 +40195,182 @@ html[data-theme="dark"] #view-sync .syncUser:hover{
   }
 }
 </style>
+
+
+<style id="v772-user-editor-fix">
+/* ============================================================
+   V7.72 – Benutzereditor Dark Mode + Projektleiter-Logik
+   ============================================================ */
+html[data-theme="dark"] #userEditorModal .permissionCheck{
+  background:#10283a!important;
+  color:#eef5f9!important;
+  border-color:#3c5f76!important;
+}
+html[data-theme="dark"] #userEditorModal .permissionCheck:hover{
+  background:#143247!important;
+  border-color:#4d748d!important;
+}
+html[data-theme="dark"] #userEditorModal .permissionCheck input{
+  accent-color:#55a5d5!important;
+}
+html[data-theme="dark"] #userEditorModal .permissionCheck.isLocked{
+  background:#173426!important;
+  color:#b9e5c8!important;
+  border-color:#447358!important;
+}
+html[data-theme="dark"] #userEditorModal .permissionCheck.isLocked input{
+  opacity:.85!important;
+}
+
+#userEditorModal .v772RoleHint{
+  margin-top:9px;
+  padding:8px 10px;
+  border:1px solid #d7e1e7;
+  border-radius:8px;
+  background:#f6f9fb;
+  color:#536a78;
+  font-size:11px;
+  line-height:1.4;
+}
+html[data-theme="dark"] #userEditorModal .v772RoleHint{
+  background:#10283a!important;
+  color:#c8d8e1!important;
+  border-color:#3c5f76!important;
+}
+html[data-theme="dark"] #userEditorModal .v772RoleHint b{
+  color:#f4f8fb!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.72 – robuste Benutzer-/Projektleiter-Verwaltung
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function permissionInputs(){
+    return [
+      $("ueSeePrices"),
+      $("ueManualPos"),
+      $("ueBilling"),
+      $("ueProjectEdit")
+    ].filter(Boolean);
+  }
+
+  function ensureRoleHint(){
+    const grid=document.querySelector("#userEditorModal .permissionGrid");
+    if(!grid)return null;
+    let hint=$("v772RoleHint");
+    if(!hint){
+      hint=document.createElement("div");
+      hint.id="v772RoleHint";
+      hint.className="v772RoleHint";
+      grid.insertAdjacentElement("afterend",hint);
+    }
+    return hint;
+  }
+
+  function refreshRoleEditorUi(){
+    const role=$("ueRole")?.value||"monteur";
+    const isPL=role==="projektleiter";
+
+    if(isPL){
+      permissionInputs().forEach(el=>{
+        el.checked=true;
+        el.disabled=true;
+        el.closest(".permissionCheck")?.classList.add("isLocked");
+      });
+    }else{
+      permissionInputs().forEach(el=>{
+        el.disabled=false;
+        el.closest(".permissionCheck")?.classList.remove("isLocked");
+      });
+    }
+
+    const hint=ensureRoleHint();
+    if(hint){
+      hint.innerHTML=isPL
+        ? "<b>Projektleiter:</b> Vollzugriff ist fest aktiviert. Dieses Profil arbeitet im Masterprojekt und wird nicht als Monteur-Arbeitsdatei-Empfänger angeboten."
+        : role==="obermonteur"
+          ? "<b>Obermonteur:</b> Standardmäßig darf er manuelle/Regie-LV-Unterpositionen verwalten. Weitere Rechte können individuell gesetzt werden."
+          : "<b>Monteur:</b> Standardmäßig nur Erfassen und Plan markieren. Weitere Rechte können bei Bedarf aktiviert werden.";
+    }
+  }
+
+  const baseRoleDefaults=window.applyRoleDefaultsToEditor;
+  window.applyRoleDefaultsToEditor=function(){
+    if(typeof baseRoleDefaults==="function"){
+      baseRoleDefaults.apply(this,arguments);
+    }else{
+      const role=$("ueRole")?.value||"monteur";
+      const d=ROLE_DEFAULTS?.[role]||ROLE_DEFAULTS.monteur;
+      if($("ueSeePrices"))$("ueSeePrices").checked=!!d.seePrices;
+      if($("ueManualPos"))$("ueManualPos").checked=!!d.manualPositions;
+      if($("ueBilling"))$("ueBilling").checked=!!d.billing;
+      if($("ueProjectEdit"))$("ueProjectEdit").checked=!!d.projectEdit;
+    }
+    refreshRoleEditorUi();
+  };
+
+  const baseOpenUserEditor=window.openUserEditor;
+  window.openUserEditor=function(id=null){
+    const r=baseOpenUserEditor.apply(this,arguments);
+    setTimeout(refreshRoleEditorUi,0);
+    return r;
+  };
+
+  function wouldRemoveLastProjectLeader(id,newRole){
+    if(newRole==="projektleiter")return false;
+    const existing=(state.users||[]).find(u=>String(u.id)===String(id));
+    if(!existing || existing.role!=="projektleiter")return false;
+    return !(state.users||[]).some(u=>u.id!==existing.id && u.role==="projektleiter");
+  }
+
+  const baseSaveUserProfile=window.saveUserProfile;
+  window.saveUserProfile=function(){
+    ensureGlobalUsers?.();
+
+    const name=$("ueName")?.value.trim()||"";
+    if(!name){
+      alert("Bitte einen Namen eingeben.");
+      return;
+    }
+
+    const id=$("ueId")?.value||"";
+    const role=$("ueRole")?.value||"monteur";
+
+    if(id && wouldRemoveLastProjectLeader(id,role)){
+      alert("Es muss mindestens ein Projektleiterprofil bestehen bleiben. Bitte zuerst einen weiteren Projektleiter anlegen.");
+      return;
+    }
+
+    if(role==="projektleiter"){
+      permissionInputs().forEach(el=>{el.checked=true;});
+    }
+
+    const r=baseSaveUserProfile.apply(this,arguments);
+
+    if(role==="projektleiter"){
+      const saved=(state.users||[]).find(u=>u.name===name && u.role==="projektleiter");
+      if(saved){
+        saved.permissions=deepClone(ROLE_DEFAULTS.projektleiter);
+        persist?.();
+        renderUsers?.();
+      }
+    }
+
+    return r;
+  };
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      ensureRoleHint();
+      refreshRoleEditorUi();
+    },300);
+  });
+})();
+</script>
 
 </body>
 </html>
