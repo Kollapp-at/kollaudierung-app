@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.08</title>
+<title>Kollaudierung – V7.09</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7275,6 +7275,37 @@ main > section.view,
   color:#8a7841;
 }
 
+
+/* ============================================================
+   V7.09 – VORLAGE PRO UNTERPOSITION IN AKTIVER GRUPPENTABELLE
+   ============================================================ */
+.v709TemplateBadge{
+  display:inline-flex;
+  align-items:center;
+  margin-left:7px;
+  padding:2px 7px;
+  border-radius:999px;
+  border:1px solid #e1c56d;
+  background:#fff7d8;
+  color:#7a5c00;
+  font-size:10px;
+  font-weight:800;
+  vertical-align:middle;
+}
+.v709TemplateQty{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.v709TemplateQtyMain{
+  font-weight:850;
+  color:#7a5c00;
+}
+.v709TemplateQtySub{
+  font-size:10.5px;
+  color:#8a7540;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -7305,7 +7336,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.08 <span class="v693BuildStamp">Build 7.08</span></h1>
+     <h1>Kollaudierung – V7.09 <span class="v693BuildStamp">Build 7.09</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16243,7 +16274,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.08",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.09",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26024,7 +26055,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.08";
+const KOLLAPP_VERSION="7.09";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -26429,6 +26460,90 @@ v614RecentQtyHtml=function(g){
 
 /* Bestehende Anzeige sofort neu zeichnen. */
 window.addEventListener('load',()=>setTimeout(()=>{try{renderRecent?.()}catch(e){}},180));
+</script>
+
+
+<script>
+/* ============================================================
+   V7.09 – FINALE VORLAGENANZEIGE FÜR v620-GRUPPENTABELLE
+   ============================================================ */
+
+function v709IsTemplateEntry(e){
+  return !!e && Math.abs(Number(e.qty||0))<=1e-12;
+}
+
+/* Aktive Gruppentabelle: konkrete LV-Unterposition kennzeichnen. */
+v620RecentLvHtml=function(group){
+  return `<div class="v620LvWrap">${group.map(e=>{
+    const pos=getPos(e.pos);
+    const badge=v709IsTemplateEntry(e)
+      ? '<span class="v709TemplateBadge">Vorlage</span>'
+      : '';
+    return `<div class="v620LvRow">
+      <div class="v620LvCode">${esc(e.pos)}${badge}</div>
+      <div class="v620LvText">${esc(pos?.text||"")}</div>
+    </div>`;
+  }).join("")}</div>`;
+};
+
+/* Menge/Rechenansatz: 0 wird nicht mehr als normale Menge dargestellt. */
+v620RecentQtyHtml=function(group){
+  return `<div class="v620QtyWrap">${group.map(e=>{
+    if(v709IsTemplateEntry(e)){
+      return `<div class="v620QtyRow v709TemplateQty">
+        <div class="v709TemplateQtyMain">Vorlage</div>
+        <div class="v709TemplateQtySub">
+          Menge 0${e.unit?` ${esc(e.unit)}`:""}${e.calc?` · Rechenansatz ${esc(e.calc)}`:""}
+        </div>
+      </div>`;
+    }
+
+    return `<div class="v620QtyRow">
+      <div class="v620QtyMain">${num(e.qty)} ${esc(e.unit||"")}</div>
+      <div class="v620QtyCalc">${esc(e.calc||"")}</div>
+    </div>`;
+  }).join("")}</div>`;
+};
+
+/* Sicherheitshalber auch die ältere Gruppendarstellung angleichen. */
+v614RecentLvHtml=function(group){
+  return `<div class="v614LvStack">${group.map(e=>{
+    const pos=getPos(e.pos);
+    const badge=v709IsTemplateEntry(e)
+      ? '<span class="v709TemplateBadge">Vorlage</span>'
+      : '';
+    return `<div class="v614LvLine">
+      <div class="v614LvCode">${esc(e.pos)}${badge}</div>
+      <div class="v614LvText">${esc(pos?.text||"")}</div>
+    </div>`;
+  }).join("")}</div>`;
+};
+
+v614RecentQtyHtml=function(group){
+  return `<div class="v614QtyStack">${group.map(e=>{
+    if(v709IsTemplateEntry(e)){
+      return `<div class="v614QtyLine v709TemplateQty">
+        <div class="v709TemplateQtyMain">Vorlage</div>
+        <div class="v709TemplateQtySub">
+          Menge 0${e.unit?` ${esc(e.unit)}`:""}${e.calc?` · Rechenansatz ${esc(e.calc)}`:""}
+        </div>
+      </div>`;
+    }
+
+    return `<div class="v614QtyLine">
+      <div class="v614QtyMain">${num(e.qty)} ${esc(e.unit||"")}</div>
+      <div class="v614QtyCalc">${esc(e.calc||"")}</div>
+    </div>`;
+  }).join("")}</div>`;
+};
+
+/* Aktuelle Anzeige sofort mit den korrigierten Helfern neu zeichnen. */
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    try{renderRecent?.()}catch(e){}
+    try{renderSheet?.()}catch(e){}
+  },180);
+});
 </script>
 
 </body>
