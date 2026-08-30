@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.18</title>
+<title>Kollaudierung – V7.20</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.18 <span class="v693BuildStamp">Build 7.18</span></h1>
+     <h1>Kollaudierung – V7.20 <span class="v693BuildStamp">Build 7.20</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.18",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.20",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.18";
+const KOLLAPP_VERSION="7.20";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -28354,6 +28354,521 @@ window.addEventListener("load",()=>{
     });
   },350);
 });
+</script>
+
+
+<style>
+/* ============================================================
+   V7.19 – Bearbeiten von Formen + Radierer für Freihand/Kritzeln
+   ============================================================ */
+#tool-eraser{
+  background:#f4f7f9!important;
+  border:1px solid #d4dfe6!important;
+  color:#203a4b!important;
+}
+#tool-eraser.active{
+  background:#2f7fae!important;
+  border-color:#2f7fae!important;
+  color:#fff!important;
+}
+#planEraserHelp{margin:0 0 6px!important;padding:7px 9px!important;border-radius:8px!important;font-size:11px!important;line-height:1.35!important;display:none}
+#planEraserHelp.show{display:block}
+#planOverlay.eraserCursor, #planOverlay.eraserCursor *{cursor:cell!important}
+.planEditHandle{fill:#fff;stroke:#0d5e91;stroke-width:2;vector-effect:non-scaling-stroke}
+.planEditHandle.move{fill:#0d5e91;stroke:#fff}
+.planEditOutline{fill:none;stroke:#0d5e91;stroke-width:1.5;stroke-dasharray:6 4;opacity:.85;vector-effect:non-scaling-stroke}
+.planEditHint{margin-top:6px;color:#4d6473}
+</style>
+<script>
+/* ============================================================
+   V7.19 – Formen nachträglich bearbeiten + Radierer
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+  let v719EditState=null;
+  let v719EraserState={active:false,pointerId:null,last:null};
+
+  function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
+  function deep(o){ return JSON.parse(JSON.stringify(o)); }
+  function activeAnn(){ return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId) || null; }
+  function normPt(x,y){ return {x:clamp(x,0,1000), y:clamp(y,0,1000)}; }
+  function centerOfBounds(b){ return {x:(b.minX+b.maxX)/2, y:(b.minY+b.maxY)/2}; }
+  function annBounds(a){
+    if(typeof boundsForAnnotation==='function') return boundsForAnnotation(a);
+    if((a.type==='line'||a.type==='freehand'||a.type==='scribble') && Array.isArray(a.points) && a.points.length){
+      const xs=a.points.map(p=>p.x), ys=a.points.map(p=>p.y);
+      return {minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys)};
+    }
+    if(a.type==='rect'||a.type==='circle') return {minX:a.x1,maxX:a.x2,minY:a.y1,maxY:a.y2};
+    return {minX:a.x||0,maxX:a.x||0,minY:a.y||0,maxY:a.y||0};
+  }
+  function avgScale(){ try{return v59MarkerScale?.()||1}catch(e){return 1;} }
+  function handleRadiusPx(){ return Math.max(9, 10*avgScale()); }
+  function moveDeltaClamped(dx,dy,b){
+    return {
+      dx: clamp(dx, -b.minX, 1000-b.maxX),
+      dy: clamp(dy, -b.minY, 1000-b.maxY)
+    };
+  }
+  function lineCenter(points){
+    if(!points?.length) return {x:500,y:500};
+    let sx=0, sy=0;
+    points.forEach(p=>{sx+=p.x; sy+=p.y;});
+    return {x:sx/points.length,y:sy/points.length};
+  }
+  function pointSegDist(p,a,b){
+    const dx=b.x-a.x, dy=b.y-a.y;
+    if(!dx && !dy) return Math.hypot(p.x-a.x,p.y-a.y);
+    const t=clamp(((p.x-a.x)*dx + (p.y-a.y)*dy)/(dx*dx+dy*dy),0,1);
+    const q={x:a.x+t*dx, y:a.y+t*dy};
+    return Math.hypot(p.x-q.x,p.y-q.y);
+  }
+  function ensureUi(){
+    const textBtn=$('tool-text')||$('tool-scribble')||$('tool-freehand');
+    if(textBtn && !$('tool-eraser')){
+      const btn=document.createElement('button');
+      btn.id='tool-eraser'; btn.type='button'; btn.className='secondary toolBtn';
+      btn.textContent='⌫ Radierer';
+      btn.onclick=()=>setPlanTool('eraser');
+      textBtn.insertAdjacentElement('afterend',btn);
+    }
+    if(!$('planEraserHelp')){
+      const after=$('planScribbleHelp')||$('planFreehandHelp')||$('planLineHelp');
+      if(after && after.parentNode){
+        const d=document.createElement('div');
+        d.id='planEraserHelp'; d.className='planLineHelp';
+        d.textContent='Radierer: entfernt Freihand- und Kritzel-Markierungen abschnittsweise. Mit gedrücktem Stift, Finger oder Maus über die Linie fahren.';
+        after.insertAdjacentElement('afterend',d);
+      }
+    }
+    const box=$('selectedAnnBox');
+    if(box && !box.querySelector('.planEditHint')){
+      const hint=document.createElement('div');
+      hint.className='small planEditHint';
+      hint.textContent='Tipp: Im Modus „Auswählen“ können Linien, Polylinien, Rechtecke und Kreise direkt über die Griffe bearbeitet werden.';
+      box.appendChild(hint);
+    }
+  }
+
+  const _setPlanTool = setPlanTool;
+  setPlanTool = function(tool){
+    _setPlanTool(tool);
+    ensureUi();
+    $('tool-eraser')?.classList.toggle('active', tool==='eraser');
+    $('planEraserHelp')?.classList.toggle('show', tool==='eraser');
+    $('planOverlay')?.classList.toggle('eraserCursor', tool==='eraser');
+    if(tool!=='eraser') v719EraserState={active:false,pointerId:null,last:null};
+    if(tool!=='select') v719EditState=null;
+    try{ renderPlanAnnotations?.(); }catch(e){}
+  };
+
+  function addHandle(svg,x,y,cls,title,onDown){
+    const c=svgEl('circle', {cx:planPxX(x), cy:planPxY(y), r:handleRadiusPx(), class:'planEditHandle '+(cls||'')});
+    if(title) c.setAttribute('data-title', title);
+    c.addEventListener('pointerdown', onDown, {passive:false});
+    c.addEventListener('click', ev=>ev.stopPropagation());
+    svg.appendChild(c);
+    return c;
+  }
+
+  function startEdit(ev,ann,meta){
+    if(planTool!=='select' || ev.button===1) return;
+    ev.preventDefault(); ev.stopPropagation();
+    const svg=$('planOverlay');
+    svg?.setPointerCapture?.(ev.pointerId);
+    v719EditState={ pointerId:ev.pointerId, annId:ann.id, meta:meta, start:planCoords(ev), orig:deep(ann) };
+  }
+
+  function updateEdit(ev){
+    const st=v719EditState; if(!st || st.pointerId!==ev.pointerId) return;
+    const ann=activePlan?.()?.annotations?.find(a=>a.id===st.annId); if(!ann) return;
+    ev.preventDefault(); ev.stopPropagation();
+    const p=planCoords(ev), dx=p.x-st.start.x, dy=p.y-st.start.y;
+    const meta=st.meta, orig=st.orig;
+
+    if(meta.kind==='move'){
+      const b=annBounds(orig), d=moveDeltaClamped(dx,dy,b);
+      if((ann.type==='line'||ann.type==='freehand'||ann.type==='scribble') && Array.isArray(orig.points)){
+        ann.points = orig.points.map(pt=>normPt(pt.x+d.dx, pt.y+d.dy));
+      }else if(ann.type==='rect'||ann.type==='circle'){
+        ann.x1=clamp(orig.x1+d.dx,0,1000); ann.y1=clamp(orig.y1+d.dy,0,1000);
+        ann.x2=clamp(orig.x2+d.dx,0,1000); ann.y2=clamp(orig.y2+d.dy,0,1000);
+      }else if(ann.type==='point'||ann.type==='text'){
+        ann.x=clamp(orig.x+d.dx,0,1000); ann.y=clamp(orig.y+d.dy,0,1000);
+      }
+    }else if(meta.kind==='vertex' && Array.isArray(orig.points)){
+      ann.points = orig.points.map((pt,i)=> i===meta.index ? normPt(p.x,p.y) : pt);
+    }else if(meta.kind==='corner' && (ann.type==='rect'||ann.type==='circle')){
+      const corners=[{x:orig.x1,y:orig.y1},{x:orig.x2,y:orig.y1},{x:orig.x2,y:orig.y2},{x:orig.x1,y:orig.y2}];
+      const opp=corners[(meta.index+2)%4];
+      if(ann.type==='rect'){
+        const b=normalizeRectBounds(opp, p);
+        ann.x1=b.x1; ann.y1=b.y1; ann.x2=b.x2; ann.y2=b.y2;
+      }else{
+        const b=normalizeCircleBounds(opp, p);
+        ann.x1=b.x1; ann.y1=b.y1; ann.x2=b.x2; ann.y2=b.y2;
+      }
+    }
+    renderPlanAnnotations?.();
+    renderSelectedAnnotation?.();
+  }
+
+  function endEdit(ev){
+    if(!v719EditState || (ev && v719EditState.pointerId!==ev.pointerId)) return;
+    v719EditState=null;
+    persist?.(); renderPlanAnnotations?.(); renderSelectedAnnotation?.();
+  }
+
+  function drawEditorHandles(){
+    const svg=$('planOverlay'); const ann=activeAnn();
+    if(!svg || !ann || planTool!=='select') return;
+    const z=avgScale();
+    const b=annBounds(ann);
+    const c=centerOfBounds(b);
+
+    if(ann.type==='line'){
+      const pts=ann.points||[];
+      if(pts.length>=2){
+        const outline=svgEl('polyline',{points:pts.map(p=>`${planPxX(p.x)},${planPxY(p.y)}`).join(' '), class:'planEditOutline'});
+        svg.appendChild(outline);
+        pts.forEach((pt,i)=>addHandle(svg,pt.x,pt.y,'vertex','Punkt ziehen',ev=>startEdit(ev,ann,{kind:'vertex',index:i})));
+        addHandle(svg,c.x,c.y,'move','Gesamt verschieben',ev=>startEdit(ev,ann,{kind:'move'}));
+      }
+    }else if(ann.type==='rect' || ann.type==='circle'){
+      if(ann.type==='rect'){
+        const x=planPxX(ann.x1), y=planPxY(ann.y1), w=planPxX(ann.x2)-planPxX(ann.x1), h=planPxY(ann.y2)-planPxY(ann.y1);
+        svg.appendChild(svgEl('rect',{x,y,width:w,height:h,class:'planEditOutline'}));
+      }else{
+        const x1=planPxX(ann.x1), y1=planPxY(ann.y1), x2=planPxX(ann.x2), y2=planPxY(ann.y2);
+        const cx=(x1+x2)/2, cy=(y1+y2)/2, r=Math.min(Math.abs(x2-x1),Math.abs(y2-y1))/2;
+        svg.appendChild(svgEl('circle',{cx,cy,r,class:'planEditOutline'}));
+      }
+      const corners=[{x:ann.x1,y:ann.y1},{x:ann.x2,y:ann.y1},{x:ann.x2,y:ann.y2},{x:ann.x1,y:ann.y2}];
+      corners.forEach((pt,i)=>addHandle(svg,pt.x,pt.y,'vertex','Ecke ziehen',ev=>startEdit(ev,ann,{kind:'corner',index:i})));
+      addHandle(svg,c.x,c.y,'move','Gesamt verschieben',ev=>startEdit(ev,ann,{kind:'move'}));
+    }else if(ann.type==='freehand' || ann.type==='scribble'){
+      addHandle(svg,c.x,c.y,'move','Gesamt verschieben',ev=>startEdit(ev,ann,{kind:'move'}));
+    }
+  }
+
+  const _renderPlanAnnotations=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    _renderPlanAnnotations.apply(this,arguments);
+    ensureUi();
+    drawEditorHandles();
+  };
+
+  function eraserRadiusNorm(){
+    const ov=$('planOverlay');
+    if(!ov) return 18;
+    const px=20; // about finger/pencil tip with tolerance
+    return px / Math.max(1,(ov.clientWidth+ov.clientHeight)/2) * 2000;
+  }
+  function annTouchedByEraser(a,p,rad){
+    if(!(a.type==='freehand' || a.type==='scribble') || !Array.isArray(a.points) || a.points.length<2) return false;
+    for(let i=0;i<a.points.length;i++){
+      if(Math.hypot(a.points[i].x-p.x,a.points[i].y-p.y)<=rad) return true;
+      if(i>0 && pointSegDist(p,a.points[i-1],a.points[i])<=rad) return true;
+    }
+    return false;
+  }
+  function splitStroke(points,p,rad){
+    const chunks=[]; let cur=[];
+    for(let i=0;i<points.length;i++){
+      const pt=points[i];
+      let erase = Math.hypot(pt.x-p.x, pt.y-p.y) <= rad;
+      if(!erase && i>0 && pointSegDist(p,points[i-1],pt)<=rad) erase=true;
+      if(erase){ if(cur.length>=2) chunks.push(cur); cur=[]; continue; }
+      cur.push({x:pt.x,y:pt.y});
+    }
+    if(cur.length>=2) chunks.push(cur);
+    return chunks;
+  }
+  function applyEraserAt(p){
+    const pl=activePlan?.(); if(!pl?.annotations) return;
+    const rad=eraserRadiusNorm();
+    let changed=false; const out=[];
+    for(const ann of pl.annotations){
+      if(!annTouchedByEraser(ann,p,rad)){ out.push(ann); continue; }
+      changed=true;
+      const chunks=splitStroke(ann.points||[], p, rad);
+      if(!chunks.length){
+        if(selectedAnnotationId===ann.id) selectedAnnotationId=null;
+        continue;
+      }
+      chunks.forEach((chunk,idx)=>{
+        if(idx===0){ ann.points=chunk; out.push(ann); }
+        else{ out.push({...deep(ann), id:uid('ann'), points:chunk, createdAt:new Date().toISOString()}); }
+      });
+    }
+    if(changed){
+      pl.annotations=out;
+      persist?.(); populatePlanFilter?.(); renderPlanList?.(); renderPlanAnnotations?.(); renderSelectedAnnotation?.();
+    }
+  }
+
+  function ensureOverlayEvents(){
+    const svg=$('planOverlay');
+    if(!svg || svg.dataset.v719Editor==='1') return;
+    svg.dataset.v719Editor='1';
+
+    svg.addEventListener('pointermove', ev=>{
+      updateEdit(ev);
+      if(planTool==='eraser' && v719EraserState.active && ev.pointerId===v719EraserState.pointerId){
+        ev.preventDefault(); ev.stopPropagation();
+        const p=planCoords(ev);
+        v719EraserState.last=p;
+        applyEraserAt(p);
+      }
+    }, {passive:false, capture:true});
+
+    const stop=(ev)=>{
+      endEdit(ev);
+      if(planTool==='eraser' && v719EraserState.active && ev.pointerId===v719EraserState.pointerId){
+        ev.preventDefault(); ev.stopPropagation();
+        v719EraserState={active:false,pointerId:null,last:null};
+      }
+    };
+    svg.addEventListener('pointerup', stop, {passive:false, capture:true});
+    svg.addEventListener('pointercancel', stop, {passive:false, capture:true});
+
+    svg.addEventListener('pointerdown', ev=>{
+      if(planTool!=='eraser' || ev.button===1) return;
+      ev.preventDefault(); ev.stopPropagation();
+      svg.setPointerCapture?.(ev.pointerId);
+      v719EraserState={active:true,pointerId:ev.pointerId,last:planCoords(ev)};
+      applyEraserAt(v719EraserState.last);
+    }, {passive:false, capture:true});
+  }
+
+  const _openPlan = openPlan;
+  openPlan = async function(id){
+    const r = await _openPlan(id);
+    ensureUi(); ensureOverlayEvents();
+    if(planTool==='eraser') $('tool-eraser')?.classList.add('active');
+    return r;
+  };
+
+  const _renderSelectedAnnotation = renderSelectedAnnotation;
+  renderSelectedAnnotation = function(){
+    const r = _renderSelectedAnnotation.apply(this,arguments);
+    ensureUi();
+    return r;
+  };
+
+  window.addEventListener('load', ()=>{ ensureUi(); ensureOverlayEvents(); });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.20 – RADIERER NUR FÜR AKTIVE MARKIERUNG
+   ============================================================ */
+#planEraserHelp.v720NoSelection{
+  background:#fff4f4!important;
+  border-color:#e8caca!important;
+  color:#8b3c3c!important;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.20 – Radierer schützt alle nicht aktiven Markierungen
+   ============================================================ */
+(function(){
+  function v720ActiveErasable(){
+    const pl=typeof activePlan==="function" ? activePlan() : null;
+    if(!pl || !selectedAnnotationId) return null;
+    const a=(pl.annotations||[]).find(x=>x.id===selectedAnnotationId);
+    if(!a) return null;
+    return (a.type==="freehand" || a.type==="scribble") ? a : null;
+  }
+
+  function v720UpdateEraserHelp(){
+    const help=document.getElementById("planEraserHelp");
+    if(!help)return;
+
+    const a=v720ActiveErasable();
+    if(a){
+      help.classList.remove("v720NoSelection");
+      help.textContent=`Radierer aktiv: Es wird ausschließlich die aktuell ausgewählte ${a.type==="scribble"?"Kritzelei":"Freihand-Markierung"} bearbeitet. Alle anderen Markierungen bleiben unverändert.`;
+    }else{
+      help.classList.add("v720NoSelection");
+      help.textContent="Radierer: Bitte zuerst mit „Auswählen“ eine Freihand- oder Kritzel-Markierung auswählen. Andere gespeicherte Markierungen werden niemals automatisch radiert.";
+    }
+  }
+
+  /* V7.19 hat applyEraserAt im Closure definiert.
+     Deshalb fangen wir Radierer-Pointer VOR dessen Handler ab und führen
+     ausschließlich die selektierte Markierung durch unsere sichere Logik. */
+  let erasing=false;
+  let pointerId=null;
+
+  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+  function pointSegDist(p,a,b){
+    const dx=b.x-a.x,dy=b.y-a.y;
+    if(!dx&&!dy)return Math.hypot(p.x-a.x,p.y-a.y);
+    const t=clamp(((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy),0,1);
+    return Math.hypot(p.x-(a.x+t*dx),p.y-(a.y+t*dy));
+  }
+  function radiusNorm(){
+    const ov=document.getElementById("planOverlay");
+    if(!ov)return 18;
+    return 20/Math.max(1,(ov.clientWidth+ov.clientHeight)/2)*2000;
+  }
+  function split(points,p,rad){
+    const chunks=[];let cur=[];
+    for(let i=0;i<points.length;i++){
+      const pt=points[i];
+      let hit=Math.hypot(pt.x-p.x,pt.y-p.y)<=rad;
+      if(!hit&&i>0)hit=pointSegDist(p,points[i-1],pt)<=rad;
+      if(hit){
+        if(cur.length>=2)chunks.push(cur);
+        cur=[];
+      }else{
+        cur.push({x:pt.x,y:pt.y});
+      }
+    }
+    if(cur.length>=2)chunks.push(cur);
+    return chunks;
+  }
+
+  function eraseOnlySelectedAt(p){
+    const pl=activePlan?.();
+    const a=v720ActiveErasable();
+    if(!pl||!a)return false;
+
+    const rad=radiusNorm();
+    const pts=a.points||[];
+    if(pts.length<2)return false;
+
+    let touched=false;
+    for(let i=0;i<pts.length;i++){
+      if(Math.hypot(pts[i].x-p.x,pts[i].y-p.y)<=rad){touched=true;break}
+      if(i>0&&pointSegDist(p,pts[i-1],pts[i])<=rad){touched=true;break}
+    }
+    if(!touched)return false;
+
+    const chunks=split(pts,p,rad);
+    const idx=pl.annotations.findIndex(x=>x.id===a.id);
+    if(idx<0)return false;
+
+    if(!chunks.length){
+      pl.annotations.splice(idx,1);
+      selectedAnnotationId=null;
+    }else{
+      a.points=chunks[0];
+
+      /* Weitere Reststücke bleiben Teil derselben aktiven Markierung,
+         werden aber als eigene Segmente gespeichert. Sie erhalten KEINE
+         Möglichkeit, andere bestehende Markierungen zu beeinflussen. */
+      if(chunks.length>1){
+        const extras=chunks.slice(1).map(chunk=>({
+          ...JSON.parse(JSON.stringify(a)),
+          id:uid("ann"),
+          points:chunk,
+          createdAt:new Date().toISOString()
+        }));
+        pl.annotations.splice(idx+1,0,...extras);
+      }
+    }
+
+    persist?.();
+    populatePlanFilter?.();
+    renderPlanList?.();
+    renderPlanAnnotations?.();
+    renderSelectedAnnotation?.();
+    v720UpdateEraserHelp();
+    return true;
+  }
+
+  function install(){
+    const svg=document.getElementById("planOverlay");
+    if(!svg||svg.dataset.v720Eraser==="1")return;
+    svg.dataset.v720Eraser="1";
+
+    svg.addEventListener("pointerdown",ev=>{
+      if(planTool!=="eraser"||ev.button===1)return;
+
+      const active=v720ActiveErasable();
+      if(!active){
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        v720UpdateEraserHelp();
+        return;
+      }
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      erasing=true;
+      pointerId=ev.pointerId;
+      svg.setPointerCapture?.(ev.pointerId);
+      eraseOnlySelectedAt(planCoords(ev));
+    },{capture:true,passive:false});
+
+    svg.addEventListener("pointermove",ev=>{
+      if(planTool!=="eraser"||!erasing||ev.pointerId!==pointerId)return;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      eraseOnlySelectedAt(planCoords(ev));
+    },{capture:true,passive:false});
+
+    const end=ev=>{
+      if(planTool!=="eraser"||!erasing||ev.pointerId!==pointerId)return;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      erasing=false;
+      pointerId=null;
+    };
+    svg.addEventListener("pointerup",end,{capture:true,passive:false});
+    svg.addEventListener("pointercancel",end,{capture:true,passive:false});
+  }
+
+  const oldSet=window.setPlanTool;
+  if(typeof oldSet==="function"){
+    window.setPlanTool=function(tool){
+      const r=oldSet.apply(this,arguments);
+      setTimeout(v720UpdateEraserHelp,0);
+      return r;
+    };
+  }
+
+  const oldSelect=window.selectPlanAnnotation;
+  if(typeof oldSelect==="function"){
+    window.selectPlanAnnotation=function(id){
+      const r=oldSelect.apply(this,arguments);
+      setTimeout(v720UpdateEraserHelp,0);
+      return r;
+    };
+  }
+
+  const oldRenderSelected=window.renderSelectedAnnotation;
+  if(typeof oldRenderSelected==="function"){
+    window.renderSelectedAnnotation=function(){
+      const r=oldRenderSelected.apply(this,arguments);
+      v720UpdateEraserHelp();
+      return r;
+    };
+  }
+
+  const oldOpen=window.openPlan;
+  if(typeof oldOpen==="function"){
+    window.openPlan=async function(id){
+      const r=await oldOpen.apply(this,arguments);
+      install();
+      v720UpdateEraserHelp();
+      return r;
+    };
+  }
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      install();
+      v720UpdateEraserHelp();
+    },220);
+  });
+})();
 </script>
 
 </body>
