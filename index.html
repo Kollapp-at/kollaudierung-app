@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.46</title>
+<title>Kollaudierung – V7.47</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.46 <span class="v693BuildStamp">Build 7.46</span></h1>
+     <h1>Kollaudierung – V7.47 <span class="v693BuildStamp">Build 7.47</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16319,7 +16319,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.46",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.47",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26100,7 +26100,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.46";
+const KOLLAPP_VERSION="7.47";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -35646,6 +35646,199 @@ tbody tr:hover td{
       return r;
     };
   }
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.47 – RECHTE LV-LISTE AUCH BEI GRÜNEM "PLANMARKIERUNG BEARBEITEN"
+   Fester ID-Kontext, unabhängig davon ob schon eine Planmarkierung
+   ausgewählt wurde.
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  let sidebarEntryId=null;
+
+  function entryById(id){
+    return (project()?.entries||[]).find(e=>String(e.id)===String(id))||null;
+  }
+
+  function anchorEntry(e){
+    if(!e)return null;
+    try{return v612AnchorEntry?.(e)||e}catch(err){return e}
+  }
+
+  function groupEntries(e){
+    if(!e)return [];
+    try{return v612GroupEntries?.(e)||[e]}catch(err){return [e]}
+  }
+
+  function ensurePanel(){
+    let panel=$("v737SiblingLvPanel");
+    if(panel)return panel;
+
+    const side=document.querySelector(".planSide");
+    if(!side)return null;
+
+    panel=document.createElement("div");
+    panel.id="v737SiblingLvPanel";
+
+    const auto=side.querySelector(".autoPlanLinkBox");
+    if(auto)auto.insertAdjacentElement("afterend",panel);
+    else side.insertBefore(panel,side.firstChild);
+
+    return panel;
+  }
+
+  function selectedAnnotation(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+
+  function currentPos(){
+    return $("planPosSelect")?.value ||
+           $("posSelect")?.value ||
+           "";
+  }
+
+  function renderSidebar(){
+    const panel=ensurePanel();
+    if(!panel)return;
+
+    let e=entryById(sidebarEntryId);
+
+    /* Wenn kein expliziter grüner-Button-Kontext aktiv ist, nichts
+       über V7.37 drüberzeichnen. */
+    if(!e)return;
+
+    const anchor=anchorEntry(e);
+    const group=groupEntries(anchor);
+
+    if(group.length<2){
+      /* Eine einzelne LV-Pos braucht keine Seitenliste. */
+      panel.classList.remove("show");
+      panel.innerHTML="";
+      return;
+    }
+
+    const ann=selectedAnnotation();
+    const active=currentPos();
+
+    panel.classList.add("show");
+    panel.innerHTML=`
+      <div class="v737Head">
+        <div class="v737Title">LV-Unterpositionen dieser ID</div>
+        <div class="v737Count">${group.length}</div>
+      </div>
+      <div class="v737Hint">Position direkt auswählen, um Rechenansatz, Menge oder Planbezug dieser ID zu bearbeiten.</div>
+      <div class="v737List">
+        ${group.map(item=>{
+          const p=getPos?.(item.pos);
+          const txt=p?.text||"LV-Unterposition";
+          const unit=item.unit||p?.unit||"";
+          const qty=Number(item.qty||0);
+          const isCurrent=String(active||"")===String(item.pos||"");
+          const markerLinked=!!ann && (
+            String(ann.lvEntryId||"")===String(item.id) ||
+            (!ann.groupScope && String(ann.pos||"")===String(item.pos||""))
+          );
+          const isTemplate=qty===0;
+
+          return `
+            <div class="v737Item${isCurrent?" current":""}${markerLinked?" markerLinked":""}">
+              <div class="v737Top">
+                <div style="min-width:0">
+                  <div class="v737Pos">${esc(item.pos||"")}</div>
+                  <div class="v737Text">${esc(txt)}</div>
+                </div>
+                <button type="button"
+                        class="secondary v737EditBtn"
+                        onclick="v737EditLvFromPlan('${String(item.pos||"").replace(/\\/g,"\\\\").replace(/'/g,"\\'")}')">
+                  ${isCurrent?"Aktiv":"Ändern"}
+                </button>
+              </div>
+              <div class="v737Meta">
+                <span class="v737Qty">${num(qty)} ${esc(unit)}</span>
+                ${item.calc?`<span>Ansatz: ${esc(item.calc)}</span>`:""}
+                ${isTemplate?`<span class="v737Template">Vorlage</span>`:""}
+                ${markerLinked?`<span>Planmarkierung</span>`:""}
+              </div>
+            </div>`;
+        }).join("")}
+      </div>`;
+  }
+
+  /*
+    Grüner Button:
+    Vor der bestehenden Logik merken wir die Erfassungs-ID.
+    Danach kann die rechte Liste unabhängig von selectedAnnotationId
+    aufgebaut werden.
+  */
+  const baseMarkEntryOnPlan=markEntryOnPlan;
+  markEntryOnPlan=function(entryId){
+    const e=entryById(entryId);
+    const anchor=anchorEntry(e);
+    sidebarEntryId=anchor?.id || entryId || null;
+
+    const r=baseMarkEntryOnPlan.apply(this,arguments);
+
+    /*
+      openPlan/showView laufen asynchron. Mehrfach kurz nachziehen,
+      aber ohne Render-Loop.
+    */
+    setTimeout(renderSidebar,60);
+    setTimeout(renderSidebar,180);
+    return r;
+  };
+
+  /*
+    Wenn der Plan / eine Markierung neu gerendert wird, die Liste des
+    grünen Button-Kontexts wieder einsetzen, falls V7.37 sie zwischenzeitlich
+    wegen fehlender ausgewählter Markierung ausgeblendet hat.
+  */
+  const baseSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=baseSelected.apply(this,arguments);
+    if(sidebarEntryId)setTimeout(renderSidebar,0);
+    return r;
+  };
+
+  const baseOpen=openPlan;
+  openPlan=async function(id){
+    const r=await baseOpen.apply(this,arguments);
+    if(sidebarEntryId)setTimeout(renderSidebar,0);
+    return r;
+  };
+
+  /*
+    Beim gezielten Wechsel über die rechte Liste bleibt derselbe ID-Kontext
+    bestehen. Danach neu markieren, welche Position gerade aktiv ist.
+  */
+  if(typeof window.v737EditLvFromPlan==="function"){
+    const baseEdit=window.v737EditLvFromPlan;
+    window.v737EditLvFromPlan=function(pos){
+      const r=baseEdit.apply(this,arguments);
+      setTimeout(renderSidebar,80);
+      return r;
+    };
+  }
+
+  /*
+    Beim Wechsel auf ein anderes Aufmaßblatt/Projekt den alten Seitenkontext
+    nicht mitschleppen.
+  */
+  const baseSheetChanged=sheetChanged;
+  sheetChanged=function(){
+    sidebarEntryId=null;
+    return baseSheetChanged.apply(this,arguments);
+  };
+
+  const baseProjectChanged=projectChanged;
+  projectChanged=function(){
+    sidebarEntryId=null;
+    return baseProjectChanged.apply(this,arguments);
+  };
 })();
 </script>
 
