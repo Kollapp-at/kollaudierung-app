@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.17</title>
+<title>Kollaudierung – V7.18</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.17 <span class="v693BuildStamp">Build 7.17</span></h1>
+     <h1>Kollaudierung – V7.18 <span class="v693BuildStamp">Build 7.18</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.17",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.18",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.17";
+const KOLLAPP_VERSION="7.18";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -28165,168 +28165,12 @@ window.addEventListener("load",()=>{
 }
 </style>
 
-<script>
-/* ============================================================
-   V7.16 – universelles 2-Finger-Zoom + 2-Finger-Pan
-   Funktioniert unabhängig von Linie, Polylinie, Freihand usw.
-   ============================================================ */
-(function(){
-  let pinch=null;
-  let raf=0;
 
-  const $=id=>document.getElementById(id);
-
-  function dist(a,b){
-    return Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
-  }
-
-  function mid(a,b){
-    return {x:(a.clientX+b.clientX)/2, y:(a.clientY+b.clientY)/2};
-  }
-
-  function cancelOneFingerDraftsForNavigation(){
-    /* Wenn der zweite Finger dazukommt, darf eine begonnene
-       Ein-Finger-Zeichnung nicht versehentlich gespeichert werden. */
-    try{
-      freehandDraftPoints=[];
-      freehandPointerId=null;
-    }catch(e){}
-    try{
-      v516FreehandPointerId=null;
-    }catch(e){}
-    try{
-      v655TouchFreehandActive=false;
-      v655TouchFreehandIdentifier=null;
-    }catch(e){}
-    try{
-      planShapeDraft=null;
-    }catch(e){}
-    try{
-      v662ShapeTouchId=null;
-      v662ShapeMoved=false;
-    }catch(e){}
-  }
-
-  function begin(ev){
-    if(!ev.touches || ev.touches.length!==2) return;
-    if(!activePlan?.()) return;
-
-    const vp=$("planViewport");
-    const stage=$("planStage");
-    if(!vp || !stage) return;
-
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
-
-    cancelOneFingerDraftsForNavigation();
-
-    const m=mid(ev.touches[0],ev.touches[1]);
-    const vr=vp.getBoundingClientRect();
-    const cx=m.x-vr.left;
-    const cy=m.y-vr.top;
-    const z=Math.max(.12,Number(planZoom||1));
-
-    /* Plan-Koordinate unter dem Finger-Mittelpunkt merken. */
-    const contentX=vp.scrollLeft + cx - stage.offsetLeft;
-    const contentY=vp.scrollTop  + cy - stage.offsetTop;
-
-    pinch={
-      startDist:Math.max(1,dist(ev.touches[0],ev.touches[1])),
-      startZoom:z,
-      naturalX:contentX/z,
-      naturalY:contentY/z,
-      startMid:m
-    };
-
-    vp.classList.add("v716Pinching");
-  }
-
-  function move(ev){
-    if(!pinch || !ev.touches || ev.touches.length!==2) return;
-
-    const vp=$("planViewport");
-    const stage=$("planStage");
-    if(!vp || !stage) return;
-
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
-
-    const d=Math.max(1,dist(ev.touches[0],ev.touches[1]));
-    const next=Math.max(.12,Math.min(5,pinch.startZoom*(d/pinch.startDist)));
-    const m=mid(ev.touches[0],ev.touches[1]);
-    const vr=vp.getBoundingClientRect();
-    const cx=m.x-vr.left;
-    const cy=m.y-vr.top;
-
-    if(raf) cancelAnimationFrame(raf);
-    raf=requestAnimationFrame(()=>{
-      planZoom=next;
-      setPlanStageSize();
-
-      /* Der aktuelle Mittelpunkt bleibt über derselben Planstelle.
-         Gleichzeitig verschiebt ein gemeinsames Bewegen beider Finger den Plan. */
-      vp.scrollLeft=stage.offsetLeft + pinch.naturalX*planZoom - cx;
-      vp.scrollTop =stage.offsetTop  + pinch.naturalY*planZoom - cy;
-
-      raf=0;
-    });
-  }
-
-  function end(ev){
-    if(!pinch) return;
-    if(ev.touches && ev.touches.length>=2) return;
-
-    const vp=$("planViewport");
-    if(vp) vp.classList.remove("v716Pinching");
-    pinch=null;
-
-    try{scheduleSharpPdfRender?.(false);}catch(e){}
-  }
-
-  function install(){
-    const vp=$("planViewport");
-    if(!vp || vp.dataset.v716Pinch==="1") return;
-    vp.dataset.v716Pinch="1";
-
-    /* Capture ist Absicht:
-       Zwei Finger werden vor den Zeichenwerkzeugen abgefangen.
-       Ein Finger läuft weiterhin unverändert zur Werkzeuglogik durch. */
-    vp.addEventListener("touchstart",begin,{capture:true,passive:false});
-    vp.addEventListener("touchmove",move,{capture:true,passive:false});
-    vp.addEventListener("touchend",end,{capture:true,passive:true});
-    vp.addEventListener("touchcancel",end,{capture:true,passive:true});
-  }
-
-  /* Auch bei aktivem Zeichenwerkzeug muss der Browser
-     Zwei-Finger-Gesten an unsere Viewport-Logik liefern. */
-  const oldApply=window.v521ApplyTouchAction;
-  if(typeof oldApply==="function"){
-    window.v521ApplyTouchAction=function(){
-      const r=oldApply.apply(this,arguments);
-      const svg=$("planOverlay");
-      if(svg && (navigator.maxTouchPoints||0)>0){
-        /* Zeichnen mit 1 Finger bleibt in JS kontrolliert;
-           2-Finger-Navigation wird über Capture verarbeitet. */
-        svg.style.touchAction="none";
-      }
-      return r;
-    };
-  }
-
-  window.addEventListener("load",()=>setTimeout(install,220));
-
-  const oldOpen=openPlan;
-  openPlan=async function(id){
-    await oldOpen(id);
-    setTimeout(install,0);
-  };
-})();
-</script>
 
 
 <script>
 /* ============================================================
-   V7.17 – STABILER 2-FINGER-ZOOM/PAN OHNE pinch=null-FEHLER
+   V7.18 – EINZIGER STABILER 2-FINGER-ZOOM/PAN HANDLER
    ============================================================ */
 (function(){
   let gesture=null;
@@ -28450,7 +28294,7 @@ window.addEventListener("load",()=>{
 
     /*
       Offenen RAF zuerst abbrechen, dann Zustand löschen.
-      Das verhindert exakt den V7.16-Fehler pinch.naturalX auf null.
+      Das verhindert den früheren Null-Zugriff beim Ende einer Pinch-Geste.
     */
     v717CancelPendingFrame();
 
@@ -28467,9 +28311,7 @@ window.addEventListener("load",()=>{
     vp.dataset.v717Pinch="1";
 
     /*
-      V7.16-Handler sind bereits registriert.
-      V7.17 läuft zuerst im Capture und stoppt ausschließlich 2-Finger-Gesten,
-      sodass die alten Handler dafür nicht mehr ausgeführt werden.
+      Ab V7.18 ist dies der einzige zusätzliche 2-Finger-Handler.
       Ein-Finger-Zeichnen bleibt vollständig bei der bestehenden Werkzeuglogik.
     */
     vp.addEventListener("touchstart",function(ev){
@@ -28497,6 +28339,21 @@ window.addEventListener("load",()=>{
     setTimeout(v717Install,0);
   };
 })();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.18 – alte Pinch-Fehleranzeige nach Update bereinigen
+   ============================================================ */
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    document.querySelectorAll(".v663Fatal").forEach(el=>{
+      const t=(el.textContent||"");
+      if(t.includes("pinch.naturalX")) el.remove();
+    });
+  },350);
+});
 </script>
 
 </body>
