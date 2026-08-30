@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.72</title>
+<title>Kollaudierung – V7.75</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.72 <span class="v693BuildStamp">Build 7.72</span></h1>
+     <h1>Kollaudierung – V7.75 <span class="v693BuildStamp">Build 7.75</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.72",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.75",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.72";
+const KOLLAPP_VERSION="7.75";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -40371,6 +40371,207 @@ html[data-theme="dark"] #userEditorModal .v772RoleHint b{
   });
 })();
 </script>
+
+
+<style id="v773-sync-history-dark-fix">
+/* ============================================================
+   V7.73 – Rückgabe-Historie im Masterbereich
+   ============================================================ */
+html[data-theme="dark"] #view-sync .syncHistoryItem{
+  background:linear-gradient(180deg,#10283a 0%,#0d2231 100%)!important;
+  color:#dce8ef!important;
+  border:1px solid #3b5e75!important;
+  border-left:4px solid #5a9fc6!important;
+  border-radius:8px!important;
+  box-shadow:none!important;
+}
+
+html[data-theme="dark"] #view-sync .syncHistoryItem b{
+  color:#f4f8fb!important;
+}
+
+html[data-theme="dark"] #view-sync .syncHistoryItem:hover{
+  background:linear-gradient(180deg,#143247 0%,#10283a 100%)!important;
+  border-color:#4d748d!important;
+  border-left-color:#6db4db!important;
+}
+
+html[data-theme="dark"] #view-sync #syncImportHistory > .small{
+  color:#c5d6df!important;
+}
+</style>
+
+
+<style id="v774-print-text-fix">
+/* ============================================================
+   V7.74 – PDF/DRUCK: feste Druckfarben unabhängig vom Dark Mode
+   ============================================================ */
+
+/* Alle eigentlichen Druckcontainer bekommen ein eigenes helles Farbschema. */
+html[data-theme="dark"] :is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  #planPrintArea,
+  .sheetPrintBlock,
+  .finalBillingSummary
+){
+  background:#fff!important;
+  color:#111!important;
+  color-scheme:light!important;
+}
+
+/* Kein geerbtes Dark-Mode-Grau mehr in PDF/Text-Export. */
+html[data-theme="dark"] :is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  #planPrintArea,
+  .sheetPrintBlock,
+  .finalBillingSummary
+) :is(
+  div,span,p,small,label,
+  h1,h2,h3,h4,h5,h6,
+  b,strong,
+  table,thead,tbody,tfoot,tr,th,td
+){
+  color:#111!important;
+  text-shadow:none!important;
+}
+
+/* Tabellenkopf bewusst etwas dunkler als Linien, aber klar schwarz lesbar. */
+html[data-theme="dark"] :is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  #planPrintArea,
+  .sheetPrintBlock,
+  .finalBillingSummary
+) table thead th{
+  background:#eef2f4!important;
+  color:#111!important;
+  border-color:#aeb9c1!important;
+}
+
+/* Tabelleninhalt schwarz statt grau. */
+html[data-theme="dark"] :is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  #planPrintArea,
+  .sheetPrintBlock,
+  .finalBillingSummary
+) table tbody td{
+  background:#fff!important;
+  color:#111!important;
+  border-color:#c4cdd3!important;
+}
+
+/* Meta-/Kopfboxen ebenfalls mit schwarzer Druckschrift. */
+html[data-theme="dark"] :is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  #planPrintArea,
+  .sheetPrintBlock,
+  .finalBillingSummary
+) :is(
+  .metaCell,.printMeta,.sheetMetaGrid,
+  .exportBrandHeader,.companyMeta,.docSub,
+  .sheetPlanEvidence,.sheetPlanEvidenceHead,
+  .billingSummary,.billingTotalsBox
+){
+  color:#111!important;
+}
+
+/* Plan-/Anmerkungstexte und kleinere Zusatzinfos nicht mehr ausgrauen. */
+html[data-theme="dark"] :is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  #planPrintArea,
+  .sheetPrintBlock,
+  .finalBillingSummary
+) :is(
+  .small,.muted,.pm,.planFileNote,.exportFooter
+){
+  color:#333!important;
+  opacity:1!important;
+}
+
+/* Drucklinien neutral und klar. */
+html[data-theme="dark"] :is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  #planPrintArea,
+  .sheetPrintBlock,
+  .finalBillingSummary
+) :is(
+  table,th,td,.metaCell,.printMeta div,
+  .exportBrandHeader,.exportFooter
+){
+  border-color:#b8c2c9!important;
+}
+
+/* Auch beim echten Browser-Druck explizit erzwingen. */
+@media print{
+  html[data-theme="dark"] :is(
+    #sheetPrintArea,
+    #sheetMultiPrintArea,
+    #planPrintArea,
+    .sheetPrintBlock,
+    .finalBillingSummary
+  ),
+  html[data-theme="dark"] :is(
+    #sheetPrintArea,
+    #sheetMultiPrintArea,
+    #planPrintArea,
+    .sheetPrintBlock,
+    .finalBillingSummary
+  ) *{
+    color:#111!important;
+    text-shadow:none!important;
+    box-shadow:none!important;
+  }
+
+  html[data-theme="dark"] :is(
+    #sheetPrintArea,
+    #sheetMultiPrintArea,
+    #planPrintArea,
+    .sheetPrintBlock,
+    .finalBillingSummary
+  ) .small{
+    color:#333!important;
+  }
+}
+</style>
+
+
+<style id="v775-billing-option-dark-fix">
+/* ============================================================
+   V7.75 – Abrechnungsaufstellung-Checkbox im Dark Mode
+   ============================================================ */
+html[data-theme="dark"] #view-sheet .v669BillingOption{
+  background:#10283a!important;
+  color:#eef5f9!important;
+  border:1px solid #3b5e75!important;
+  border-radius:9px!important;
+  padding:9px 11px!important;
+  opacity:1!important;
+}
+
+html[data-theme="dark"] #view-sheet .v669BillingOption:hover{
+  background:#143247!important;
+  border-color:#4d748d!important;
+}
+
+html[data-theme="dark"] #view-sheet .v669BillingOption span{
+  color:#e4edf2!important;
+  opacity:1!important;
+}
+
+html[data-theme="dark"] #view-sheet .v669BillingOption input[type="checkbox"]{
+  width:16px!important;
+  height:16px!important;
+  accent-color:#55a5d5!important;
+  opacity:1!important;
+  flex:0 0 auto!important;
+}
+</style>
 
 </body>
 </html>
