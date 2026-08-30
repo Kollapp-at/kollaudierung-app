@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.25</title>
+<title>Kollaudierung – V7.26</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.25 <span class="v693BuildStamp">Build 7.25</span></h1>
+     <h1>Kollaudierung – V7.26 <span class="v693BuildStamp">Build 7.26</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.25",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.26",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.25";
+const KOLLAPP_VERSION="7.26";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -30474,6 +30474,189 @@ window.addEventListener("load",()=>{
       renderPanel();
     },300);
   });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.26 – PUNKTNUMMERN DIREKT IM PLAN
+   ============================================================ */
+#planOverlay .v726PointMarker{
+  pointer-events:none!important;
+}
+#planOverlay .v726PointDot{
+  fill:#fff;
+  stroke:#0d5e91;
+  stroke-width:2.5;
+  vector-effect:non-scaling-stroke;
+}
+#planOverlay .v726PointDot.active{
+  fill:#ffb000;
+  stroke:#7a5200;
+}
+#planOverlay .v726PointText{
+  fill:#0d4f78;
+  font-weight:700;
+  text-anchor:middle;
+  dominant-baseline:middle;
+  paint-order:stroke;
+  stroke:#fff;
+  stroke-width:3px;
+  stroke-linejoin:round;
+}
+#planOverlay .v726PointText.active{
+  fill:#7a5200;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.26 – sichtbare Nummern für Linie/Polylinie und Formecken
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  function selectedAnn(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+
+  function currentTarget(){
+    /* V7.25 editTarget ist closure-lokal. Wir lesen stattdessen
+       den aktiven Button aus dem Geometrie-Editor. */
+    const panel=$("v725GeometryEditor");
+    const btn=panel?.querySelector("button.active[data-v725-kind][data-v725-index]");
+    if(!btn)return null;
+    return {
+      kind:btn.dataset.v725Kind,
+      index:Number(btn.dataset.v725Index)
+    };
+  }
+
+  function corners(a){
+    return [
+      {x:a.x1,y:a.y1},
+      {x:a.x2,y:a.y1},
+      {x:a.x2,y:a.y2},
+      {x:a.x1,y:a.y2}
+    ];
+  }
+
+  function addMarker(svg,p,label,active){
+    const z=typeof v59MarkerScale==="function" ? v59MarkerScale() : 1;
+    const x=planPxX(p.x), y=planPxY(p.y);
+    const g=svgEl("g",{class:"v726PointMarker"});
+
+    const dot=svgEl("circle",{
+      cx:x,cy:y,r:11*z,
+      class:"v726PointDot"+(active?" active":"")
+    });
+
+    const text=svgEl("text",{
+      x:x,
+      y:y+0.5*z,
+      "font-size":11*z,
+      class:"v726PointText"+(active?" active":"")
+    });
+    text.textContent=label;
+
+    g.append(dot,text);
+    svg.appendChild(g);
+  }
+
+  function renderNumbers(){
+    const svg=$("planOverlay");
+    if(!svg)return;
+
+    svg.querySelectorAll(".v726PointMarker").forEach(n=>n.remove());
+
+    const a=selectedAnn();
+    if(!a || planTool!=="select")return;
+
+    const target=currentTarget();
+
+    if(a.type==="line" && Array.isArray(a.points)){
+      a.points.forEach((p,i)=>{
+        addMarker(
+          svg,
+          p,
+          `P${i+1}`,
+          target?.kind==="vertex" && target.index===i
+        );
+      });
+    }else if(a.type==="rect" || a.type==="circle"){
+      corners(a).forEach((p,i)=>{
+        addMarker(
+          svg,
+          p,
+          `E${i+1}`,
+          target?.kind==="corner" && target.index===i
+        );
+      });
+    }
+  }
+
+  const oldRender=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    oldRender.apply(this,arguments);
+    renderNumbers();
+  };
+
+  const oldSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=oldSelected.apply(this,arguments);
+    setTimeout(renderNumbers,0);
+    return r;
+  };
+
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    const r=oldSet.apply(this,arguments);
+    setTimeout(renderNumbers,0);
+    return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    const r=await oldOpen.apply(this,arguments);
+    renderNumbers();
+    return r;
+  };
+
+  /* Buttons im V7.25-Editor ändern ihren Active-Zustand.
+     MutationObserver aktualisiert die Nummern sofort. */
+  function watchEditor(){
+    const panel=$("v725GeometryEditor");
+    if(!panel || panel.dataset.v726Watch==="1")return;
+    panel.dataset.v726Watch="1";
+
+    const obs=new MutationObserver(()=>renderNumbers());
+    obs.observe(panel,{
+      subtree:true,
+      attributes:true,
+      attributeFilter:["class"],
+      childList:true
+    });
+  }
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      watchEditor();
+      renderNumbers();
+    },350);
+  });
+
+  const oldPanelRender=window.renderSelectedAnnotation;
+  if(typeof oldPanelRender==="function"){
+    window.renderSelectedAnnotation=function(){
+      const r=oldPanelRender.apply(this,arguments);
+      setTimeout(()=>{
+        watchEditor();
+        renderNumbers();
+      },0);
+      return r;
+    };
+  }
 })();
 </script>
 
