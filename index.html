@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.75</title>
+<title>Kollaudierung – V7.76</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7384,7 +7384,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.75 <span class="v693BuildStamp">Build 7.75</span></h1>
+     <h1>Kollaudierung – V7.76 <span class="v693BuildStamp">Build 7.76</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16337,7 +16337,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.75",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.76",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26118,7 +26118,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.75";
+const KOLLAPP_VERSION="7.76";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -40570,6 +40570,159 @@ html[data-theme="dark"] #view-sheet .v669BillingOption input[type="checkbox"]{
   accent-color:#55a5d5!important;
   opacity:1!important;
   flex:0 0 auto!important;
+}
+</style>
+
+
+<style id="v776-print-line-fix">
+/* ============================================================
+   V7.76 – PDF/DRUCK: eindeutiges Liniensystem
+   Keine überlagerten border-top / border-bottom mehr.
+   ============================================================ */
+
+/*
+  Aufmaß-Tabelle:
+  - Tabellenkopf: genau eine Abschlusslinie
+  - neue Erfassungs-ID: genau eine stärkere obere Linie
+  - weitere LV-Unterposition derselben ID: eine dünne interne Linie
+  - KEINE zusätzliche border-bottom-Linie an jeder Zelle
+*/
+:is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock,
+  .v651CaptureRoot
+) .v520EntryTable{
+  border-collapse:separate!important;
+  border-spacing:0!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+}
+
+:is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock,
+  .v651CaptureRoot
+) .v520EntryTable th{
+  border-top:0!important;
+  border-left:0!important;
+  border-right:0!important;
+  border-bottom:2px solid #9aa8b1!important;
+  box-shadow:none!important;
+}
+
+:is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock,
+  .v651CaptureRoot
+) .v520EntryTable td{
+  border-left:0!important;
+  border-right:0!important;
+  border-bottom:0!important;
+  box-shadow:none!important;
+}
+
+/* Trennung zwischen zwei Erfassungs-IDs */
+:is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock,
+  .v651CaptureRoot
+) .v520EntryTable tbody tr.v614PrintGroupStart td{
+  border-top:2px solid #aebbc3!important;
+}
+
+/* Direkt unter dem Tabellenkopf keine zweite Linie */
+:is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock,
+  .v651CaptureRoot
+) .v520EntryTable tbody tr:first-child td{
+  border-top:0!important;
+}
+
+/*
+  Unterposition innerhalb derselben ID:
+  nur über den tatsächlich neuen LV-Zellen.
+  Die rowspan-Felder ID/Beschreibung/Detail/Status/Anmerkung
+  erhalten dadurch keine optisch durchgeschnittene Linie.
+*/
+:is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock,
+  .v651CaptureRoot
+) .v520EntryTable tbody tr.v614PrintSub td{
+  border-top:1px solid #d3dbe0!important;
+}
+
+/* Letzte Zeile der Tabelle sauber abschließen */
+:is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock,
+  .v651CaptureRoot
+) .v520EntryTable tbody tr:last-child td{
+  border-bottom:1px solid #b7c2c9!important;
+}
+
+/* Kein Zebra-/Dark-Theme-Effekt im PDF */
+html[data-theme="dark"] :is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock
+) .v520EntryTable tbody td{
+  background:#fff!important;
+  color:#111!important;
+}
+
+/* Abrechnungstabellen ebenfalls ohne kollidierende doppelte Linien */
+:is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock,
+  .v651CaptureRoot
+) .v520BillingTable{
+  border-collapse:separate!important;
+  border-spacing:0!important;
+  border:0!important;
+}
+
+:is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock,
+  .v651CaptureRoot
+) .v520BillingTable th{
+  border-left:0!important;
+  border-right:0!important;
+  border-top:0!important;
+  border-bottom:2px solid #9aa8b1!important;
+}
+
+:is(
+  #sheetPrintArea,
+  #sheetMultiPrintArea,
+  .sheetPrintBlock,
+  .v651CaptureRoot
+) .v520BillingTable td{
+  border-left:0!important;
+  border-right:0!important;
+  border-top:0!important;
+  border-bottom:1px solid #d1d9de!important;
+}
+
+/* allgemeine Print-Zeilen nicht mit Bildschirm-CSS überschreiben */
+@media print{
+  :is(#sheetPrintArea,#sheetMultiPrintArea,.sheetPrintBlock) .v520EntryTable,
+  :is(#sheetPrintArea,#sheetMultiPrintArea,.sheetPrintBlock) .v520BillingTable{
+    box-shadow:none!important;
+    outline:0!important;
+  }
 }
 </style>
 
