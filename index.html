@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.33</title>
+<title>Kollaudierung – V7.34</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.33 <span class="v693BuildStamp">Build 7.33</span></h1>
+     <h1>Kollaudierung – V7.34 <span class="v693BuildStamp">Build 7.34</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.33",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.34",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.33";
+const KOLLAPP_VERSION="7.34";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -32099,18 +32099,19 @@ window.addEventListener("load",()=>{
 
 <style>
 /* ============================================================
-   V7.33 – PERSISTENTE GELBE GEOMETRIE-MARKIERUNG
+   V7.34 – STABILE GELBE PUNKT-HERVORHEBUNG
+   Kein MutationObserver / keine Render-Schleife.
    ============================================================ */
-#planOverlay .v733GeomActive{
+#planOverlay .v734ActivePoint{
   pointer-events:none!important;
 }
-#planOverlay .v733GeomActive circle{
+#planOverlay .v734ActivePoint circle{
   fill:#ffb000!important;
   stroke:#7a5200!important;
-  stroke-width:3.5!important;
+  stroke-width:3.3!important;
   vector-effect:non-scaling-stroke!important;
 }
-#planOverlay .v733GeomActive text{
+#planOverlay .v734ActivePoint text{
   fill:#7a5200!important;
   font-weight:800!important;
   text-anchor:middle!important;
@@ -32124,14 +32125,14 @@ window.addEventListener("load",()=>{
 
 <script>
 /* ============================================================
-   V7.33 – eigener globaler Bearbeitungszustand
-   unabhängig von Legacy-/Closure-Zuständen.
+   V7.34 – stabile Geometriebearbeitung + persistente Hervorhebung
+   Basis: V7.32. Kein Observer. Kein rekursives Rendern.
    ============================================================ */
 (function(){
   const $=id=>document.getElementById(id);
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
-  window.__v733GeomTarget = null;
+  let target=null; // {annId, kind:"vertex"|"corner", index}
 
   function selectedAnn(){
     return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
@@ -32150,154 +32151,109 @@ window.addEventListener("load",()=>{
     ];
   }
 
-  function targetPoint(a,t){
-    if(!a||!t)return null;
-    if(t.kind==="vertex" && a.type==="line"){
-      return a.points?.[t.index]||null;
+  function targetPoint(a){
+    if(!a || !target || a.id!==target.annId)return null;
+    if(target.kind==="vertex" && a.type==="line"){
+      return a.points?.[target.index]||null;
     }
-    if(t.kind==="corner" && (a.type==="rect"||a.type==="circle")){
-      return corners(a)[t.index]||null;
+    if(target.kind==="corner" && (a.type==="rect" || a.type==="circle")){
+      return corners(a)[target.index]||null;
     }
     return null;
   }
 
-  function drawPersistentHighlight(){
+  function drawHighlight(){
     const svg=$("planOverlay");
     if(!svg)return;
 
-    svg.querySelectorAll(".v733GeomActive").forEach(n=>n.remove());
+    svg.querySelectorAll(".v734ActivePoint").forEach(n=>n.remove());
 
-    const t=window.__v733GeomTarget;
     const a=selectedAnn();
-    if(!t || !a || a.id!==t.annId || planTool!=="select")return;
-
-    const p=targetPoint(a,t);
-    if(!p)return;
+    const p=targetPoint(a);
+    if(!a || !p || planTool!=="select")return;
 
     const z=typeof v59MarkerScale==="function" ? v59MarkerScale() : 1;
     const x=planPxX(p.x), y=planPxY(p.y);
-    const g=svgEl("g",{class:"v733GeomActive"});
 
+    const g=svgEl("g",{class:"v734ActivePoint"});
     const c=svgEl("circle",{cx:x,cy:y,r:14*z});
     const tx=svgEl("text",{
-      x:x,
-      y:y+0.5*z,
+      x:x,y:y+0.5*z,
       "font-size":12*z
     });
-    tx.textContent=(t.kind==="vertex"?"P":"E")+(t.index+1);
+    tx.textContent=(target.kind==="vertex"?"P":"E")+(target.index+1);
 
     g.append(c,tx);
     svg.appendChild(g);
   }
 
-  function queueHighlight(){
-    requestAnimationFrame(()=>{
-      drawPersistentHighlight();
-      /* Einige alte Renderer laufen noch über setTimeout(0).
-         Deshalb ein zweiter finaler Draw NACH diesen Jobs. */
-      setTimeout(drawPersistentHighlight,0);
-      setTimeout(drawPersistentHighlight,25);
-    });
-  }
-
-  function syncBarVisual(){
+  function refreshBarVisual(){
     const bar=$("v731GeometryBar");
     if(!bar)return;
 
-    const t=window.__v733GeomTarget;
     const a=selectedAnn();
 
     [...bar.querySelectorAll("button")].forEach(btn=>{
       const m=(btn.textContent||"").trim().match(/^([PE])(\d+)$/i);
-      if(!m){btn.classList.remove("active");return}
-      const kind=m[1].toUpperCase()==="P"?"vertex":"corner";
-      const idx=Number(m[2])-1;
-      const on=!!t && !!a && t.annId===a.id && t.kind===kind && t.index===idx;
-      btn.classList.toggle("active",on);
-    });
+      if(!m)return;
 
-    bar.classList.toggle("waiting",!!t && !!a && t.annId===a.id);
+      const kind=m[1].toUpperCase()==="P" ? "vertex" : "corner";
+      const idx=Number(m[2])-1;
+      const active=!!target && !!a &&
+        target.annId===a.id &&
+        target.kind===kind &&
+        target.index===idx;
+
+      btn.classList.toggle("active",active);
+    });
 
     const hint=bar.querySelector(".v731Hint");
     if(hint){
-      hint.textContent=(t && a && t.annId===a.id)
+      hint.textContent=(target && a && target.annId===a.id)
         ? "→ jetzt neue Position im Plan tippen"
         : "Punkt wählen → neue Position im Plan tippen";
     }
   }
 
-  function captureBarButtons(){
-    const bar=$("v731GeometryBar");
-    if(!bar || bar.dataset.v733Capture==="1")return;
-    bar.dataset.v733Capture="1";
+  function chooseFromButton(btn){
+    const a=selectedAnn();
+    if(!a || !editable(a))return false;
 
-    /*
-      Capture direkt auf der sichtbaren Leiste:
-      Wir setzen unseren globalen Zustand, bevor V7.31 seinen
-      closure-lokalen Zustand bearbeitet.
-    */
-    bar.addEventListener("pointerdown",ev=>{
-      const btn=ev.target.closest?.("button");
-      if(!btn || !bar.contains(btn))return;
+    const m=(btn.textContent||"").trim().match(/^([PE])(\d+)$/i);
+    if(!m)return false;
 
-      const m=(btn.textContent||"").trim().match(/^([PE])(\d+)$/i);
-      if(!m)return;
+    target={
+      annId:a.id,
+      kind:m[1].toUpperCase()==="P" ? "vertex" : "corner",
+      index:Number(m[2])-1
+    };
 
-      const a=selectedAnn();
-      if(!a || !editable(a))return;
-
-      window.__v733GeomTarget={
-        annId:a.id,
-        kind:m[1].toUpperCase()==="P"?"vertex":"corner",
-        index:Number(m[2])-1
-      };
-
-      syncBarVisual();
-      queueHighlight();
-    },{capture:true,passive:true});
-
-    bar.addEventListener("touchstart",ev=>{
-      const btn=ev.target.closest?.("button");
-      if(!btn || !bar.contains(btn))return;
-
-      const m=(btn.textContent||"").trim().match(/^([PE])(\d+)$/i);
-      if(!m)return;
-
-      const a=selectedAnn();
-      if(!a || !editable(a))return;
-
-      window.__v733GeomTarget={
-        annId:a.id,
-        kind:m[1].toUpperCase()==="P"?"vertex":"corner",
-        index:Number(m[2])-1
-      };
-
-      syncBarVisual();
-      queueHighlight();
-    },{capture:true,passive:true});
+    refreshBarVisual();
+    drawHighlight();
+    return true;
   }
 
-  function applyGlobalTargetAt(pt){
-    const t=window.__v733GeomTarget;
-    if(!t)return false;
+  function applyAt(pt){
+    if(!target)return false;
 
     const pl=activePlan?.();
-    const a=pl?.annotations?.find(x=>x.id===t.annId);
+    const a=pl?.annotations?.find(x=>x.id===target.annId);
     if(!a || !editable(a)){
-      window.__v733GeomTarget=null;
-      syncBarVisual();
-      queueHighlight();
+      target=null;
+      refreshBarVisual();
+      drawHighlight();
       return false;
     }
 
     pt={x:clamp(pt.x,0,1000),y:clamp(pt.y,0,1000)};
 
-    if(t.kind==="vertex" && a.type==="line"){
-      if(!Array.isArray(a.points) || !a.points[t.index])return false;
-      a.points[t.index]={x:pt.x,y:pt.y};
-    }else if(t.kind==="corner" && (a.type==="rect"||a.type==="circle")){
+    if(target.kind==="vertex" && a.type==="line"){
+      if(!Array.isArray(a.points) || !a.points[target.index])return false;
+      a.points[target.index]={x:pt.x,y:pt.y};
+
+    }else if(target.kind==="corner" && (a.type==="rect" || a.type==="circle")){
       const cs=corners(a);
-      const opposite=cs[(t.index+2)%4];
+      const opposite=cs[(target.index+2)%4];
 
       if(a.type==="rect"){
         const b=normalizeRectBounds(opposite,pt);
@@ -32310,7 +32266,7 @@ window.addEventListener("load",()=>{
       return false;
     }
 
-    window.__v733GeomTarget=null;
+    target=null;
 
     try{
       if(typeof currentAccess==="function" && currentAccess().mode==="worker"){
@@ -32321,128 +32277,143 @@ window.addEventListener("load",()=>{
     persist?.();
     renderPlanAnnotations?.();
     renderSelectedAnnotation?.();
-    syncBarVisual();
-    queueHighlight();
+    refreshBarVisual();
+    drawHighlight();
     return true;
   }
 
   function insidePlan(ev){
     const vp=$("planViewport");
     if(!vp)return false;
+
     if(ev.target && vp.contains(ev.target))return true;
 
     if(typeof ev.clientX==="number" && typeof ev.clientY==="number"){
       const r=vp.getBoundingClientRect();
       return ev.clientX>=r.left && ev.clientX<=r.right &&
-             ev.clientY>=r.top  && ev.clientY<=r.bottom;
+             ev.clientY>=r.top && ev.clientY<=r.bottom;
     }
     return false;
   }
 
-  function installPlanCapture(){
-    if(window.__v733PlanCapture)return;
-    window.__v733PlanCapture=true;
+  function install(){
+    if(window.__v734Installed)return;
+    window.__v734Installed=true;
 
     /*
-      Noch vor V7.31: Wenn unser globaler Punkt aktiv ist,
-      erledigen wir die Zielsetzung selbst und stoppen die alte Kette.
+      1) Button-Auswahl:
+      capture auf document, damit wir den Zustand sicher setzen.
+      Kein renderPlanAnnotations() hier -> keine Render-Schleife.
+    */
+    document.addEventListener("pointerdown",ev=>{
+      const bar=$("v731GeometryBar");
+      if(!bar || !bar.contains(ev.target))return;
+
+      const btn=ev.target.closest?.("button");
+      if(!btn)return;
+
+      chooseFromButton(btn);
+    },{capture:true,passive:true});
+
+    document.addEventListener("touchstart",ev=>{
+      const bar=$("v731GeometryBar");
+      if(!bar || !bar.contains(ev.target))return;
+
+      const btn=ev.target.closest?.("button");
+      if(!btn)return;
+
+      chooseFromButton(btn);
+    },{capture:true,passive:true});
+
+    /*
+      2) Zielpunkt:
+      unser Capture-Handler setzt die Geometrie und stoppt danach
+      die älteren V7.31/V7.32-Handler für diesen einzelnen Tipp.
     */
     window.addEventListener("pointerdown",ev=>{
-      if(!window.__v733GeomTarget || planTool!=="select")return;
+      if(!target || planTool!=="select")return;
       if(!insidePlan(ev))return;
       if(ev.pointerType==="mouse" && ev.button!==0)return;
 
       ev.preventDefault();
       ev.stopImmediatePropagation();
-      applyGlobalTargetAt(planCoords(ev));
+      applyAt(planCoords(ev));
     },{capture:true,passive:false});
 
     window.addEventListener("touchstart",ev=>{
-      if(!window.__v733GeomTarget || planTool!=="select" || ev.touches?.length!==1)return;
+      if(!target || planTool!=="select" || ev.touches?.length!==1)return;
+
       const t=ev.touches[0];
       const fake={clientX:t.clientX,clientY:t.clientY,target:ev.target};
       if(!insidePlan(fake))return;
 
       ev.preventDefault();
       ev.stopImmediatePropagation();
-      applyGlobalTargetAt(planCoords(t));
+      applyAt(planCoords(t));
     },{capture:true,passive:false});
   }
 
-  function watchBar(){
-    const bar=$("v731GeometryBar");
-    if(!bar || bar.dataset.v733Watch==="1")return;
-    bar.dataset.v733Watch="1";
-    const obs=new MutationObserver(()=>{
-      captureBarButtons();
-      syncBarVisual();
-      queueHighlight();
-    });
-    obs.observe(bar,{subtree:true,childList:true,attributes:true,attributeFilter:["class"]});
-  }
-
   /*
-    Finaler Renderer: nach JEDEM renderPlanAnnotations persistent gelb.
-    Selbst wenn V7.26/V7.32 später umzeichnen, die setTimeout-Finaldraws
-    setzen unseren aktiven Punkt wieder ganz oben drauf.
+    Nach normalen Plan-Rendern nur EINMAL gelb nachzeichnen.
+    Kein Observer, kein setTimeout-Loop, kein erneutes renderPlanAnnotations.
   */
   const oldRender=renderPlanAnnotations;
   renderPlanAnnotations=function(){
     const r=oldRender.apply(this,arguments);
-    queueHighlight();
+    requestAnimationFrame(drawHighlight);
     return r;
   };
 
   const oldSelected=renderSelectedAnnotation;
   renderSelectedAnnotation=function(){
     const r=oldSelected.apply(this,arguments);
-    setTimeout(()=>{
-      captureBarButtons();
-      watchBar();
-      syncBarVisual();
-      queueHighlight();
-    },0);
+    requestAnimationFrame(()=>{
+      refreshBarVisual();
+      drawHighlight();
+    });
     return r;
   };
 
   const oldSet=setPlanTool;
   setPlanTool=function(tool){
-    if(tool!=="select")window.__v733GeomTarget=null;
+    if(tool!=="select")target=null;
     const r=oldSet.apply(this,arguments);
-    syncBarVisual();
-    queueHighlight();
+    requestAnimationFrame(()=>{
+      refreshBarVisual();
+      drawHighlight();
+    });
     return r;
   };
 
   const oldSelect=selectPlanAnnotation;
   selectPlanAnnotation=function(id){
-    if(window.__v733GeomTarget?.annId!==id)window.__v733GeomTarget=null;
+    if(target?.annId!==id)target=null;
     const r=oldSelect.apply(this,arguments);
-    syncBarVisual();
-    queueHighlight();
+    requestAnimationFrame(()=>{
+      refreshBarVisual();
+      drawHighlight();
+    });
     return r;
   };
 
   const oldOpen=openPlan;
   openPlan=async function(id){
-    window.__v733GeomTarget=null;
+    target=null;
     const r=await oldOpen.apply(this,arguments);
-    installPlanCapture();
-    captureBarButtons();
-    watchBar();
-    syncBarVisual();
-    queueHighlight();
+    install();
+    requestAnimationFrame(()=>{
+      refreshBarVisual();
+      drawHighlight();
+    });
     return r;
   };
 
   window.addEventListener("load",()=>{
     setTimeout(()=>{
-      installPlanCapture();
-      captureBarButtons();
-      watchBar();
-      syncBarVisual();
-      queueHighlight();
-    },700);
+      install();
+      refreshBarVisual();
+      drawHighlight();
+    },600);
   });
 })();
 </script>
