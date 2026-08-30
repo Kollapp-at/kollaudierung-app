@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.01</title>
+<title>Kollaudierung – V7.02</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -6538,6 +6538,142 @@ main > section.view,
   gap:9px!important;
 }
 
+
+/* ============================================================
+   V7.02 – Auswahlbereich neu angeordnet / Liste lesbarer
+   ============================================================ */
+@media (min-width: 1101px){
+  #view-entry .v666EntryGrid{
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+    gap: 18px !important;
+    align-items: stretch !important;
+  }
+  #view-entry .v666EntryGrid > .card{
+    height: 100% !important;
+  }
+}
+
+#view-entry .v666LvSection,
+#view-entry .v666MeasureSection{
+  display:flex !important;
+  flex-direction:column !important;
+}
+
+#view-entry #mobilePosPicker{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:12px !important;
+  margin-top:8px !important;
+}
+
+#view-entry #posInfo{
+  order:1 !important;
+  margin:0 !important;
+  padding:14px 16px !important;
+  background:linear-gradient(180deg,#f7fbfe 0%, #eef6fb 100%) !important;
+  border:1px solid #d5e4ef !important;
+  border-left:4px solid #2f739b !important;
+  border-radius:14px !important;
+  min-height:96px !important;
+  box-shadow:none !important;
+}
+
+#view-entry #posInfo .strong{
+  font-size:18px !important;
+  line-height:1.35 !important;
+}
+
+#view-entry #posInfo .small{
+  font-size:13px !important;
+  line-height:1.45 !important;
+}
+
+#view-entry #mobilePosResults{
+  order:2 !important;
+}
+
+#view-entry .mobilePosPickerHead{
+  order:3 !important;
+  margin:0 !important;
+  padding:9px 12px !important;
+  background:#f5f8fb !important;
+  border:1px solid #dfe8ef !important;
+  border-radius:12px !important;
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  gap:12px !important;
+}
+
+#view-entry .mobilePosPickerHead span{
+  font-size:12.5px !important;
+  line-height:1.35 !important;
+  color:#486274 !important;
+  font-weight:700 !important;
+}
+
+#view-entry .mobilePosPickerHead button{
+  min-height:34px !important;
+  padding:6px 10px !important;
+  white-space:nowrap !important;
+}
+
+#view-entry .mobilePosResults{
+  gap:12px !important;
+  padding:8px 6px 10px 4px !important;
+  border:1px solid #dfe7ee !important;
+  border-radius:14px !important;
+  background:#fbfdff !important;
+}
+
+#view-entry .mobilePosResult,
+#view-entry .mobilePosResult.selected{
+  min-height:84px !important;
+  padding:14px 16px !important;
+  border-radius:14px !important;
+}
+
+#view-entry .mobilePosResult .mprCode{
+  font-size:15px !important;
+  line-height:1.2 !important;
+  font-weight:800 !important;
+  margin:0 0 6px !important;
+}
+
+#view-entry .mobilePosResult .mprText{
+  font-size:13.5px !important;
+  line-height:1.45 !important;
+  margin:0 !important;
+}
+
+#view-entry .mobilePosResult .mprMeta{
+  font-size:12.5px !important;
+  line-height:1.4 !important;
+  margin-top:9px !important;
+  padding-top:7px !important;
+}
+
+#view-entry .mobilePosResult.selected::after{
+  top:12px !important;
+  right:12px !important;
+}
+
+#view-entry #lineDesc{
+  min-height:118px !important;
+}
+
+@media (max-width: 1100px){
+  #view-entry #posInfo .strong{
+    font-size:16px !important;
+  }
+  #view-entry .mobilePosResult .mprCode{
+    font-size:14px !important;
+  }
+  #view-entry .mobilePosResult .mprText{
+    font-size:13px !important;
+  }
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -6568,7 +6704,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.01 <span class="v693BuildStamp">Build 7.01</span></h1>
+     <h1>Kollaudierung – V7.02 <span class="v693BuildStamp">Build 7.02</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -15505,7 +15641,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.01",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.02",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -25286,7 +25422,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.01";
+const KOLLAPP_VERSION="7.02";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -25560,6 +25696,71 @@ window.addEventListener("load",()=>{
     }
   },140);
 });
+</script>
+
+
+<script>
+(function(){
+  function v702SwapSelectionFields(){
+    const picker = document.getElementById("mobilePosPicker");
+    const results = document.getElementById("mobilePosResults");
+    const head = picker ? picker.querySelector(".mobilePosPickerHead") : null;
+    const posInfo = document.getElementById("posInfo");
+    if(!picker || !results || !head || !posInfo) return;
+
+    if(posInfo.parentElement !== picker || posInfo.nextElementSibling !== results){
+      picker.insertBefore(posInfo, results);
+    }
+    if(head.parentElement !== picker || head.previousElementSibling !== results){
+      picker.appendChild(head);
+    }
+  }
+
+  function v702EqualizeEntryCards(){
+    const left = document.querySelector("#view-entry .v666LvSection");
+    const right = document.querySelector("#view-entry .v666MeasureSection");
+    if(!left || !right) return;
+    left.style.minHeight = "";
+    right.style.minHeight = "";
+    if(window.innerWidth < 1101) return;
+    const h = Math.max(left.offsetHeight, right.offsetHeight);
+    left.style.minHeight = h + "px";
+    right.style.minHeight = h + "px";
+  }
+
+  function v702ApplyLayoutTweaks(){
+    v702SwapSelectionFields();
+    v702EqualizeEntryCards();
+  }
+
+  const oldShowPosInfo = window.showPosInfo;
+  if(typeof oldShowPosInfo === "function"){
+    window.showPosInfo = function(){
+      const r = oldShowPosInfo.apply(this, arguments);
+      requestAnimationFrame(v702ApplyLayoutTweaks);
+      return r;
+    };
+  }
+
+  const oldRenderMobilePositionResults = window.renderMobilePositionResults;
+  if(typeof oldRenderMobilePositionResults === "function"){
+    window.renderMobilePositionResults = function(){
+      const r = oldRenderMobilePositionResults.apply(this, arguments);
+      requestAnimationFrame(v702ApplyLayoutTweaks);
+      return r;
+    };
+  }
+
+  window.addEventListener("load", function(){
+    v702ApplyLayoutTweaks();
+    setTimeout(v702ApplyLayoutTweaks, 120);
+    setTimeout(v702ApplyLayoutTweaks, 500);
+  });
+
+  window.addEventListener("resize", function(){
+    v702EqualizeEntryCards();
+  });
+})();
 </script>
 
 </body>
