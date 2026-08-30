@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kollaudierung – V7.22</title>
+<title>Kollaudierung – V7.24</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -7372,7 +7372,7 @@ main > section.view,
     </div>
     <div class="headerTextBlock">
      <div class="headerEyebrow">Kollapp © Mst. Dominic Höfler</div>
-     <h1>Kollaudierung – V7.22 <span class="v693BuildStamp">Build 7.22</span></h1>
+     <h1>Kollaudierung – V7.24 <span class="v693BuildStamp">Build 7.24</span></h1>
      <div class="sub">Digitales Aufmaß · Offline-Monteurworkflow · Benutzerrechte · sicherer Master-Import</div>
     </div>
    </div>
@@ -16310,7 +16310,7 @@ async function registerKollaudierungPwa(){
   if(!("serviceWorker" in navigator))return;
   if(location.protocol!=="https:" && location.hostname!=="localhost" && location.hostname!=="127.0.0.1")return;
   try{
-    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.22",{scope:"./",updateViaCache:"none"});
+    const reg=await navigator.serviceWorker.register("./service-worker.js?v=7.24",{scope:"./",updateViaCache:"none"});
     reg.update().catch(()=>{});
   }catch(e){
     console.warn("Service Worker konnte nicht registriert werden",e);
@@ -26091,7 +26091,7 @@ function scrollToEntryTop(){
 /* ============================================================
    V6.94 – EINFACHE AUTOMATISCHE APP-AKTUALISIERUNG
    ============================================================ */
-const KOLLAPP_VERSION="7.22";
+const KOLLAPP_VERSION="7.24";
 let v694UpdateInProgress=false;
 
 async function v694CheckForUpdate(){
@@ -29478,6 +29478,660 @@ window.addEventListener("load",()=>{
       renderV722Handles();
     },300);
   });
+})();
+</script>
+
+
+<style>
+/* ============================================================
+   V7.23 – ROBUSTE KNOTENBEARBEITUNG: GRIFF WÄHLEN → ZIEL TIPPEN
+   ============================================================ */
+
+#planOverlay .v723EditHandle{
+  pointer-events:auto!important;
+  touch-action:none!important;
+  cursor:pointer!important;
+  fill:#fff!important;
+  stroke:#0d5e91!important;
+  stroke-width:3!important;
+  vector-effect:non-scaling-stroke!important;
+}
+
+#planOverlay .v723EditHandle.active{
+  fill:#ffb000!important;
+  stroke:#7a5200!important;
+  stroke-width:3.5!important;
+}
+
+#planOverlay .v723EditHit{
+  pointer-events:auto!important;
+  touch-action:none!important;
+  cursor:pointer!important;
+  fill:transparent!important;
+  stroke:transparent!important;
+}
+
+.v723EditHelp{
+  display:none;
+  margin-top:7px;
+  padding:9px 11px;
+  border-radius:9px;
+  border:1px solid #c9ddea;
+  background:#eef6fb;
+  color:#315d77;
+  font-size:11.5px;
+  line-height:1.4;
+}
+.v723EditHelp.show{
+  display:block;
+}
+.v723EditHelp.waiting{
+  border-color:#e6c66a;
+  background:#fff8df;
+  color:#765a08;
+}
+</style>
+
+<script>
+/* ============================================================
+   V7.23 – Tap-to-place für Linienknoten / Formecken
+   ============================================================ */
+(function(){
+  const $=id=>document.getElementById(id);
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  let pending=null; // {annId,kind,index}
+  let ignoreNextCanvasClickUntil=0;
+
+  function selected(){
+    return activePlan?.()?.annotations?.find(a=>a.id===selectedAnnotationId)||null;
+  }
+
+  function norm(p){
+    return {x:clamp(p.x,0,1000), y:clamp(p.y,0,1000)};
+  }
+
+  function corners(a){
+    return [
+      {x:a.x1,y:a.y1},
+      {x:a.x2,y:a.y1},
+      {x:a.x2,y:a.y2},
+      {x:a.x1,y:a.y2}
+    ];
+  }
+
+  function ensureHelp(){
+    const box=$("selectedAnnBox");
+    if(!box)return null;
+    let help=box.querySelector(".v723EditHelp");
+    if(!help){
+      help=document.createElement("div");
+      help.className="v723EditHelp";
+      box.appendChild(help);
+    }
+    return help;
+  }
+
+  function updateHelp(){
+    const help=ensureHelp();
+    if(!help)return;
+
+    const a=selected();
+    const editable=a && planTool==="select" &&
+      (a.type==="line" || a.type==="rect" || a.type==="circle");
+
+    if(!editable){
+      help.classList.remove("show","waiting");
+      pending=null;
+      return;
+    }
+
+    help.classList.add("show");
+    if(pending && pending.annId===a.id){
+      help.classList.add("waiting");
+      help.innerHTML="<b>Griff ausgewählt.</b> Jetzt die gewünschte neue Position direkt im Plan antippen oder anklicken.";
+    }else{
+      help.classList.remove("waiting");
+      help.innerHTML=a.type==="line"
+        ? "<b>Linie / Polylinie bearbeiten:</b> Einen weißen Punkt antippen und danach die neue Position im Plan antippen. Der blaue Griff verschiebt weiterhin die ganze Markierung."
+        : "<b>Form bearbeiten:</b> Einen weißen Eckpunkt antippen und danach die neue Position im Plan antippen. Der blaue Griff verschiebt weiterhin die ganze Form.";
+    }
+  }
+
+  function applyPendingAt(pt){
+    if(!pending)return false;
+
+    const pl=activePlan?.();
+    const a=pl?.annotations?.find(x=>x.id===pending.annId);
+    if(!a){
+      pending=null;
+      updateHelp();
+      return false;
+    }
+
+    pt=norm(pt);
+
+    if(pending.kind==="vertex" && a.type==="line" && Array.isArray(a.points)){
+      if(pending.index<0 || pending.index>=a.points.length)return false;
+      a.points[pending.index]=pt;
+    }else if(pending.kind==="corner" && (a.type==="rect"||a.type==="circle")){
+      const cs=corners(a);
+      const opposite=cs[(pending.index+2)%4];
+
+      if(a.type==="rect"){
+        const b=normalizeRectBounds(opposite,pt);
+        a.x1=b.x1;a.y1=b.y1;a.x2=b.x2;a.y2=b.y2;
+      }else{
+        const b=normalizeCircleBounds(opposite,pt);
+        a.x1=b.x1;a.y1=b.y1;a.x2=b.x2;a.y2=b.y2;
+      }
+    }else{
+      return false;
+    }
+
+    pending=null;
+    persist?.();
+
+    try{
+      if(typeof currentAccess==="function" && currentAccess().mode==="worker"){
+        markAnnotationSyncDirty?.(a,true);
+        persist?.();
+      }
+    }catch(e){}
+
+    renderPlanAnnotations?.();
+    renderSelectedAnnotation?.();
+    updateHelp();
+    return true;
+  }
+
+  function chooseHandle(ev,a,kind,index){
+    if(planTool!=="select")return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    pending={annId:a.id,kind,index};
+    ignoreNextCanvasClickUntil=Date.now()+350;
+
+    renderV723Handles();
+    updateHelp();
+  }
+
+  function addHandle(svg,a,p,kind,index){
+    const coarse=(navigator.maxTouchPoints||0)>0 ||
+      window.matchMedia?.("(pointer:coarse)")?.matches;
+
+    const hitR=coarse?28:18;
+    const visR=coarse?11:8;
+
+    const common={
+      cx:planPxX(p.x),
+      cy:planPxY(p.y),
+      "data-v723-kind":kind,
+      "data-v723-index":String(index)
+    };
+
+    const hit=svgEl("circle",{...common,r:hitR,class:"v723EditHit"});
+    const vis=svgEl("circle",{
+      ...common,
+      r:visR,
+      class:"v723EditHandle"+(
+        pending &&
+        pending.annId===a.id &&
+        pending.kind===kind &&
+        pending.index===index ? " active" : ""
+      )
+    });
+
+    const pick=ev=>chooseHandle(ev,a,kind,index);
+
+    /* Pointer für Maus/Pencil, click als zusätzliche Fallback-Ebene */
+    hit.addEventListener("pointerdown",pick,{passive:false});
+    vis.addEventListener("pointerdown",pick,{passive:false});
+
+    hit.addEventListener("click",pick,{passive:false});
+    vis.addEventListener("click",pick,{passive:false});
+
+    /* Touch-Fallback für Safari */
+    const touchPick=ev=>{
+      if(ev.touches?.length!==1)return;
+      chooseHandle(ev,a,kind,index);
+    };
+    hit.addEventListener("touchstart",touchPick,{passive:false});
+    vis.addEventListener("touchstart",touchPick,{passive:false});
+
+    svg.append(hit,vis);
+  }
+
+  function renderV723Handles(){
+    const svg=$("planOverlay");
+    if(!svg)return;
+
+    svg.querySelectorAll(".v723EditHit,.v723EditHandle").forEach(n=>n.remove());
+
+    const a=selected();
+    if(!a || planTool!=="select")return;
+
+    if(a.type==="line" && Array.isArray(a.points)){
+      a.points.forEach((p,i)=>addHandle(svg,a,p,"vertex",i));
+    }else if(a.type==="rect" || a.type==="circle"){
+      corners(a).forEach((p,i)=>addHandle(svg,a,p,"corner",i));
+    }
+  }
+
+  function installCanvasPlacement(){
+    const svg=$("planOverlay");
+    if(!svg || svg.dataset.v723Placement==="1")return;
+    svg.dataset.v723Placement="1";
+
+    function placeFromEvent(ev){
+      if(!pending || planTool!=="select")return;
+      if(Date.now()<ignoreNextCanvasClickUntil)return;
+
+      /* Nicht auf einem Griff selbst platzieren. */
+      if(ev.target?.classList?.contains("v723EditHandle") ||
+         ev.target?.classList?.contains("v723EditHit"))return;
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      applyPendingAt(planCoords(ev));
+    }
+
+    /* Pointerup ist auf Tablet/Pencil zuverlässiger als click. */
+    svg.addEventListener("pointerup",placeFromEvent,{capture:true,passive:false});
+
+    /* Maus-Fallback */
+    svg.addEventListener("click",placeFromEvent,{capture:true,passive:false});
+
+    /* Safari Touch-Fallback */
+    svg.addEventListener("touchend",ev=>{
+      if(!pending || planTool!=="select")return;
+      if(Date.now()<ignoreNextCanvasClickUntil)return;
+      if(ev.changedTouches?.length!==1)return;
+
+      const t=ev.changedTouches[0];
+      const fake={clientX:t.clientX,clientY:t.clientY,target:ev.target,
+                  preventDefault:()=>ev.preventDefault(),
+                  stopImmediatePropagation:()=>ev.stopImmediatePropagation()};
+      placeFromEvent(fake);
+    },{capture:true,passive:false});
+  }
+
+  /* Die alten weißen Edit-Griffe aus V7.19-22 ausblenden.
+     Der funktionierende blaue Verschiebegriff bleibt bestehen. */
+  function removeOldWhiteHandles(){
+    const svg=$("planOverlay");
+    if(!svg)return;
+    svg.querySelectorAll(".v722Hit,.v722VertexHandle,.v721HandleHit").forEach(n=>n.remove());
+
+    svg.querySelectorAll(".planEditHandle:not(.move)").forEach(n=>{
+      if(!n.classList.contains("v723EditHandle"))n.remove();
+    });
+  }
+
+  const oldRender=renderPlanAnnotations;
+  renderPlanAnnotations=function(){
+    oldRender.apply(this,arguments);
+    removeOldWhiteHandles();
+    renderV723Handles();
+  };
+
+  const oldSelected=renderSelectedAnnotation;
+  renderSelectedAnnotation=function(){
+    const r=oldSelected.apply(this,arguments);
+    updateHelp();
+    return r;
+  };
+
+  const oldSelect=selectPlanAnnotation;
+  selectPlanAnnotation=function(id){
+    if(selectedAnnotationId!==id)pending=null;
+    const r=oldSelect.apply(this,arguments);
+    setTimeout(()=>{
+      renderV723Handles();
+      updateHelp();
+    },0);
+    return r;
+  };
+
+  const oldSet=setPlanTool;
+  setPlanTool=function(tool){
+    if(tool!=="select")pending=null;
+    const r=oldSet.apply(this,arguments);
+    setTimeout(()=>{
+      removeOldWhiteHandles();
+      renderV723Handles();
+      updateHelp();
+    },0);
+    return r;
+  };
+
+  const oldOpen=openPlan;
+  openPlan=async function(id){
+    pending=null;
+    const r=await oldOpen.apply(this,arguments);
+    installCanvasPlacement();
+    removeOldWhiteHandles();
+    renderV723Handles();
+    updateHelp();
+    return r;
+  };
+
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      installCanvasPlacement();
+      removeOldWhiteHandles();
+      renderV723Handles();
+      updateHelp();
+    },320);
+  });
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   V7.24 – PLANMARKIERUNG VERWENDET DIE AKTUELLE ERFASSUNGS-
+   ZUORDNUNG STATT NUR DAS HISTORISCHE posSelect-FELD.
+   ============================================================ */
+(function(){
+  function v724ResolveDrawingLink(){
+    const p=project?.();
+    const planEntryRaw=document.getElementById("planEntrySelect")?.value||"";
+    const planPosRaw=document.getElementById("planPosSelect")?.value||"";
+    const formPos=document.getElementById("posSelect")?.value||"";
+
+    let entryId="";
+    let anchor=null;
+    let draft=false;
+
+    if(planEntryRaw && planEntryRaw!=="__CURRENT_DRAFT__"){
+      const e=(p?.entries||[]).find(x=>x.id===planEntryRaw);
+      if(e){
+        anchor=(typeof v612AnchorEntry==="function" ? v612AnchorEntry(e) : e) || e;
+        entryId=anchor.id;
+      }
+    }
+
+    if(!entryId && editingEntryId){
+      const e=(p?.entries||[]).find(x=>x.id===editingEntryId);
+      if(e){
+        anchor=(typeof v612AnchorEntry==="function" ? v612AnchorEntry(e) : e) || e;
+        entryId=anchor.id;
+      }
+    }
+
+    if(!entryId){
+      entryId=typeof draftEntryId==="function" ? draftEntryId() : "";
+      draft=true;
+    }
+
+    let candidates=[];
+
+    if(anchor){
+      const group=typeof v612GroupEntries==="function" ? v612GroupEntries(anchor) : [anchor];
+      candidates=group.map(x=>x.pos).filter(Boolean);
+    }else{
+      try{
+        candidates=(multiLvDraft||[]).map(x=>x.pos).filter(Boolean);
+      }catch(e){}
+      if(formPos && !candidates.includes(formPos))candidates.push(formPos);
+    }
+
+    candidates=[...new Set(candidates)];
+
+    const wholeId =
+      planPosRaw==="__GROUP__" ||
+      candidates.length>1;
+
+    let pos="";
+    if(planPosRaw && planPosRaw!=="__GROUP__"){
+      pos=planPosRaw;
+    }else if(formPos){
+      pos=formPos;
+    }else if(candidates.length){
+      pos=candidates[0];
+    }
+
+    return{
+      entryId,
+      pos,
+      groupScope:wholeId,
+      draft,
+      note:document.getElementById("planAnnNote")?.value.trim()||"",
+      text:document.getElementById("planFreeText")?.value.trim()||"",
+      candidates
+    };
+  }
+
+  /* Historischer Helfer bleibt kompatibel, liefert jetzt aber die aktuelle Zuordnung. */
+  currentPlanLink=function(){
+    return v724ResolveDrawingLink();
+  };
+
+  function v724CanDraw(link){
+    return !!(link && link.entryId && (link.pos || link.groupScope));
+  }
+
+  function v724ApplyLink(ann,link){
+    if(!ann||!link)return ann;
+
+    ann.entryId=link.entryId;
+    ann.note=link.note||ann.note||"";
+
+    if(link.groupScope){
+      ann.groupScope=true;
+      ann.pos="";
+      ann.posText="";
+      ann.lvEntryId="";
+      ann.lvSyncUuid="";
+    }else{
+      ann.groupScope=false;
+      ann.pos=link.pos||"";
+      ann.posText=getPos?.(ann.pos)?.text||"";
+    }
+
+    /* Bestehende zentrale Bindelogik darf die Details ergänzen. */
+    try{v633BindAnnotationToSelectedLv?.(ann)}catch(e){}
+
+    return ann;
+  }
+
+  function v724NoLinkMessage(){
+    const box=document.getElementById("finalizeMessage");
+    if(box){
+      box.innerHTML='<span style="color:#9a4a20"><b>Planmarkierung:</b> Bitte zuerst eine LV-Unterposition in der Aufmaßzeile auswählen.</span>';
+    }else{
+      alert("Bitte zuerst eine LV-Unterposition in der Aufmaßzeile auswählen.");
+    }
+  }
+
+  /* Punkt / Text */
+  createPlanAnnotation=function(type,pt){
+    const pl=activePlan?.(),link=v724ResolveDrawingLink(),style=currentPlanStyle();
+    if(!pl)return;
+    if(!v724CanDraw(link)){v724NoLinkMessage();return}
+    if(type==="text"&&!link.text){alert("Bitte einen Text für die Planmarkierung eingeben.");return}
+
+    const ann={
+      id:uid("ann"),
+      type,
+      label:nextAnnLabel(type),
+      entryId:link.entryId,
+      pos:link.pos||"",
+      note:link.note||"",
+      text:type==="text"?link.text:"",
+      x:pt.x,y:pt.y,
+      color:style.color,
+      width:style.width,
+      createdAt:new Date().toISOString()
+    };
+
+    v724ApplyLink(ann,link);
+    pl.annotations.push(ann);
+    selectedAnnotationId=ann.id;
+    persist();
+    populatePlanFilter?.();
+    renderPlanList?.();
+    renderPlanAnnotations?.();
+    renderSelectedAnnotation?.();
+    try{renderDraftEntrySummary?.();renderAutoPlanLinkSummary?.()}catch(e){}
+  };
+
+  /* Linie / Polylinie */
+  finishPlanLine=function(){
+    if(!Array.isArray(planLineDraft)||planLineDraft.length<2){
+      if(planLineDraft?.length)alert("Mindestens zwei Punkte setzen.");
+      return;
+    }
+
+    const pl=activePlan?.(),link=v724ResolveDrawingLink(),style=currentPlanStyle();
+    if(!pl)return;
+    if(!v724CanDraw(link)){
+      v724NoLinkMessage();
+      planLineDraft=[];
+      planLineHoverNorm=null;
+      toggleLineButtons?.();
+      renderPlanAnnotations?.();
+      return;
+    }
+
+    const isPolyline=planTool==="polyline" || planLineDraft.length>2;
+    const ann={
+      id:uid("ann"),
+      type:"line",
+      mode:isPolyline?"polyline":"line",
+      label:nextAnnLabel("line"),
+      entryId:link.entryId,
+      pos:link.pos||"",
+      note:link.note||"",
+      text:"",
+      points:planLineDraft.slice(),
+      color:style.color,
+      width:style.width,
+      createdAt:new Date().toISOString()
+    };
+
+    v724ApplyLink(ann,link);
+    pl.annotations.push(ann);
+    selectedAnnotationId=ann.id;
+    planLineDraft=[];
+    planLineHoverNorm=null;
+
+    persist();
+    populatePlanFilter?.();
+    renderPlanList?.();
+    renderPlanAnnotations?.();
+    renderSelectedAnnotation?.();
+    toggleLineButtons?.();
+    try{renderDraftEntrySummary?.();renderAutoPlanLinkSummary?.()}catch(e){}
+  };
+
+  /* Freihand – Kritzeln hat weiterhin seine eigene Whole-ID-Logik. */
+  const v724ScribbleAwareFinish=finishFreehand;
+  finishFreehand=function(){
+    if(typeof v659FreehandMode!=="undefined" && v659FreehandMode==="scribble"){
+      return v724ScribbleAwareFinish.apply(this,arguments);
+    }
+
+    if(!freehandDraftPoints?.length || freehandDraftPoints.length<2){
+      freehandDraftPoints=[];
+      freehandPointerId=null;
+      renderPlanAnnotations?.();
+      return;
+    }
+
+    const link=v724ResolveDrawingLink();
+    if(!v724CanDraw(link)){
+      freehandDraftPoints=[];
+      freehandPointerId=null;
+      v724NoLinkMessage();
+      renderPlanAnnotations?.();
+      return;
+    }
+
+    const pl=activePlan?.(),style=currentPlanStyle();
+    if(!pl)return;
+
+    const ann={
+      id:uid("ann"),
+      type:"freehand",
+      label:nextAnnLabel("freehand"),
+      entryId:link.entryId,
+      pos:link.pos||"",
+      note:link.note||"",
+      text:"",
+      points:simplifyFreehand(freehandDraftPoints),
+      width:style.width,
+      color:style.color,
+      createdAt:new Date().toISOString()
+    };
+
+    v724ApplyLink(ann,link);
+    pl.annotations.push(ann);
+    selectedAnnotationId=ann.id;
+    freehandDraftPoints=[];
+    freehandPointerId=null;
+
+    persist();
+    populatePlanFilter?.();
+    renderPlanList?.();
+    renderPlanAnnotations?.();
+    renderSelectedAnnotation?.();
+    try{renderDraftEntrySummary?.();renderAutoPlanLinkSummary?.()}catch(e){}
+  };
+
+  /* Rechteck / Kreis */
+  finishShapeDraft=function(){
+    if(!planShapeDraft)return;
+
+    const draft=planShapeDraft;
+    planShapeDraft=null;
+
+    const pl=activePlan?.(),link=v724ResolveDrawingLink(),style=currentPlanStyle();
+    if(!pl)return;
+
+    if(!v724CanDraw(link)){
+      renderPlanAnnotations?.();
+      v724NoLinkMessage();
+      return;
+    }
+
+    const b=draft.type==="circle"
+      ? normalizeCircleBounds(draft.start,draft.current)
+      : normalizeRectBounds(draft.start,draft.current);
+
+    if(Math.abs(b.x2-b.x1)<5||Math.abs(b.y2-b.y1)<5){
+      renderPlanAnnotations?.();
+      return;
+    }
+
+    const ann={
+      id:uid("ann"),
+      type:draft.type,
+      label:nextAnnLabel(draft.type),
+      entryId:link.entryId,
+      pos:link.pos||"",
+      note:link.note||"",
+      text:"",
+      color:style.color,
+      width:style.width,
+      createdAt:new Date().toISOString(),
+      ...b
+    };
+
+    v724ApplyLink(ann,link);
+    pl.annotations.push(ann);
+    selectedAnnotationId=ann.id;
+
+    persist();
+    populatePlanFilter?.();
+    renderPlanList?.();
+    renderPlanAnnotations?.();
+    renderSelectedAnnotation?.();
+    try{renderDraftEntrySummary?.();renderAutoPlanLinkSummary?.()}catch(e){}
+  };
+
 })();
 </script>
 
